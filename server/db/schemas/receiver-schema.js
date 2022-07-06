@@ -27,7 +27,7 @@ const ReceiverSchema = new Schema(
         },
     },
     {
-        collection: 'wills',
+        collection: 'receivers',
         timestamps: true,
     },
 );
