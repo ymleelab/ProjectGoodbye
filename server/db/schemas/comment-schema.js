@@ -18,7 +18,7 @@ const CommentSchema = new Schema(
     {
         collection: 'comments',
         timestamps: true,
-    }
+    },
 );
 
 export { CommentSchema };

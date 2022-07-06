@@ -23,15 +23,17 @@ const RemembranceSchema = new Schema(
             type: String,
             required: false,
         },
-        comments: [{
-            type: CommentSchema,
-            required: false,
-        }],
+        comments: [
+            {
+                type: CommentSchema,
+                required: false,
+            },
+        ],
     },
     {
         collection: 'remembrances',
         timestamps: true,
-    }
+    },
 );
 
 export { RemembranceSchema };
