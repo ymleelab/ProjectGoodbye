@@ -1,7 +1,7 @@
 //user Schema
 import { Schema } from 'mongoose';
-import { willSchema } from './will-schema';
-import { receiverSchema } from './receiver-schema';
+import { WillSchema } from './will-schema';
+import { ReceiverSchema } from './receiver-schema';
 const UserSchema = new Schema(
     {
         email: {
@@ -27,13 +27,13 @@ const UserSchema = new Schema(
         },
         wills: [
             {
-                type: willSchema,
+                type: WillSchema,
                 required: false,
             },
         ],
         receivers: [
             {
-                type: receiverSchema,
+                type: ReceiverSchema,
                 required: false,
             },
         ],
