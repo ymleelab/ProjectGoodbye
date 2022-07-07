@@ -31,6 +31,7 @@ class UserService {
             password: hashedPassword,
             dateOfBirth,
         };
+        console.log(newUserInfo);
 
         // db에 저장
         const createdNewUser = await this.userModel.create(newUserInfo);
