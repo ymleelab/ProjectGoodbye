@@ -17,8 +17,11 @@ authRouter.patch('/:userId', async (req, res, next) => {
         // is로 req.body 확인 필요?
         // params로부터 id를 가져옴
         const { userId } = req.params;
-        const loggedInUserId = req.user._id;
-        console.log(loggedInUserId);
+        const loggedInUserId = req.user._id.toString();
+        const isUserIdValid = loggedInUserId === userId;
+        if (!isUserIdValid) {
+            throw new Error('유저 토큰 정보가 일치하지 않습니다.');
+        }
 
         // body data 로부터 업데이트할 사용자 정보를 추출함.
         const { fullName, password, dateOfBirth, photo, currentPassword } =
@@ -56,10 +59,17 @@ authRouter.patch('/:userId', async (req, res, next) => {
 authRouter.delete('/:userId', async (req, res, next) => {
     try {
         const { userId } = req.params;
+        const loggedInUserId = req.user._id.toString();
+        const isUserIdValid = loggedInUserId === userId;
+
+        if (!isUserIdValid) {
+            throw new Error('유저 토큰 정보가 일치하지 않습니다.');
+        }
         const { currentPassword } = req.body;
         if (!currentPassword) {
             throw new Error('정보를 변경하려면, 현재의 비밀번호가 필요합니다.');
         }
+
         const userInfoRequired = { userId, currentPassword };
         const deletedUserInfo = await userService.deleteUser(userInfoRequired);
         // 만약에 정상적으로 delete가 되어서 delete한 유저 정보가 있다면,
