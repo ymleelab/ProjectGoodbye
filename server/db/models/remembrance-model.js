@@ -1,19 +1,23 @@
 import { model } from 'mongoose';
 import { RemembranceSchema } from '../schemas/remembrance-schema';
 
-const Remembrance = model('remembrances', RemembranceSchema);
-
 class RemembranceModel {
+    constructor() {
+        this.Remembrance = model('remembrances', RemembranceSchema);
+    }
+
     // 새 추모 데이터 생성 - 언제?
     async create(remembranceInfo) {
-        const createdNewRemembrance = await Remembrance.create(remembranceInfo);
+        const createdNewRemembrance = await this.Remembrance.create(
+            remembranceInfo,
+        );
 
         return createdNewRemembrance;
     }
 
     // 최근 업데이트 추모 조회
     async findRecent(count) {
-        const recentRemembrances = await Remembrance.find()
+        const recentRemembrances = await this.Remembrance.find()
             .sort({ updatedAt: -1 })
             .limit(count);
 
@@ -22,7 +26,9 @@ class RemembranceModel {
 
     // objectId를 이용해 특정 추모 조회
     async findById(remembranceId) {
-        const remembrance = await Remembrance.findOne({ _id: remembranceId });
+        const remembrance = await this.Remembrance.findOne({
+            _id: remembranceId,
+        });
 
         return remembrance;
     }
@@ -31,7 +37,7 @@ class RemembranceModel {
 
     // ObjectId를 이용해 특정 추모글 조회
     async findCommentById(remembranceId, commentId) {
-        const comment = await Remembrance.findOne(
+        const comment = await this.Remembrance.findOne(
             {
                 _id: remembranceId,
                 'comments._id': commentId,
@@ -51,7 +57,7 @@ class RemembranceModel {
         const filter = { _id: remembranceId };
         const option = { returnOriginal: false };
 
-        const updatedRemembrance = await Remembrance.findOneAndUpdate(
+        const updatedRemembrance = await this.Remembrance.findOneAndUpdate(
             filter,
             {
                 $push: {
@@ -72,7 +78,7 @@ class RemembranceModel {
         };
         const option = { returnOriginal: false };
 
-        const updatedRemembrance = await Remembrance.findOneAndUpdate(
+        const updatedRemembrance = await this.Remembrance.findOneAndUpdate(
             filter,
             { $set: { 'comments.$': update } },
             option,
@@ -85,11 +91,14 @@ class RemembranceModel {
     async deleteComment(remembranceId, commentId) {
         const filter = { _id: remembranceId };
 
-        const deletedRemembrance = await Remembrance.findOneAndUpdate(filter, {
-            $pull: {
-                comments: { _id: commentId },
+        const deletedRemembrance = await this.Remembrance.findOneAndUpdate(
+            filter,
+            {
+                $pull: {
+                    comments: { _id: commentId },
+                },
             },
-        });
+        );
 
         return deletedRemembrance;
     }

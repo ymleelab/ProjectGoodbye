@@ -1,15 +1,15 @@
 import { remembranceModel } from '../db';
-import { userService } from './index';
+import { userService } from './user-service';
 
 class RemembranceService {
-    constructor(remembranceModel) {
+    constructor() {
         this.remembranceModel = remembranceModel;
     }
 
     // 새 추모 생성
     async addRemembrance(userId, remembranceInfo) {
         const user = await userService.getUser(userId);
-        remembranceInfo = {
+        const newInfo = {
             fullName: user.fullName,
             dateOfBirth: user.dateOfBirth,
             photo: user.photo,
@@ -17,7 +17,7 @@ class RemembranceService {
         };
 
         const createdNewRemembrance = await this.remembranceModel.create(
-            remembranceInfo,
+            newInfo,
         );
 
         return createdNewRemembrance;
@@ -76,7 +76,7 @@ class RemembranceService {
             commentId,
         );
         // 비밀번호 확인 과정 수정 필요
-        if (originalPassword != currentPassword) {
+        if (originalPassword !== currentPassword) {
             throw new Error(
                 '비밀번호가 일치하지 않습니다. 다시 확인해 주세요.',
             );
@@ -98,7 +98,7 @@ class RemembranceService {
             commentId,
         );
         // 비밀번호 확인 과정 수정 필요
-        if (originalPassword != currentPassword) {
+        if (originalPassword !== currentPassword) {
             throw new Error(
                 '비밀번호가 일치하지 않습니다. 다시 확인해 주세요.',
             );
@@ -113,6 +113,6 @@ class RemembranceService {
     }
 }
 
-const remembranceService = new RemembranceService(remembranceModel);
+const remembranceService = new RemembranceService();
 
 export { remembranceService };

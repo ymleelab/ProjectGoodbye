@@ -1,8 +1,9 @@
-import express from 'express';
-const indexRouter = express.Router();
+import { Router } from 'express';
+
+const indexRouter = Router();
 
 /* GET home page. */
-indexRouter.get('/', function (req, res, next) {
+indexRouter.get('/', (req, res) => {
     res.render('index', { title: 'Express' });
 });
 
