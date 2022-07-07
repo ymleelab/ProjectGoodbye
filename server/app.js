@@ -4,12 +4,12 @@ import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import passport from 'passport';
-import { indexRouter } from './routes';
-import { usersRouter } from './routes/user-router';
+import { usersRouter, authRouter } from './routes';
 import {
     passportConfiguration,
     JWTConfiguration,
 } from './services/passport-service';
+import { loginRequired } from './middlewares/login-required';
 
 const app = express();
 const __dirname = path.resolve();
@@ -30,9 +30,8 @@ passportConfiguration(); // passport.use 로 local strategy 사용
 JWTConfiguration();
 
 //routers
-app.use('/', indexRouter);
 app.use('/api/users', usersRouter);
-
+app.use('/api/auth', loginRequired, authRouter);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
     next(createError(404));
