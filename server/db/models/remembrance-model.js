@@ -3,7 +3,7 @@ import { RemembranceSchema } from '../schemas/remembrance-schema';
 
 const Remembrance = model('remembrances', RemembranceSchema);
 
-export class RemembranceModel {
+class RemembranceModel {
     // 새 추모 데이터 생성 - 언제?
     async create(remembranceInfo) {
         const createdNewRemembrance = await Remembrance.create(remembranceInfo);
