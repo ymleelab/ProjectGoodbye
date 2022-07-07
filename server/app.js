@@ -3,9 +3,13 @@ import express from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
-
+import passport from 'passport';
 import { indexRouter } from './routes';
 import { usersRouter } from './routes/user-router';
+import {
+    passportConfiguration,
+    JWTConfiguration,
+} from './services/passport-service';
 
 const app = express();
 const __dirname = path.resolve();
@@ -20,6 +24,12 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+//passport related - initialize and configs
+app.use(passport.initialize()); // passport 사용 시작
+passportConfiguration(); // passport.use 로 local strategy 사용
+JWTConfiguration();
+
+//routers
 app.use('/', indexRouter);
 app.use('/api/users', usersRouter);
 

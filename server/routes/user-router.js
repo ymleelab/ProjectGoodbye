@@ -65,7 +65,4 @@ usersRouter.post('/login', async (req, res, next) => {
     }
 });
 
-usersRouter.get('/hi', function (req, res, next) {
-    res.send('hello');
-});
 export { usersRouter };

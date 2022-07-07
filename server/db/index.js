@@ -16,5 +16,4 @@ db.on('error', (error) =>
     ),
 );
 
-export * from './models/remembrance-model';
 export * from './models/user-model';
