@@ -14,10 +14,14 @@ const CommentSchema = new Schema(
             type: String,
             required: true,
         },
+        password: {
+            type: String,
+            required: true,
+        },
     },
     {
         collection: 'comments',
-        timestamps: true,
+        timestamps: false,
     },
 );
 

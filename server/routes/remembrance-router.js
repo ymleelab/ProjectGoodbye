@@ -73,12 +73,13 @@ remembranceRouter.get(
 remembranceRouter.post('/:remembranceId/comments', async (req, res, next) => {
     try {
         const { remembranceId } = req.params;
-        const { writer, title, content } = req.body;
+        const { writer, title, content, password } = req.body;
 
         const newComment = await remembranceService.addComment(remembranceId, {
             writer,
             title,
             content,
+            password,
         });
 
         res.status(201).json(newComment);
@@ -93,11 +94,12 @@ remembranceRouter.patch(
     async (req, res, next) => {
         try {
             const { remembranceId, commentId } = req.params;
-            const { writer, title, content } = req.body;
+            const { writer, title, content, password } = req.body;
 
             const comment = await remembranceService.updateCommet(
                 remembranceId,
                 commentId,
+                password,
                 {
                     writer,
                     title,
@@ -118,10 +120,12 @@ remembranceRouter.delete(
     async (req, res, next) => {
         try {
             const { remembranceId, commentId } = req.params;
+            const { password } = req.body;
 
             const remembrance = await remembranceService.deleteComment(
                 remembranceId,
                 commentId,
+                password,
             );
             if (remembrance) {
                 res.status(201).json({ result: 'success' });

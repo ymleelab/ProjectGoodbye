@@ -59,6 +59,8 @@ class RemembranceService {
 
     // 추모글 추가
     async addComment(remembranceId, commentInfo) {
+        // commentInfo.password 암호화 필요 -> bcrypt 이용?
+
         const comment = await this.remembranceModel.createComment(
             remembranceId,
             commentInfo,
@@ -68,7 +70,18 @@ class RemembranceService {
     }
 
     // 추모글 수정
-    async updateCommet(remembranceId, commentId, update) {
+    async updateCommet(remembranceId, commentId, currentPassword, update) {
+        const originalPassword = await this.remembranceModel.getCommentById(
+            remembranceId,
+            commentId,
+        );
+        // 비밀번호 확인 과정 수정 필요
+        if (originalPassword != currentPassword) {
+            throw new Error(
+                '비밀번호가 일치하지 않습니다. 다시 확인해 주세요.',
+            );
+        }
+
         const updatedRemembrance = await this.remembranceModel.updateComment(
             remembranceId,
             commentId,
@@ -79,8 +92,19 @@ class RemembranceService {
     }
 
     // 추모글 삭제
-    async deleteComment(remembranceId, commentId) {
-        const deletedRemembrance = await this.remembranceModel.delete(
+    async deleteComment(remembranceId, commentId, currentPassword) {
+        const originalPassword = await this.remembranceModel.getCommentById(
+            remembranceId,
+            commentId,
+        );
+        // 비밀번호 확인 과정 수정 필요
+        if (originalPassword != currentPassword) {
+            throw new Error(
+                '비밀번호가 일치하지 않습니다. 다시 확인해 주세요.',
+            );
+        }
+
+        const deletedRemembrance = await this.remembranceModel.deleteComment(
             remembranceId,
             commentId,
         );
