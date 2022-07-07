@@ -10,7 +10,8 @@ class UserService {
     // 회원가입
     async addUser(userInfo) {
         // 객체 destructuring
-        const { email, fullName, password, dateOfBirth } = userInfo;
+        const { email, fullName, password, repeatPassword, dateOfBirth } =
+            userInfo;
 
         // 이메일 중복 확인
         const user = await this.userModel.findByEmail(email);
@@ -20,7 +21,13 @@ class UserService {
             );
         }
 
-        // 이메일 중복은 이제 아니므로, 회원가입을 진행함
+        // 이메일 중복은 이제 아님
+
+        //비밀번호 일치여부 확인..
+        const isPasswordSame = password === repeatPassword;
+        if (!isPasswordSame) {
+            throw new Error(' 비밀번호가 일치하지 않습니다.');
+        }
 
         // 우선 비밀번호 해쉬화(암호화)
         const hashedPassword = await bcrypt.hash(password, 10);

@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import { app } from './app.js';
+//우선 임시로 mongoose와 connect를 마지막 index에서 실행.
 import mongoose from 'mongoose';
 const DB_URL =
     process.env.MONGODB_URL ||
