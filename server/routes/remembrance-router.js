@@ -82,7 +82,7 @@ remembranceRouter.patch('/:remembranceId', async (req, res, next) => {
                 ...(fullName && { fullName }),
                 ...(dateOfBirth && { dateOfBirth }),
                 ...(dateOfDeath && { dateOfDeath }),
-                ...(isPublic && { isPublic }),
+                ...(typeof isPublic === 'boolean' && { isPublic }),
                 ...(photo && { photo }),
             },
         );
