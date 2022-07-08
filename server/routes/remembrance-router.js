@@ -123,11 +123,11 @@ remembranceRouter.patch(
             const comment = await remembranceService.setCommet(
                 remembranceId,
                 commentId,
+                password,
                 {
                     writer,
                     title,
                     content,
-                    password,
                 },
             );
 

@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt';
 import { remembranceModel } from '../db';
 import { userService } from './user-service';
 
@@ -71,34 +72,45 @@ class RemembranceService {
 
     // 추모글 추가
     async addComment(remembranceId, commentInfo) {
-        // commentInfo.password 암호화 필요 -> bcrypt 이용?
+        const hashedPassword = await bcrypt.hash(commentInfo.password, 10);
+
+        const newInfo = {
+            ...commentInfo,
+            password: hashedPassword,
+        };
 
         const comment = await this.remembranceModel.createComment(
             remembranceId,
-            commentInfo,
+            newInfo,
         );
 
         return comment;
     }
 
     // 추모글 수정
-    async setCommet(remembranceId, commentId, update) {
+    async setCommet(remembranceId, commentId, currentPassword, update) {
+        // 작성자 확인을 위해 해당 추모글의 비밀번호 조회
         const remembrance = await this.remembranceModel.findCommentById(
             remembranceId,
             commentId,
         );
+        const hashedPassword = remembrance.comments[0].password;
 
-        // 비밀번호 확인 과정 수정 필요
-        if (remembrance.comments[0].password !== update.password) {
+        const isPasswordCorrect = await bcrypt.compare(
+            currentPassword,
+            hashedPassword,
+        );
+        if (!isPasswordCorrect) {
             throw new Error(
                 '비밀번호가 일치하지 않습니다. 다시 확인해 주세요.',
             );
         }
 
+        const newInfo = { ...update, password: hashedPassword };
         const updatedRemembrance = await this.remembranceModel.updateComment(
             remembranceId,
             commentId,
-            update,
+            newInfo,
         );
 
         return updatedRemembrance;
@@ -106,13 +118,18 @@ class RemembranceService {
 
     // 추모글 삭제
     async deleteComment(remembranceId, commentId, currentPassword) {
+        // 작성자 확인을 위해 해당 추모글의 비밀번호 조회
         const remembrance = await this.remembranceModel.findCommentById(
             remembranceId,
             commentId,
         );
+        const hashedPassword = remembrance.comments[0].password;
 
-        // 비밀번호 확인 과정 수정 필요
-        if (remembrance.comments[0].password !== currentPassword) {
+        const isPasswordCorrect = await bcrypt.compare(
+            currentPassword,
+            hashedPassword,
+        );
+        if (!isPasswordCorrect) {
             throw new Error(
                 '비밀번호가 일치하지 않습니다. 다시 확인해 주세요.',
             );
