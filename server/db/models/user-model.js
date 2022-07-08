@@ -51,6 +51,20 @@ export class UserModel {
         return willDeletedUser;
     }
     //관련된 user의 receiver 추가, 수정, 삭제
+    async addReceiver(userId, receiverId) {
+        const receiverAddedUser = await User.updateOne(
+            { _id: userId },
+            { $push: { receivers: receiverId } },
+        );
+        return receiverAddedUser;
+    }
+    async deleteReceiver(userId, receiverId) {
+        const receiverDeletedUser = await User.updateOne(
+            { _id: userId },
+            { $pull: { receivers: receiverId } },
+        );
+        return receiverDeletedUser;
+    }
 }
 
 const userModel = new UserModel();

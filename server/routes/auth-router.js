@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { userService } from '../services/user-service';
 import { willService } from '../services/will-service';
+import { receiverService } from '../services/receiver-service';
 const authRouter = Router();
 authRouter.get('/', async (req, res, next) => {
     try {
@@ -111,6 +112,7 @@ authRouter.post('/:userId/will', async (req, res, next) => {
             throw new Error('유저 토큰 정보가 일치하지 않습니다.');
         }
         // will collection에 추가
+        //receivers 부분을 클라이언트가 잘 찾아서 바디에 넣기가 쉽나? 그러면 전혀 문제가 없을 듯
         const { title, content, receivers } = req.body;
         const newWill = await willService.addWill({
             title,
@@ -126,7 +128,7 @@ authRouter.post('/:userId/will', async (req, res, next) => {
     }
 });
 
-authRouter.delete('/:userId/:willId', async (req, res, next) => {
+authRouter.delete('/:userId/wills/:willId', async (req, res, next) => {
     try {
         const { userId, willId } = req.params;
         const loggedInUserId = req.user._id.toString();
@@ -149,7 +151,7 @@ authRouter.delete('/:userId/:willId', async (req, res, next) => {
     }
 });
 
-authRouter.patch('/:userId/:willId', async (req, res, next) => {
+authRouter.patch('/:userId/wills/:willId', async (req, res, next) => {
     try {
         const { userId, willId } = req.params;
         const loggedInUserId = req.user._id.toString();
@@ -170,4 +172,111 @@ authRouter.patch('/:userId/:willId', async (req, res, next) => {
         next(error);
     }
 });
+
+///////
+///////////////////////////////
+//receiver
+//흠 receiver를 작성후 유언장에 추가하는 방식인가? 그러면 유언장 생성 시에 유언장 db에 수신자를 저장하는 건가?
+//유언장 작성 시 바로 수신자를 바로 만드는 방식인가?
+
+//유저와 유언장, 수신자의 관계는 쉬운편인거 같은데 - 유언장/수신자의 관계에서 삭제, 추가, 수정이 미치는 영향을 더 생각
+authRouter.get('/:userId/receivers', async (req, res, next) => {
+    try {
+        const { userId } = req.params;
+        const loggedInUserId = req.user._id.toString();
+        const isUserIdValid = loggedInUserId === userId;
+
+        if (!isUserIdValid) {
+            throw new Error('유저 토큰 정보가 일치하지 않습니다.');
+        }
+        const receiverList = await receiverService.findWillsForOneUser(userId);
+        res.status(200).json(receiverList);
+    } catch (error) {
+        next(error);
+    }
+});
+authRouter.post('/:userId/receiver', async (req, res, next) => {
+    try {
+        const { userId } = req.params;
+        const loggedInUserId = req.user._id.toString();
+        const isUserIdValid = loggedInUserId === userId;
+
+        if (!isUserIdValid) {
+            throw new Error('유저 토큰 정보가 일치하지 않습니다.');
+        }
+        // receiver collection에 추가
+        const { fullName, emailAddress, relation, role } = req.body;
+        const newReceiver = await receiverService.addReceiver({
+            fullName,
+            emailAddress,
+            userId,
+            relation,
+            role,
+        });
+        //유저의 receiver list에 추가
+        const updatedUser = await userService.addReceiver(
+            userId,
+            newReceiver._id,
+        );
+        res.status(200).json(newReceiver);
+    } catch (error) {
+        next(error);
+    }
+});
+
+authRouter.delete('/:userId/receivers/:receiverId', async (req, res, next) => {
+    try {
+        const { userId, receiverId } = req.params;
+        const loggedInUserId = req.user._id.toString();
+        const isUserIdValid = loggedInUserId === userId;
+
+        if (!isUserIdValid) {
+            throw new Error('유저 토큰 정보가 일치하지 않습니다.');
+        }
+        // receiver collection에서 제거
+        const deletedReceiver = await receiverService.deleteReceiver(
+            receiverId,
+        );
+        if (!deletedReceiver) {
+            throw new Error('해당 수신자는 등록되어 있지 않습니다.');
+        }
+        // user의 receivers에서 제거
+        const updatedUser = await userService.deleteReceiver(
+            userId,
+            receiverId,
+        );
+        console.log(updatedUser);
+        // wills들 중, receiver가 들어가 있다면, 모든 해당하는 유언장에서 지워야함.
+        // 이부분은 좀 있다가 수정하자..
+        res.status(200).json({ result: 'success' });
+    } catch (error) {
+        next(error);
+    }
+});
+authRouter.patch('/:userId/receivers/:receiverId', async (req, res, next) => {
+    try {
+        const { userId, receiverId } = req.params;
+        const loggedInUserId = req.user._id.toString();
+        const isUserIdValid = loggedInUserId === userId;
+
+        if (!isUserIdValid) {
+            throw new Error('유저 토큰 정보가 일치하지 않습니다.');
+        }
+        const { fullName, emailAddress, relation, role } = req.body;
+        const toUpdate = {
+            ...(fullName && { fullName }),
+            ...(emailAddress && { emailAddress }),
+            ...(relation && { relation }),
+            ...(role && { role }),
+        };
+        const updatedReceiver = await receiverService.updateReceiver(
+            receiverId,
+            toUpdate,
+        );
+        res.status(200).json(updatedReceiver);
+    } catch (error) {
+        next(error);
+    }
+});
+
 export { authRouter };

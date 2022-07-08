@@ -138,6 +138,21 @@ class UserService {
         const updatedUser = await this.userModel.deleteWill(userId, willId);
         return updatedUser;
     }
+
+    async addReceiver(userId, receiverId) {
+        const updatedUser = await this.userModel.addReceiver(
+            userId,
+            receiverId,
+        );
+        return updatedUser;
+    }
+    async deleteReceiver(userId, receiverId) {
+        const updatedUser = await this.userModel.deleteReceiver(
+            userId,
+            receiverId,
+        );
+        return updatedUser;
+    }
 }
 
 const userService = new UserService(userModel);
