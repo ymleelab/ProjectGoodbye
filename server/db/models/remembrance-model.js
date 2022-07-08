@@ -50,7 +50,19 @@ class RemembranceModel {
         return comment;
     }
 
-    // 추모 글 외의 추모 데이터를 수정할 일이 있는가?
+    // 추모 데이터 수정
+    async update(remembranceId, update) {
+        const filter = { _id: remembranceId };
+        const option = { returnOriginal: false };
+
+        const updatedRemembrance = await this.Remembrance.findOneAndUpdate(
+            filter,
+            update,
+            option,
+        );
+
+        return updatedRemembrance;
+    }
 
     // 추모글 추가
     async createComment(remembranceId, commentInfo) {

@@ -69,6 +69,30 @@ remembranceRouter.get(
     },
 );
 
+// 추모 수정
+remembranceRouter.patch('/:remembranceId', async (req, res, next) => {
+    try {
+        const { remembranceId } = req.params;
+        const { fullName, dateOfBirth, dateOfDeath, isPublic, photo } =
+            req.body;
+
+        const remembrance = await remembranceService.setRemembrance(
+            remembranceId,
+            {
+                ...(fullName && { fullName }),
+                ...(dateOfBirth && { dateOfBirth }),
+                ...(dateOfDeath && { dateOfDeath }),
+                ...(isPublic && { isPublic }),
+                ...(photo && { photo }),
+            },
+        );
+
+        res.status(201).json(remembrance);
+    } catch (error) {
+        next(error);
+    }
+});
+
 // 추모 글 추가
 remembranceRouter.post('/:remembranceId/comments', async (req, res, next) => {
     try {
@@ -96,14 +120,14 @@ remembranceRouter.patch(
             const { remembranceId, commentId } = req.params;
             const { writer, title, content, password } = req.body;
 
-            const comment = await remembranceService.updateCommet(
+            const comment = await remembranceService.setCommet(
                 remembranceId,
                 commentId,
-                password,
                 {
                     writer,
                     title,
                     content,
+                    password,
                 },
             );
 
