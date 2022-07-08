@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 
 import { css } from '@emotion/react';
 import styled from '@emotion/styled'
@@ -6,8 +6,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'antd/dist/antd.css';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
+import Pagination from "../components/Pagination";
 import { Button, Card } from "antd";
 
 
@@ -21,16 +23,18 @@ import { Button, Card } from "antd";
 const MyWill = () => {
     const [isSSR, setIsSSR] = useState(true);
     const [isLogIn, setIsLogIn] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
 
     useEffect(() => {
         setIsSSR(false);
     }, []);
+    
 
-
-    const loginBtnHandler = () => {
+    const loginBtnHandler = useCallback(() => {
         setIsLogIn((prev) => !prev);
-    }
+    },[]);
 
+    const clickPagination = useCallback(setCurrentPage, []);
 
     return (
         <>
@@ -47,6 +51,7 @@ const MyWill = () => {
                             src="https://media.istockphoto.com/photos/signing-last-will-testament-picture-id875284846?b=1&k=20&m=875284846&s=170667a&w=0&h=4kzW8N24YNRyhr8Hfoad9t9egggq0ZPGhPde2sR3DG0="
                             alt="유언장 작성"
                             layout='fill'
+                            priority
                         />
                     </div>
                 </div>
@@ -58,18 +63,30 @@ const MyWill = () => {
                             <Button css={buttonStyle}>회원가입하기</Button>
                         </NoticeBtnGroup>
                     </NoticeBox>
-                    : <CardGroup>
-                        {Array(6).fill('').map((x, i) =>
-                            <Card
-                                title={`${i}번째 예시카드 입니다.`}
-                                extra={<a href="#">More</a>}
-                                style={{
-                                    width: 300,
-                                }}
-                                key={`card-${i}`}
-                            >친구 리스트~</Card>)}
-                    </CardGroup>
-                }
+                    : 
+                    <>
+                        <CardGroup>
+                            {Array(6).fill('').map((x, i) =>
+                                <Card   
+                                    title={`${i + 1}번째 유언장`}
+                                    extra={
+                                        <CardBtnGroup>
+                                            <button type="button" css={buttonStyle}>펼쳐보기</button>
+                                            <Link href="#"><a css={aTagStyle}>유언장 상세보기</a></Link>
+                                        </CardBtnGroup>
+                                    }
+                                    style={{
+                                        width: '20rem',
+                                    }}
+                                    key={`card-${i}`}
+                                >친구 리스트</Card>)}
+                        </CardGroup>
+                        <Pagination
+                            currPage={currentPage}
+                            pageCount={3}
+                            onClickPage={clickPagination}
+                        />
+                    </>}
             </div>
             <Footer />
         </>
@@ -116,6 +133,11 @@ const buttonStyle = css`
     border: none;
 `
 
+const aTagStyle = css`
+    color: #3E606F;           
+    background-color: #D1DBBD;
+`
+
 
 const NoticeBox = styled.div`
     height: 5rem;
@@ -137,11 +159,22 @@ const NoticeBtnGroup = styled.div`
     }
 
 `
-// index.js 파일의 CardGroup과 중복 발행 추후에 분리(수정된 것 확인 필요)
+// 페이지 가로 크기에 따라 정렬될 카드 개수 유동적으로 만들기
 const CardGroup = styled.div`
     display: grid;
-    grid-template-columns: repeat(3, 1rem);
-    grid-column-gap: 22rem;
+    grid-template-columns: repeat(3, 20rem);
     grid-row-gap: 3rem;
-    place-content: space-around;
+    grid-column-gap: 3rem; 
+    justify-content: center;
+
+    @media (max-width: 70rem) {
+        grid-template-columns: repeat(2, 20rem);
+    }
+`
+const CardBtnGroup = styled.div`
+    display: flex;
+    flex-direction: column;
+    button:first-of-type {
+        margin-bottom: 10px;
+    }
 `
