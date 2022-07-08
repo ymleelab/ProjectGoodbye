@@ -13,11 +13,11 @@ const RemembranceSchema = new Schema(
         },
         dateOfDeath: {
             type: String,
-            required: true,
+            required: false,
         },
         isPublic: {
             type: Boolean,
-            required: true,
+            default: true,
         },
         photo: {
             type: String,
