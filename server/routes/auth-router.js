@@ -189,7 +189,9 @@ authRouter.get('/:userId/receivers', async (req, res, next) => {
         if (!isUserIdValid) {
             throw new Error('유저 토큰 정보가 일치하지 않습니다.');
         }
-        const receiverList = await receiverService.findWillsForOneUser(userId);
+        const receiverList = await receiverService.findReceiversForOneUser(
+            userId,
+        );
         res.status(200).json(receiverList);
     } catch (error) {
         next(error);
