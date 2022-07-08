@@ -94,8 +94,7 @@ authRouter.get('/:userId/wills', async (req, res, next) => {
         if (!isUserIdValid) {
             throw new Error('유저 토큰 정보가 일치하지 않습니다.');
         }
-        const foundUser = await userService.getUser(userId);
-        const willList = foundUser.wills;
+        const willList = await willService.findWillsForOneUser(userId);
         res.status(200).json(willList);
     } catch (error) {
         next(error);
@@ -121,8 +120,52 @@ authRouter.post('/:userId/will', async (req, res, next) => {
         });
         //유저의 will list에 추가
         const updatedUser = await userService.addWill(userId, newWill._id);
-        console.log(updatedUser);
         res.status(200).json(newWill);
+    } catch (error) {
+        next(error);
+    }
+});
+
+authRouter.delete('/:userId/:willId', async (req, res, next) => {
+    try {
+        const { userId, willId } = req.params;
+        const loggedInUserId = req.user._id.toString();
+        const isUserIdValid = loggedInUserId === userId;
+
+        if (!isUserIdValid) {
+            throw new Error('유저 토큰 정보가 일치하지 않습니다.');
+        }
+        //collection에서 삭제
+        const deletedWill = await willService.deleteWill(willId);
+        if (!deletedWill) {
+            throw new Error('해당 유언장은 존재하지 않습니다.');
+        }
+        // user의 wills에서 제거
+        const updatedUser = await userService.deleteWill(userId, willId);
+        console.log(updatedUser);
+        res.status(200).json({ result: 'success' });
+    } catch (error) {
+        next(error);
+    }
+});
+
+authRouter.patch('/:userId/:willId', async (req, res, next) => {
+    try {
+        const { userId, willId } = req.params;
+        const loggedInUserId = req.user._id.toString();
+        const isUserIdValid = loggedInUserId === userId;
+
+        if (!isUserIdValid) {
+            throw new Error('유저 토큰 정보가 일치하지 않습니다.');
+        }
+        const { title, content, receivers } = req.body;
+        const toUpdate = {
+            ...(title && { title }),
+            ...(content && { content }),
+            ...(receivers && { receivers }),
+        };
+        const updatedWill = await willService.updateWill(willId, toUpdate);
+        res.status(200).json(updatedWill);
     } catch (error) {
         next(error);
     }

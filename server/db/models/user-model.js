@@ -41,6 +41,15 @@ export class UserModel {
         );
         return willAddedUser;
     }
+
+    async deleteWill(userId, willId) {
+        console.log('userId: ' + userId + 'willData: ' + willId);
+        const willDeletedUser = await User.updateOne(
+            { _id: userId },
+            { $pull: { wills: willId } },
+        );
+        return willDeletedUser;
+    }
     //관련된 user의 receiver 추가, 수정, 삭제
 }
 

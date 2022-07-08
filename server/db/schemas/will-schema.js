@@ -16,12 +16,11 @@ const WillSchema = new Schema(
             type: String,
             required: true,
         },
-        receivers: [
-            {
-                type: ReceiverSchema,
-                required: true,
-            },
-        ],
+        //Object Id로 된 receivers list
+        receivers: {
+            type: [String],
+            required: true,
+        },
     },
     {
         collection: 'wills',

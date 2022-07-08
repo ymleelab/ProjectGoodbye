@@ -134,6 +134,10 @@ class UserService {
         console.log('helloooo');
         return updatedUser;
     }
+    async deleteWill(userId, willId) {
+        const updatedUser = await this.userModel.deleteWill(userId, willId);
+        return updatedUser;
+    }
 }
 
 const userService = new UserService(userModel);
