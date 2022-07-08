@@ -1,6 +1,4 @@
 import { Router } from 'express';
-import passport from 'passport';
-import jwt from 'jsonwebtoken';
 import { userService } from '../services/user-service';
 const authRouter = Router();
 authRouter.get('/', async (req, res, next) => {
@@ -16,6 +14,7 @@ authRouter.patch('/:userId', async (req, res, next) => {
     try {
         // is로 req.body 확인 필요?
         // params로부터 id를 가져옴
+        //이부분을 따로 함수같이 빼는 것을 고려
         const { userId } = req.params;
         const loggedInUserId = req.user._id.toString();
         const isUserIdValid = loggedInUserId === userId;
@@ -80,5 +79,8 @@ authRouter.delete('/:userId', async (req, res, next) => {
         next(error);
     }
 });
+
+//userId 로 유언장 리스트 전부 get 요청 - 유저아이디만 더블 체크 후
+//userId로 유언장을 post 경우, userId 정상 여부 확인 => 정상이라면, user의 willList에 push, 동시에 willSchema에 create method 사용..
 
 export { authRouter };
