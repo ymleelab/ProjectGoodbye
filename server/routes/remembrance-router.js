@@ -3,15 +3,15 @@ import { remembranceService } from '../services';
 
 const remembranceRouter = Router();
 
-// 추모 데이터 생성
+// 추모 데이터 생성 - 언제?
 remembranceRouter.post('/', async (req, res, next) => {
     try {
-        // userId는 뭐로 전달..? isPublic은 추모 생성할 때 입력받는지, user 데이터에서 가져오는지?
-        const { dateOfDeath, isPublic } = req.body;
+        // userId는 일단 쿼리로 받아오는거로 구현
+        const { userId } = req.query;
+        const { dateOfDeath } = req.body; // death 받아오나? - 생성 시점에 따라 다를듯
 
         const newRemembrance = await remembranceService.addRemembrance(userId, {
             dateOfDeath,
-            isPublic,
         });
 
         res.status(201).json(newRemembrance);

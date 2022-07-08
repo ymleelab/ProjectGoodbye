@@ -8,11 +8,13 @@ class RemembranceService {
 
     // 새 추모 생성
     async addRemembrance(userId, remembranceInfo) {
+        // 추모 대상자 확인을 위해 유저 정보 조회
         const user = await userService.getUser(userId);
+
         const newInfo = {
             fullName: user.fullName,
             dateOfBirth: user.dateOfBirth,
-            photo: user.photo,
+            ...(user.photo && { photo: user.photo }),
             ...remembranceInfo,
         };
 
