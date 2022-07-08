@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { userService } from '../services/user-service';
+import { willService } from '../services/will-service';
 const authRouter = Router();
 authRouter.get('/', async (req, res, next) => {
     try {
@@ -83,4 +84,47 @@ authRouter.delete('/:userId', async (req, res, next) => {
 //userId 로 유언장 리스트 전부 get 요청 - 유저아이디만 더블 체크 후
 //userId로 유언장을 post 경우, userId 정상 여부 확인 => 정상이라면, user의 willList에 push, 동시에 willSchema에 create method 사용..
 
+//authrouter- will post, get, patch, delete
+authRouter.get('/:userId/wills', async (req, res, next) => {
+    try {
+        const { userId } = req.params;
+        const loggedInUserId = req.user._id.toString();
+        const isUserIdValid = loggedInUserId === userId;
+
+        if (!isUserIdValid) {
+            throw new Error('유저 토큰 정보가 일치하지 않습니다.');
+        }
+        const foundUser = await userService.getUser(userId);
+        const willList = foundUser.wills;
+        res.status(200).json(willList);
+    } catch (error) {
+        next(error);
+    }
+});
+
+authRouter.post('/:userId/will', async (req, res, next) => {
+    try {
+        const { userId } = req.params;
+        const loggedInUserId = req.user._id.toString();
+        const isUserIdValid = loggedInUserId === userId;
+
+        if (!isUserIdValid) {
+            throw new Error('유저 토큰 정보가 일치하지 않습니다.');
+        }
+        // will collection에 추가
+        const { title, content, receivers } = req.body;
+        const newWill = await willService.addWill({
+            title,
+            content,
+            userId,
+            receivers,
+        });
+        //유저의 will list에 추가
+        const updatedUser = await userService.addWill(userId, newWill._id);
+        console.log(updatedUser);
+        res.status(200).json(newWill);
+    } catch (error) {
+        next(error);
+    }
+});
 export { authRouter };

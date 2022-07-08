@@ -12,6 +12,10 @@ const WillSchema = new Schema(
             required: true,
         },
         //userId가 필요한가? 어차피 유저 DB안에 들어감
+        userId: {
+            type: String,
+            required: true,
+        },
         receivers: [
             {
                 type: ReceiverSchema,

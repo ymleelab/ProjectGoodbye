@@ -128,6 +128,12 @@ class UserService {
         const deletedUser = await this.userModel.deleteById(userId);
         return deletedUser;
     }
+
+    async addWill(userId, willId) {
+        const updatedUser = await this.userModel.addWill(userId, willId);
+        console.log('helloooo');
+        return updatedUser;
+    }
 }
 
 const userService = new UserService(userModel);
