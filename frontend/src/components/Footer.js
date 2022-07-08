@@ -34,7 +34,7 @@ const FooterItems = styled.ul`
     }
 
     li:nth-of-type(3) {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
         margin-bottom: 15px;
     }
     
