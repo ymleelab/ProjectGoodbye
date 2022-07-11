@@ -19,6 +19,7 @@ export class WillModel {
         const deletedWill = await Will.findOneAndDelete({ _id: willId });
         return deletedWill;
     }
+// update부분의 interface가 다를지도? 그냥 여기만 any?
 
     async updateById(willId: string, update: InterfaceWill) {
         const filter = { _id: willId };
