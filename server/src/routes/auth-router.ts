@@ -11,6 +11,17 @@ declare global {
         }
     }
 }
+const checkUserValidity = (req: Request, userId:string)=>{
+    if (!req.user){
+        throw new Error('유저가 존재하지 않습니다.')
+    }
+    const loggedInUserId = req.user._id.toString();
+    const isUserIdValid = loggedInUserId === userId;
+    if (!isUserIdValid) {
+        throw new Error('유저 토큰 정보가 일치하지 않습니다.');
+    }
+    return true;
+}
 
 const authRouter = Router();
 authRouter.get('/', async (req: Request, res: Response, next: NextFunction) => {
@@ -34,14 +45,15 @@ authRouter.patch(
             // params로부터 id를 가져옴
             // 이부분을 따로 함수같이 빼는 것을 고려
             const { userId } = req.params;
-            if (!req.user){
-                throw new Error('유저가 존재하지 않습니다.')
-            }
-            const loggedInUserId = req.user._id.toString();
-            const isUserIdValid = loggedInUserId === userId;
-            if (!isUserIdValid) {
-                throw new Error('유저 토큰 정보가 일치하지 않습니다.');
-            }
+            // if (!req.user){
+            //     throw new Error('유저가 존재하지 않습니다.')
+            // }
+            // const loggedInUserId = req.user._id.toString();
+            // const isUserIdValid = loggedInUserId === userId;
+            // if (!isUserIdValid) {
+            //     throw new Error('유저 토큰 정보가 일치하지 않습니다.');
+            // }
+            checkUserValidity(req, userId);
 
             // body data 로부터 업데이트할 사용자 정보를 추출함.
             const { fullName, password, dateOfBirth, photo, currentPassword } =
@@ -84,15 +96,7 @@ authRouter.delete(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { userId } = req.params;
-            if (!req.user){
-                throw new Error('유저가 존재하지 않습니다.')
-            }
-            const loggedInUserId = req.user._id.toString();
-            const isUserIdValid = loggedInUserId === userId;
-
-            if (!isUserIdValid) {
-                throw new Error('유저 토큰 정보가 일치하지 않습니다.');
-            }
+            checkUserValidity(req, userId);
             const { currentPassword } = req.body;
             if (!currentPassword) {
                 throw new Error(
@@ -123,15 +127,7 @@ authRouter.get(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { userId } = req.params;
-            if (!req.user){
-                throw new Error('유저가 존재하지 않습니다.')
-            }
-            const loggedInUserId = req.user._id.toString();
-            const isUserIdValid = loggedInUserId === userId;
-
-            if (!isUserIdValid) {
-                throw new Error('유저 토큰 정보가 일치하지 않습니다.');
-            }
+            checkUserValidity(req, userId);
             const willList = await willService.findWillsForOneUser(userId);
             res.status(200).json(willList);
         } catch (error) {
@@ -145,15 +141,7 @@ authRouter.post(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { userId } = req.params;
-            if (!req.user){
-                throw new Error('유저가 존재하지 않습니다.')
-            }
-            const loggedInUserId = req.user._id.toString();
-            const isUserIdValid = loggedInUserId === userId;
-
-            if (!isUserIdValid) {
-                throw new Error('유저 토큰 정보가 일치하지 않습니다.');
-            }
+            checkUserValidity(req,userId);
             // will collection에 추가
             // receivers 부분을 클라이언트가 잘 찾아서 바디에 넣기가 쉽나? 그러면 전혀 문제가 없을 듯
             const { title, content, receivers } = req.body;
@@ -177,15 +165,7 @@ authRouter.delete(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { userId, willId } = req.params;
-            if (!req.user){
-                throw new Error('유저가 존재하지 않습니다.')
-            }
-            const loggedInUserId = req.user._id.toString();
-            const isUserIdValid = loggedInUserId === userId;
-
-            if (!isUserIdValid) {
-                throw new Error('유저 토큰 정보가 일치하지 않습니다.');
-            }
+            checkUserValidity(req, userId);
             // collection에서 삭제
             const deletedWill = await willService.deleteWill(willId);
             if (!deletedWill) {
@@ -206,15 +186,7 @@ authRouter.patch(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { userId, willId } = req.params;
-            if (!req.user){
-                throw new Error('유저가 존재하지 않습니다.')
-            }
-            const loggedInUserId = req.user._id.toString();
-            const isUserIdValid = loggedInUserId === userId;
-
-            if (!isUserIdValid) {
-                throw new Error('유저 토큰 정보가 일치하지 않습니다.');
-            }
+            checkUserValidity(req, userId);
             const { title, content, receivers } = req.body;
             const toUpdate = {
                 ...(title && { title }),
@@ -241,15 +213,7 @@ authRouter.get(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { userId } = req.params;
-            if (!req.user){
-                throw new Error('유저가 존재하지 않습니다.')
-            }
-            const loggedInUserId = req.user._id.toString();
-            const isUserIdValid = loggedInUserId === userId;
-
-            if (!isUserIdValid) {
-                throw new Error('유저 토큰 정보가 일치하지 않습니다.');
-            }
+            checkUserValidity(req, userId);
             const receiverList = await receiverService.findReceiversForOneUser(
                 userId,
             );
@@ -264,15 +228,7 @@ authRouter.post(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { userId } = req.params;
-            if (!req.user){
-                throw new Error('유저가 존재하지 않습니다.')
-            }
-            const loggedInUserId = req.user._id.toString();
-            const isUserIdValid = loggedInUserId === userId;
-
-            if (!isUserIdValid) {
-                throw new Error('유저 토큰 정보가 일치하지 않습니다.');
-            }
+            checkUserValidity(req, userId);
             // receiver collection에 추가
             const { fullName, emailAddress, relation, role } = req.body;
             const newReceiver = await receiverService.addReceiver({
@@ -299,15 +255,7 @@ authRouter.delete(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { userId, receiverId } = req.params;
-            if (!req.user){
-                throw new Error('유저가 존재하지 않습니다.')
-            }
-            const loggedInUserId = req.user._id.toString();
-            const isUserIdValid = loggedInUserId === userId;
-
-            if (!isUserIdValid) {
-                throw new Error('유저 토큰 정보가 일치하지 않습니다.');
-            }
+            checkUserValidity(req, userId);
             // receiver collection에서 제거
             const deletedReceiver = await receiverService.deleteReceiver(
                 receiverId,
@@ -335,15 +283,7 @@ authRouter.patch(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { userId, receiverId } = req.params;
-            if (!req.user){
-                throw new Error('유저가 존재하지 않습니다.')
-            }
-            const loggedInUserId = req.user._id.toString();
-            const isUserIdValid = loggedInUserId === userId;
-
-            if (!isUserIdValid) {
-                throw new Error('유저 토큰 정보가 일치하지 않습니다.');
-            }
+            checkUserValidity(req, userId);
             const { fullName, emailAddress, relation, role } = req.body;
             const toUpdate = {
                 ...(fullName && { fullName }),
