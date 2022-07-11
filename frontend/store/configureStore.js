@@ -1,22 +1,23 @@
+import { applyMiddleware, compose } from 'redux';
+import createSagaMiddleware from 'redux-saga';
 import { createWrapper } from 'next-redux-wrapper';
-import { applyMiddleware, createStore, compose } from 'redux';
+import { configureStore } from '@reduxjs/toolkit';
 import { composeWithDevTools } from 'redux-devtools-extension';
 
-import createSagaMiddleware from 'redux-saga';
 
 import reducer from '../reducers';
 import rootSaga from '../sagas';
 
 
 // 미들웨어를 작성할 때는 아래처럼 3단 고차함수를 가지는 형식이다.
-const loggerMiddleware = ({ dispatch, getState }) => (next) => (action) => {
+// const loggerMiddleware = ({ dispatch, getState }) => (next) => (action) => {
 
-    // if (typeof action === 'function') {
-    //     return action(dispatch, getState);
-    // }
-    console.log(action);
-    return next(action);
-}
+//     // if (typeof action === 'function') {
+//     //     return action(dispatch, getState);
+//     // }
+//     console.log(action);
+//     return next(action);
+// }
 
 
 const configureStore = () => {
@@ -25,8 +26,8 @@ const configureStore = () => {
     const middlewares = [sagaMiddleware, loggerMiddleware];
     const enhancer = process.env.NODE_ENV === 'production'
     ? compose(applyMiddleware(...middlewares))
-    : composeWithDevTools(applyMiddleware(...middlewares))
-    const store = createStore(reducer, enhancer);
+    : composeWithDevTools(applyMiddleware(...middlewares));
+    const store = configureStore(reducer, enhancer);
     store.sagaTask = sagaMiddleware.run(rootSaga);
     
     return store;
