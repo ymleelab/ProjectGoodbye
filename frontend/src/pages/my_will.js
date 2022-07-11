@@ -7,8 +7,8 @@ import 'antd/dist/antd.css';
 
 import Image from 'next/image';
 import Link from 'next/link';
-import NavBar from "../components/NavBar";
-import Footer from "../components/Footer";
+// import NavBar from "../components/NavBar";
+// import Footer from "../components/Footer";
 import Pagination from "../components/Pagination";
 import { Button, Card } from "antd";
 
@@ -21,13 +21,13 @@ import { Button, Card } from "antd";
 
 
 const MyWill = () => {
-    const [isSSR, setIsSSR] = useState(true);
+    // const [isSSR, setIsSSR] = useState(true);
     const [isLogIn, setIsLogIn] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
 
-    useEffect(() => {
-        setIsSSR(false);
-    }, []);
+    // useEffect(() => {
+    //     setIsSSR(false);
+    // }, []);
     
 
     const loginBtnHandler = useCallback(() => {
@@ -38,7 +38,7 @@ const MyWill = () => {
 
     return (
         <>
-            {!isSSR && <NavBar />}
+            {/* {!isSSR && <NavBar />} */}
             <div>
                 <div css={adBoxStyle}>
                     <div css={adContentStyle}>
@@ -88,7 +88,7 @@ const MyWill = () => {
                         />
                     </>}
             </div>
-            <Footer />
+            {/* <Footer /> */}
         </>
     )
 }

@@ -16,7 +16,7 @@
     "rules": {
         "prettier/prettier": ["error"],
         "import/no-unresolved": "off",
-        "endOfLine": 2,
+        "endOfLine": "auto",
         "no-multiple-empty-lines": 2
     }
 }
