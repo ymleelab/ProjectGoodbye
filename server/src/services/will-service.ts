@@ -7,7 +7,7 @@ class WillService {
         this.willModel = willModel;
     }
 
-    async addWill(willInfo: InterfaceWill) {
+    async addWill(willInfo: InterfaceWill): Promise<any> {
         // 더 필요한 부분이 있을 수도 있음...
         // db에 저장
         const createdNewWill = await this.willModel.create(willInfo);

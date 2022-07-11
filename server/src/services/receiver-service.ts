@@ -8,7 +8,7 @@ class ReceiverService {
         this.receiverModel = receiverModel;
     }
 
-    async addReceiver(receiverInfo: InterfaceReceiver) {
+    async addReceiver(receiverInfo: InterfaceReceiver): Promise<any> {
         // 더 필요한 부분이 있을 수도 있음...
         // db에 저장
         const createdNewReceiver = await this.receiverModel.create(
