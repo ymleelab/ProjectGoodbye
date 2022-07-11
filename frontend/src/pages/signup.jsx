@@ -1,8 +1,32 @@
-import { useDispatch } from 'react-redux';
+import React, { useCallback, useState } from 'react';
 import { Form } from 'antd';
 import { css } from '@emotion/react';
+import { useDispatch } from 'react-redux';
+import { SIGN_UP_REQUEST } from '../reducers/user';
+import useInput from '../hooks/useInput';
 
 const SignUp = () => {
+	const dispatch = useDispatch();
+	const [email, onChangeEmail] = useInput('');
+	const [fullName, onChangeFullName] = useInput('');
+	const [dateOfBirth, onChangeDateOfBirth] = useInput('');
+	const [password, onChangePassword] = useInput('');
+	const [repeatPassword, onChangeRepeatPassword] = useInput('');
+	const [term, onChangeTerm] = useState(false);
+
+	const onSubmitForm = useCallback(() => {
+		return dispatch({
+			type: SIGN_UP_REQUEST,
+			data: {
+				email,
+				fullName,
+				dateOfBirth,
+				password,
+				repeatPassword,
+			},
+		});
+	}, [email, fullName, dateOfBirth, password, repeatPassword, term]);
+
 	return (
 		<main css={mainWrapper}>
 			<section css={sectionWrapper}>
@@ -11,26 +35,54 @@ const SignUp = () => {
 				</div>
 				<Form onFinish={onSubmitForm}>
 					<div css={inputWrapper}>
-						<input type="text" placeholder="이메일" name="email" />
-						<input type="text" placeholder="이름" name="fullname" />
+						<input
+							type="text"
+							placeholder="이메일"
+							name="email"
+							value={email}
+							required
+							onChange={onChangeEmail}
+						/>
+						<input
+							type="text"
+							placeholder="이름"
+							name="fullName"
+							value={fullName}
+							required
+							onChange={onChangeFullName}
+						/>
 						<input
 							type="text"
 							placeholder="생년월일"
 							name="dateOfBirth"
+							value={dateOfBirth}
+							required
+							onChange={onChangeDateOfBirth}
 						/>
 						<input
 							type="password"
 							placeholder="비밀번호"
 							name="password"
+							value={password}
+							required
+							onChange={onChangePassword}
 						/>
 						<input
 							type="password"
 							placeholder="비밀번호 확인"
 							name="repeatPassword"
+							value={repeatPassword}
+							required
+							onChange={onChangeRepeatPassword}
 						/>
 
 						<span>
-							<input type="checkbox" name="term" />
+							<input
+								type="checkbox"
+								name="term"
+								value={term}
+								onChange={onChangeTerm}
+							/>
 							약관에 동의합니다.
 						</span>
 					</div>
@@ -43,18 +95,6 @@ const SignUp = () => {
 		</main>
 	);
 };
-
-const onSubmitForm = useCallback(() => {
-	// dispatch(
-	// 	signUpAction({
-	// 		email,
-	// 		fullname,
-	// 		dateOfBirth,
-	// 		password,
-	// 		repeatPassword,
-	// 	}),
-	// );
-}, [email, fullname, dateOfBirth, password, repeatPassword, term]);
 
 const mainWrapper = css`
 	display: flex;
