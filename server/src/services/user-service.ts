@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { UserModel, userModel } from '../db/models/user-model';
-import type { InterfaceUser } from '../db/schemas/user-schema';
+import type { InterfaceUser, InterfaceUserInfoRequired } from '../db/schemas/user-schema';
 
 class UserService {
     // 본 파일의 맨 아래에서, new UserService(userModel) 하면, 이 함수의 인자로 전달됨
@@ -11,7 +11,7 @@ class UserService {
     }
 
     // 회원가입
-    async addUser(userInfo: any) {
+    async addUser(userInfo: InterfaceUser) {
         // 객체 destructuring
         const { email, fullName, password, repeatPassword, dateOfBirth } =
             userInfo;
@@ -53,7 +53,7 @@ class UserService {
     }
 
     // 유저정보 수정, 현재 비밀번호가 있어야 수정 가능함.
-    async setUser(userInfoRequired, toUpdate) {
+    async setUser(userInfoRequired: InterfaceUserInfoRequired, toUpdate: any) {
         // 객체 destructuring
         const { userId, currentPassword } = userInfoRequired;
 
@@ -95,7 +95,7 @@ class UserService {
         return user;
     }
 
-    async deleteUser(userInfoRequired) {
+    async deleteUser(userInfoRequired: InterfaceUserInfoRequired) {
         // 객체 destructuring
         const { userId, currentPassword } = userInfoRequired;
         // 우선 해당 id의 유저가 db에 있는지 확인
@@ -126,18 +126,17 @@ class UserService {
         return deletedUser;
     }
 
-    async addWill(userId, willId) {
+    async addWill(userId: string, willId: string) {
         const updatedUser = await this.userModel.addWill(userId, willId);
-        console.log('helloooo');
         return updatedUser;
     }
 
-    async deleteWill(userId, willId) {
+    async deleteWill(userId: string, willId: string) {
         const updatedUser = await this.userModel.deleteWill(userId, willId);
         return updatedUser;
     }
 
-    async addReceiver(userId, receiverId) {
+    async addReceiver(userId: string, receiverId: string) {
         const updatedUser = await this.userModel.addReceiver(
             userId,
             receiverId,
@@ -145,7 +144,7 @@ class UserService {
         return updatedUser;
     }
 
-    async deleteReceiver(userId, receiverId) {
+    async deleteReceiver(userId: string, receiverId: string) {
         const updatedUser = await this.userModel.deleteReceiver(
             userId,
             receiverId,

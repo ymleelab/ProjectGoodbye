@@ -11,6 +11,11 @@ interface InterfaceUser {
     receivers?: string[];
 }
 
+interface InterfaceUserInfoRequired {
+    userId: string;
+    currentPassword: string;
+}
+
 const UserSchema = new Schema<InterfaceUser>(
     {
         email: {
@@ -52,5 +57,5 @@ const UserSchema = new Schema<InterfaceUser>(
     },
 );
 
-export type { InterfaceUser };
+export type { InterfaceUser, InterfaceUserInfoRequired };
 export { UserSchema };
