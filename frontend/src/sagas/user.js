@@ -14,7 +14,7 @@ import {
 } from '../reducers/user';
 
 function logInAPI(data) {
-	return axios.post('api/users/login', data);
+	return axios.post('/api/users/login', data);
 }
 
 function* logIn(action) {
@@ -34,7 +34,7 @@ function* logIn(action) {
 }
 
 function logOutAPI() {
-	return axios.post('api/users/logout');
+	return axios.post('/api/users/logout');
 }
 
 function* logOut() {
@@ -52,8 +52,8 @@ function* logOut() {
 	}
 }
 
-function signUpAPI(data) {
-	return axios.post('api/users/register', data);
+async function signUpAPI(data) {
+	return axios.post('/api/users/register', data);
 }
 
 function* signUp(action) {
@@ -64,7 +64,9 @@ function* signUp(action) {
 			type: SIGN_UP_SUCCESS,
 		});
 	} catch (err) {
-		console.error(err);
+		console.error(`Error : ${err}`);
+		//alert(err.response.data.message);
+		//res.status(500).json({ message: error.message });
 		yield put({
 			type: SIGN_UP_FAILURE,
 			error: err.response.data,
