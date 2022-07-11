@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { UserModel, userModel } from '../db/models/user-model';
-import type { InterfaceUser, InterfaceUserInfoRequired } from '../db/schemas/user-schema';
+import type { InterfaceUserInfoRequired } from '../db/schemas/user-schema';
 
 class UserService {
     // 본 파일의 맨 아래에서, new UserService(userModel) 하면, 이 함수의 인자로 전달됨
@@ -11,7 +11,7 @@ class UserService {
     }
 
     // 회원가입
-    async addUser(userInfo: InterfaceUser) {
+    async addUser(userInfo: any) {
         // 객체 destructuring
         const { email, fullName, password, repeatPassword, dateOfBirth } =
             userInfo;
