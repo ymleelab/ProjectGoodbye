@@ -1,7 +1,6 @@
-//user Schema
+// user Schema
 import { Schema } from 'mongoose';
-import { WillSchema } from './will-schema';
-import { ReceiverSchema } from './receiver-schema';
+
 const UserSchema = new Schema(
     {
         email: {
@@ -25,7 +24,7 @@ const UserSchema = new Schema(
             type: String,
             required: false,
         },
-        //will과 receivers 둘다 id만 담는 것이 효율적일까?
+        // will과 receivers 둘다 id만 담는 것이 효율적일까?
         wills: {
             type: [String],
             required: false,
