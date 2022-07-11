@@ -1,7 +1,17 @@
 // user Schema
 import { Schema } from 'mongoose';
 
-const UserSchema = new Schema(
+interface InterfaceUser {
+    email: string;
+    fullName: string;
+    password: string;
+    dateOfBirth: string;
+    photo?: string;
+    wills?: string[];
+    receivers?: string[];
+}
+
+const UserSchema = new Schema<InterfaceUser>(
     {
         email: {
             type: String,
@@ -42,4 +52,5 @@ const UserSchema = new Schema(
     },
 );
 
+export type { InterfaceUser };
 export { UserSchema };
