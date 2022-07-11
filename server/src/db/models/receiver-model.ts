@@ -1,27 +1,27 @@
 import { model } from 'mongoose';
-import { ReceiverSchema } from '../schemas/receiver-schema';
+import { InterfaceReceiver, ReceiverSchema } from '../schemas/receiver-schema';
 
-const Receiver = model('receivers', ReceiverSchema);
+const Receiver = model<InterfaceReceiver>('receivers', ReceiverSchema);
 
 export class RecieverModel {
-    async findById(receiverId) {
+    async findById(receiverId: string) {
         const receiver = await Receiver.findOne({ _id: receiverId });
         return receiver;
     }
 
-    async create(receiverInfo) {
+    async create(receiverInfo: InterfaceReceiver) {
         const createdNewReceiver = await Receiver.create(receiverInfo);
         return createdNewReceiver;
     }
 
-    async deleteById(receiverId) {
+    async deleteById(receiverId: string) {
         const deletedReceiver = await Receiver.findOneAndDelete({
             _id: receiverId,
         });
         return deletedReceiver;
     }
 
-    async updateById(receiverId, update) {
+    async updateById(receiverId: string, update: InterfaceReceiver) {
         const filter = { _id: receiverId };
         const option = { returnOriginal: false };
         const updatedReceiver = await Receiver.findOneAndUpdate(
@@ -31,7 +31,8 @@ export class RecieverModel {
         );
         return updatedReceiver;
     }
-    async findReceiversByUserId(userId) {
+
+    async findReceiversByUserId(userId: string) {
         const receivers = await Receiver.find({ userId });
         return receivers;
     }

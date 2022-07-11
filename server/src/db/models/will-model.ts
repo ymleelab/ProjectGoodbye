@@ -10,7 +10,7 @@ export class WillModel {
         return will;
     }
 
-    async create(willInfo) {
+    async create(willInfo: InterfaceWill) {
         const createdNewWill = await Will.create(willInfo);
         return createdNewWill;
     }
@@ -20,7 +20,7 @@ export class WillModel {
         return deletedWill;
     }
 
-    async updateById(willId: string, update) {
+    async updateById(willId: string, update: InterfaceWill) {
         const filter = { _id: willId };
         const option = { returnOriginal: false };
         const updatedWill = await Will.findOneAndUpdate(filter, update, option);
