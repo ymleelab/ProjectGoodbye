@@ -20,7 +20,7 @@ export class UserModel {
         return user;
     }
 
-    async create(userInfo: string) {
+    async create(userInfo) {
         const createdNewUser = await User.create(userInfo);
         return createdNewUser;
     }

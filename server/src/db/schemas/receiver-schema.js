@@ -1,5 +1,5 @@
-//user Schema
 import { Schema } from 'mongoose';
+
 const ReceiverSchema = new Schema(
     {
         fullName: {
