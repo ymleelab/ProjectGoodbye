@@ -1,21 +1,25 @@
-import { model } from 'mongoose';
+import { model, Model } from 'mongoose';
 import { InterfaceReceiver, ReceiverSchema } from '../schemas/receiver-schema';
 
-const Receiver = model<InterfaceReceiver>('receivers', ReceiverSchema);
-
 export class ReceiverModel {
+    Receiver: Model<InterfaceReceiver>;
+
+    constructor() {
+        this.Receiver = model<InterfaceReceiver>('receivers', ReceiverSchema);
+    }
+
     async findById(receiverId: string) {
-        const receiver = await Receiver.findOne({ _id: receiverId });
+        const receiver = await this.Receiver.findOne({ _id: receiverId });
         return receiver;
     }
 
     async create(receiverInfo: InterfaceReceiver) {
-        const createdNewReceiver = await Receiver.create(receiverInfo);
+        const createdNewReceiver = await this.Receiver.create(receiverInfo);
         return createdNewReceiver;
     }
 
     async deleteById(receiverId: string) {
-        const deletedReceiver = await Receiver.findOneAndDelete({
+        const deletedReceiver = await this.Receiver.findOneAndDelete({
             _id: receiverId,
         });
         return deletedReceiver;
@@ -24,7 +28,7 @@ export class ReceiverModel {
     async updateById(receiverId: string, update: InterfaceReceiver) {
         const filter = { _id: receiverId };
         const option = { returnOriginal: false };
-        const updatedReceiver = await Receiver.findOneAndUpdate(
+        const updatedReceiver = await this.Receiver.findOneAndUpdate(
             filter,
             update,
             option,
@@ -33,7 +37,7 @@ export class ReceiverModel {
     }
 
     async findReceiversByUserId(userId: string) {
-        const receivers = await Receiver.find({ userId });
+        const receivers = await this.Receiver.find({ userId });
         return receivers;
     }
 }
