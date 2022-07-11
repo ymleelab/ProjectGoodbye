@@ -90,10 +90,7 @@ class UserService {
         }
 
         // 업데이트 진행
-        user = await this.userModel.updateById({
-            userId,
-            update: toUpdate,
-        });
+        user = await this.userModel.updateById(userId, toUpdate);
 
         return user;
     }

@@ -8,7 +8,7 @@ export class UserModel {
     // constructor() {
     //     this.User = model<InterfaceUser>('users', UserSchema);
     // }
-    // this.User를 쓰면 Property User does not exist on type UserModel이라고 뜸.. 
+    // this.User를 쓰면 Property User does not exist on type UserModel이라고 뜸..
 
     async findByEmail(email: string) {
         const user = await User.findOne({ email });
@@ -20,12 +20,12 @@ export class UserModel {
         return user;
     }
 
-    async create(userInfo) {
+    async create(userInfo: InterfaceUser) {
         const createdNewUser = await User.create(userInfo);
         return createdNewUser;
     }
 
-    async updateById({ userId, update }) {
+    async updateById(userId: string, update: InterfaceUser) {
         const filter = { _id: userId };
         const option = { returnOriginal: false };
 
