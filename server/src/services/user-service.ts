@@ -1,10 +1,12 @@
 import bcrypt from 'bcrypt';
-import { userModel } from '../db/models/user-model';
+import { UserModel, userModel } from '../db/models/user-model';
 import type { InterfaceUser } from '../db/schemas/user-schema';
 
 class UserService {
     // 본 파일의 맨 아래에서, new UserService(userModel) 하면, 이 함수의 인자로 전달됨
-    constructor(userModel) {
+    userModel: UserModel;
+
+    constructor(userModel: UserModel) {
         this.userModel = userModel;
     }
 
@@ -24,7 +26,7 @@ class UserService {
 
         // 이메일 중복은 이제 아님
 
-        //비밀번호 일치여부 확인..
+        // 비밀번호 일치여부 확인..
         const isPasswordSame = password === repeatPassword;
         if (!isPasswordSame) {
             throw new Error(' 비밀번호가 일치하지 않습니다.');
@@ -49,8 +51,6 @@ class UserService {
         const user = await this.userModel.findById(userId);
         return user;
     }
-
-    
 
     // 유저정보 수정, 현재 비밀번호가 있어야 수정 가능함.
     async setUser(userInfoRequired, toUpdate) {
@@ -131,6 +131,7 @@ class UserService {
         console.log('helloooo');
         return updatedUser;
     }
+
     async deleteWill(userId, willId) {
         const updatedUser = await this.userModel.deleteWill(userId, willId);
         return updatedUser;
@@ -143,6 +144,7 @@ class UserService {
         );
         return updatedUser;
     }
+
     async deleteReceiver(userId, receiverId) {
         const updatedUser = await this.userModel.deleteReceiver(
             userId,

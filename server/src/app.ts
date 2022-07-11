@@ -4,14 +4,14 @@ import path from 'path';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
 
-// import {
-//     indexRouter,
-//     usersRouter,
-//     authRouter,
-//     remembranceRouter,
-// } from './routes';
-// import { passportConfiguration, JWTConfiguration } from './services';
-// import { loginRequired } from './middlewares';
+import {
+    indexRouter,
+    usersRouter,
+    authRouter,
+    // remembranceRouter,
+} from './routes';
+import { passportConfiguration, JWTConfiguration } from './services';
+import { loginRequired } from './middlewares';
 
 const app = express();
 
@@ -26,13 +26,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // passport related - initialize and configs
 app.use(passport.initialize()); // passport 사용 시작
-// passportConfiguration(); // passport.use 로 local strategy 사용
-// JWTConfiguration();
+passportConfiguration(); // passport.use 로 local strategy 사용
+JWTConfiguration();
 
 // routers
-// app.use('/', indexRouter);
-// app.use('/api/users', usersRouter);
-// app.use('/api/auth', loginRequired, authRouter);
+app.use('/', indexRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/auth', loginRequired, authRouter);
 // app.use('/api/remembrances', remembranceRouter);
 
 // catch 404 and forward to error handler

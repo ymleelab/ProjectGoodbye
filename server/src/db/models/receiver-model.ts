@@ -3,7 +3,7 @@ import { InterfaceReceiver, ReceiverSchema } from '../schemas/receiver-schema';
 
 const Receiver = model<InterfaceReceiver>('receivers', ReceiverSchema);
 
-export class RecieverModel {
+export class ReceiverModel {
     async findById(receiverId: string) {
         const receiver = await Receiver.findOne({ _id: receiverId });
         return receiver;
@@ -38,6 +38,6 @@ export class RecieverModel {
     }
 }
 
-const receiverModel = new RecieverModel();
+const receiverModel = new ReceiverModel();
 
 export { receiverModel };
