@@ -1,7 +1,17 @@
+tags:
+  - name: Remembrances
+    description: '추모 관련 API'
+  - name: Comments
+    description: '추모글 관련 API'
+
 definitions:
   Remembrance:
     type: object
     properties:
+      _id:
+        type: string
+        description: '추모 objectId'
+        example: '62c7dc5863bae168010c0113'
       fullName:
         type: string
         description: '회원 이름'
@@ -24,12 +34,16 @@ definitions:
       comments:
         type: array
         items:
-          $ref: "#/definitions/Comments"
+          $ref: "#/definitions/Comment"
         description: '추모 글 배열'
   
-  Comments:
+  Comment:
     type: object
     properties:
+      _id:
+        type: string
+        description: '추모글 objectId'
+        example: '62c7ead09e9ddd0155095ace'
       writer:
         type: string
         description: '추모글 작성자'

@@ -42,12 +42,6 @@ app.use(
 app.use('/', indexRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/auth', loginRequired, authRouter);
-/**
- * @swagger
- * tags:
- *  name: Remembrances
- *  description: 추모 및 추모글 관련 API
- */
 app.use('/api/remembrances', remembranceRouter);
 
 // catch 404 and forward to error handler

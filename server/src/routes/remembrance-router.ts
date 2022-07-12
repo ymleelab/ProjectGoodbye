@@ -26,9 +26,7 @@ const remembranceRouter = Router();
  *        type: object
  *        properties:
  *          dateOfDeath:
- *            type: string
- *            example: '2099-01-01'
- *            description: 유저 사망일
+ *            $ref: "#/definitions/Remembrance/properties/dateOfDeath"
  *
  *    responses:
  *      201:
@@ -76,7 +74,7 @@ remembranceRouter.post('/', async (req, res, next) => {
  *
  *    responses:
  *      200:
- *        description: "조회된 추모 데이터"
+ *        description: "여러개의 추모 데이터 조회"
  *        schema:
  *          type: array
  *          items:
@@ -111,9 +109,7 @@ remembranceRouter.get('/', async (req, res, next) => {
  *      in: path
  *      required: true
  *      schema:
- *        type: string
- *        description: 추모의 objectId
- *      example: "62c7dc5863bae168010c0113"
+ *        $ref: "#/definitions/Remembrance/properties/_id"
  *
  *    responses:
  *      200:
@@ -136,6 +132,38 @@ remembranceRouter.get('/:remembranceId', async (req, res, next) => {
     }
 });
 
+/**
+ * @swagger
+ * /api/remembrances/{remembranceId}/comments/{commentId}:
+ *  get:
+ *    tags:
+ *    - Comments
+ *    summary: "특정 추모글 조회"
+ *    description: "remembranceId와 commentId로 특정 추모의 특정 추모글 조회"
+ *
+ *    parameters:
+ *    - name: remembranceId
+ *      in: path
+ *      required: true
+ *      schema:
+ *        $ref: "#/definitions/Remembrance/properties/_id"
+ *    - name: commentId
+ *      in: path
+ *      required: true
+ *      schema:
+ *        $ref: "#/definitions/Comment/properties/_id"
+ *
+ *    responses:
+ *      200:
+ *        description: "하나의 추모글 조회"
+ *        schema:
+ *          type: object
+ *          properties:
+ *            _id:
+ *              $ref: "#/definitions/Remembrance/properties/_id"
+ *            comments:
+ *              $ref: "#/definitions/Remembrance/properties/comments"
+ */
 // 특정 추모 글 조회
 remembranceRouter.get(
     '/:remembranceId/comments/:commentId',
@@ -169,18 +197,26 @@ remembranceRouter.get(
  *      in: path
  *      required: true
  *      schema:
- *        type: string
- *        description: 추모 데이터의 objectId
- *      example: "62c7dc5863bae168010c0113"
+ *        $ref: "#/definitions/Remembrance/properties/_id"
  *    - name: body
  *      in: body
  *      schema:
  *        type: object
- *        $ref: "#/definitions/Remembrance"
+ *        properties:
+ *          fullName:
+ *            $ref: "#/definitions/Remembrance/properties/fullName"
+ *          dateOfBirth:
+ *            $ref: "#/definitions/Remembrance/properties/dateOfBirth"
+ *          dateOfDeath:
+ *            $ref: "#/definitions/Remembrance/properties/dateOfDeath"
+ *          isPublic:
+ *            $ref: "#/definitions/Remembrance/properties/isPublic"
+ *          photo:
+ *            $ref: "#/definitions/Remembrance/properties/photo"
  *
  *    responses:
  *      201:
- *        description: "추모 데이터 생성"
+ *        description: "추모 데이터 수정"
  *        schema:
  *          $ref: "#/definitions/Remembrance"
  */
@@ -208,6 +244,41 @@ remembranceRouter.patch('/:remembranceId', async (req, res, next) => {
     }
 });
 
+/**
+ * @swagger
+ * /api/remembrances/{remembranceId}/comments:
+ *  post:
+ *    tags:
+ *    - Comments
+ *    summary: "추모글 생성"
+ *    description: "remembrancId로 추모 데이터 조회 후 추모글 추가"
+ *
+ *    parameters:
+ *    - name: remembrancId
+ *      in: path
+ *      required: true
+ *      schema:
+ *        $ref: "#/definitions/Remembrance/properties/_id"
+ *    - name: body
+ *      in: body
+ *      schema:
+ *        type: object
+ *        properties:
+ *          writer:
+ *            $ref: "#/definitions/Comment/properties/writer"
+ *          title:
+ *            $ref: "#/definitions/Comment/properties/title"
+ *          content:
+ *            $ref: "#/definitions/Comment/properties/content"
+ *          password:
+ *            $ref: "#/definitions/Comment/properties/password"
+ *
+ *    responses:
+ *      201:
+ *        description: "추모글 생성"
+ *        schema:
+ *          $ref: "#/definitions/Remembrance"
+ */
 // 추모 글 추가
 remembranceRouter.post('/:remembranceId/comments', async (req, res, next) => {
     try {
@@ -227,8 +298,48 @@ remembranceRouter.post('/:remembranceId/comments', async (req, res, next) => {
     }
 });
 
+/**
+ * @swagger
+ * /api/remembrances/{remembranceId}/comments/{commentId}:
+ *  put:
+ *    tags:
+ *    - Comments
+ *    summary: "추모글 수정"
+ *    description: "remembranceId와 commentId로 추모글 조회 후 수정"
+ *
+ *    parameters:
+ *    - name: remembrancId
+ *      in: path
+ *      required: true
+ *      schema:
+ *        $ref: "#/definitions/Remembrance/properties/_id"
+ *    - name: commentId
+ *      in: path
+ *      required: true
+ *      schema:
+ *        $ref: "#/definitions/Comment/properties/_id"
+ *    - name: body
+ *      in: body
+ *      schema:
+ *        type: object
+ *        properties:
+ *          writer:
+ *            $ref: "#/definitions/Comment/properties/writer"
+ *          title:
+ *            $ref: "#/definitions/Comment/properties/title"
+ *          content:
+ *            $ref: "#/definitions/Comment/properties/content"
+ *          password:
+ *            $ref: "#/definitions/Comment/properties/password"
+ *
+ *    responses:
+ *      200:
+ *        description: "추모글 수정"
+ *        schema:
+ *          $ref: "#/definitions/Remembrance"
+ */
 // 추모 글 수정
-remembranceRouter.patch(
+remembranceRouter.put(
     '/:remembranceId/comments/:commentId',
     async (req, res, next) => {
         try {
@@ -254,6 +365,37 @@ remembranceRouter.patch(
     },
 );
 
+/**
+ * @swagger
+ * /api/remembrances/{remembranceId}/comments/{commentId}:
+ *  delete:
+ *    tags:
+ *    - Comments
+ *    summary: "추모글 삭제"
+ *    description: "remembranceId와 commentId로 추모글 조회 후 삭제"
+ *
+ *    parameters:
+ *    - name: remembrancId
+ *      in: path
+ *      required: true
+ *      schema:
+ *        $ref: "#/definitions/Remembrance/properties/_id"
+ *    - name: commentId
+ *      in: path
+ *      required: true
+ *      schema:
+ *        $ref: "#/definitions/Comment/properties/_id"
+ *
+ *    responses:
+ *      201:
+ *        description: "추모글 삭제"
+ *        schema:
+ *          type: object
+ *          properties:
+ *            result:
+ *              type: string
+ *              example: 'success'
+ */
 // 추모 글 삭제
 remembranceRouter.delete(
     '/:remembranceId/comments/:commentId',
