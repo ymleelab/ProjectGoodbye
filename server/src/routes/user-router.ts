@@ -104,6 +104,23 @@ const usersRouter = Router();
  *           type: string
  *         updatedAt:
  *           type: string
+ *     WillPost:
+ *       type: Object
+ *       required:
+ *         - title
+ *         - content
+ *         - receivers
+ *       properties:
+ *         title:
+ *           type: string
+ *         content:
+ *           type: string
+ *         receivers:
+ *           type: array
+ *       example:
+ *         title: 어머니에게
+ *         content: 사랑하는 어머니에게...
+ *         receivers: ["motherId"]
  */
 
 /**

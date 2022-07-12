@@ -219,6 +219,32 @@ authRouter.get(
     },
 );
 
+/**
+ * @swagger
+ * /api/auth/{userId}/will:
+ *   post:
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         required: true
+ *     security:
+ *       - bearerAuth: []
+ *     tags: [AuthWill]
+ *     summary: 특정 유저의 유언장을 DB에 등록할 때 사용하는 API
+ *     description: 유저가 유언장을 post요청시 req.body의 title, content, receivers 정보를 사용, 새 유언장을 등록
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/WillPost'
+ *     responses:
+ *       200:
+ *         description: Created Will as JSON
+ *
+ */
 authRouter.post(
     '/:userId/will',
     async (req: Request, res: Response, next: NextFunction) => {
@@ -242,7 +268,31 @@ authRouter.post(
         }
     },
 );
-
+/**
+ * @swagger
+ * /api/auth/{userId}/wills/{willId}:
+ *   delete:
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         schema:
+ *           type: string
+ *           required: true
+ *       - in: path
+ *         name: willId
+ *         schema:
+ *           type: string
+ *           required: true
+ *     security:
+ *       - bearerAuth: []
+ *     tags: [AuthWill]
+ *     summary: 특정 유저의 특정 유언장을 삭제할 때 사용하는 API
+ *     description: 유저가 유언장을 delete 요청시 유언장 정보를 삭제
+ *     responses:
+ *       200:
+ *         description: result success as JSON
+ *
+ */
 authRouter.delete(
     '/:userId/wills/:willId',
     async (req: Request, res: Response, next: NextFunction) => {
@@ -264,6 +314,37 @@ authRouter.delete(
     },
 );
 
+/**
+ * @swagger
+ * /api/auth/{userId}/wills/{willId}:
+ *   patch:
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         schema:
+ *           type: string
+ *           required: true
+ *       - in: path
+ *         name: willId
+ *         schema:
+ *           type: string
+ *           required: true
+ *     security:
+ *       - bearerAuth: []
+ *     tags: [AuthWill]
+ *     summary: 특정 유저의 특정 유언장을 수정할 때 사용하는 API
+ *     description: 유저가 유언장을 patch 요청시 req.body의 title, content, receivers 정보를 사용, 유언장 정보를 수정
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/WillPost'
+ *     responses:
+ *       200:
+ *         description: Updated Will as JSON
+ *
+ */
 authRouter.patch(
     '/:userId/wills/:willId',
     async (req: Request, res: Response, next: NextFunction) => {
@@ -291,6 +372,27 @@ authRouter.patch(
 // 유언장 작성 시 바로 수신자를 바로 만드는 방식인가?
 
 // 유저와 유언장, 수신자의 관계는 쉬운편인거 같은데 - 유언장/수신자의 관계에서 삭제, 추가, 수정이 미치는 영향을 더 생각
+
+/**
+ * @swagger
+ * /api/auth/{userId}/receivers:
+ *   get:
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         required: true
+ *     security:
+ *       - bearerAuth: []
+ *     tags: [AuthReceiver]
+ *     summary: 유저의 수신자 리스트를 불러오는 API
+ *     description: 유저의 uri의 유저 아이디를 통하여 해당 유저의 수신자 리스트를 불러오는 API
+ *     responses:
+ *       200:
+ *         description: Receiver list as JSON
+ *
+ */
 authRouter.get(
     '/:userId/receivers',
     async (req: Request, res: Response, next: NextFunction) => {
