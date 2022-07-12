@@ -19,7 +19,7 @@ const remembranceRouter = Router();
  *      schema:
  *        type: string
  *        description: 유저의 objectId
- *      example: "62c7d6d0aa14441e00d23232"
+ *        example: "62c7d6d0aa14441e00d23232"
  *    - name: body
  *      in: body
  *      schema:
@@ -70,7 +70,7 @@ remembranceRouter.post('/', async (req, res, next) => {
  *      schema:
  *        type: number
  *        description: 가져올 데이터의 개수
- *      example: 8
+ *        example: 8
  *
  *    responses:
  *      200:
