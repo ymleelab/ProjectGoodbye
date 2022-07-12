@@ -121,6 +121,27 @@ const usersRouter = Router();
  *         title: 어머니에게
  *         content: 사랑하는 어머니에게...
  *         receivers: ["motherId"]
+ *     ReceiverPost:
+ *       type: Object
+ *       required:
+ *         - fullName
+ *         - emailAddress
+ *         - relation
+ *         - role
+ *       properties:
+ *         fullName:
+ *           type: string
+ *         emailAddress:
+ *           type: string
+ *         relation:
+ *           type: string
+ *         role:
+ *           type: string
+ *       example:
+ *         fullName: 홍길동
+ *         emailAddress: hong@email.com
+ *         relation: brother
+ *         role: basic-user
  */
 
 /**
