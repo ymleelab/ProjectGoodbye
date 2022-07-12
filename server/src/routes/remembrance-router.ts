@@ -254,7 +254,7 @@ remembranceRouter.patch('/:remembranceId', async (req, res, next) => {
  *    description: "remembrancId로 추모 데이터 조회 후 추모글 추가"
  *
  *    parameters:
- *    - name: remembrancId
+ *    - name: remembranceId
  *      in: path
  *      required: true
  *      schema:
@@ -308,7 +308,7 @@ remembranceRouter.post('/:remembranceId/comments', async (req, res, next) => {
  *    description: "remembranceId와 commentId로 추모글 조회 후 수정"
  *
  *    parameters:
- *    - name: remembrancId
+ *    - name: remembranceId
  *      in: path
  *      required: true
  *      schema:
@@ -375,7 +375,7 @@ remembranceRouter.put(
  *    description: "remembranceId와 commentId로 추모글 조회 후 삭제"
  *
  *    parameters:
- *    - name: remembrancId
+ *    - name: remembranceId
  *      in: path
  *      required: true
  *      schema:
