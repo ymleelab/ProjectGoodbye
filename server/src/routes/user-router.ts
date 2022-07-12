@@ -15,6 +15,15 @@ const usersRouter = Router();
  *       scheme: bearer
  *       bearerFormat: JWT
  *   schemas:
+ *     UserDelete:
+ *       type: Object
+ *       required:
+ *         - currentPassword
+ *       properties:
+ *         currentPassword:
+ *           type: string
+ *       example:
+ *         currentPassword: "12345"
  *     UserUpdate:
  *       type: Object
  *       required:
