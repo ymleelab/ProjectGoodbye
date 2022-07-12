@@ -15,8 +15,12 @@ const Header = () => {
                 <LoginHeader>
                     {!isLogIn ?
                         <ButtonGroup>
-                            <Button type='button'>로그인</Button>
-                            <Button type='button'>회원가입</Button>
+                            <Link href={'/signin'}>
+                                <Button type='button'>로그인</Button>
+                            </Link>
+                            <Link href={'signup'}>
+                                <Button type='button'>회원가입</Button>
+                            </Link>
                         </ButtonGroup>
                         : <Button type='button'>로그아웃</Button>
                     }

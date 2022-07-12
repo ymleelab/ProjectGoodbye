@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { useSelector } from 'react-redux';
 
 import { css } from '@emotion/react';
@@ -12,6 +12,8 @@ import AppLayout from '../components/AppLayout';
 import Pagination from "../components/Pagination";
 import { Card } from "antd";
 
+import ReceiverList from "../components/ReceiverList";
+
 
 /* 
     로그인 한 상태에서만 유언장 페이지에 접근가능
@@ -23,16 +25,19 @@ import { Card } from "antd";
 const MyWill = () => {
     const [isLogIn, setIsLogIn] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-
+    
     const { willList } = useSelector(state => state.will);
-
-
     // 임시 로그인 토글 설정
     const loginBtnHandler = useCallback(() => {
         setIsLogIn((prev) => !prev);
     }, []);
-
+    
     const clickPagination = useCallback(setCurrentPage, []);
+
+
+    useEffect(() => {
+        
+    }, [])
 
     return (
         <>
@@ -63,7 +68,7 @@ const MyWill = () => {
                     :
                     <>
                         <CardGroup>
-                            {willList.map((will, i) =>
+                            {willList.map((will, i) => (
                                 <Card
                                     title={will.title}
                                     extra={
@@ -75,17 +80,11 @@ const MyWill = () => {
                                         width: '20rem',
                                     }}
                                     key={`card-${i}`}
-                                >{
-                                    <ReceiverListWrap>
-                                        <Button type="button" css={ListSpreadBtnStyle}>펼쳐보기</Button>
-                                        <div>
-                                            {will.receivers.map((content, i) =>
-                                                <span key={content+`${i}`}>{content}</span>
-                                            )}
-                                        </div>
-                                    </ReceiverListWrap>
-                                }
-                                </Card>)}
+                                >
+                                    <ReceiverList will={will} />
+                                </Card>
+                            ))
+                            }
                         </CardGroup>
                         <Pagination
                             currPage={currentPage}
@@ -182,13 +181,4 @@ const CardBtnGroup = styled.div`
     button:first-of-type {
         margin-bottom: 10px;
     }
-`
-
-const ReceiverListWrap = styled.div`
-    
-`
-
-const ListSpreadBtnStyle = css`
-    position: relative;
-    // left: 24px;
 `
