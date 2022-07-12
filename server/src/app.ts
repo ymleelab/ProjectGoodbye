@@ -3,6 +3,8 @@ import express, { Request, Response } from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
+import swaggerUi from 'swagger-ui-express';
+import swaggerJSDoc from 'swagger-jsdoc';
 
 import {
     indexRouter,
@@ -12,6 +14,7 @@ import {
 } from './routes';
 import { passportConfiguration, JWTConfiguration } from './services';
 import { loginRequired } from './middlewares/login-required';
+import { specs } from '../swagger';
 
 
 const app = express();
@@ -30,6 +33,11 @@ app.use(passport.initialize()); // passport 사용 시작
 passportConfiguration(); // passport.use 로 local strategy 사용
 JWTConfiguration();
 
+app.use(
+    '/api-docs',
+    swaggerUi.serve,
+    swaggerUi.setup(specs, { explorer: true }),
+);
 // routers
 app.use('/', indexRouter);
 app.use('/api/users', usersRouter);
