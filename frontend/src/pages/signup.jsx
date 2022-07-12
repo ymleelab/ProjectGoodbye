@@ -4,6 +4,7 @@ import { css } from '@emotion/react';
 import { useDispatch } from 'react-redux';
 import { SIGN_UP_REQUEST } from '../reducers/user';
 import useInput from '../hooks/useInput';
+import AppLayout from '../components/AppLayout';
 
 const SignUp = () => {
 	const dispatch = useDispatch();
@@ -28,71 +29,73 @@ const SignUp = () => {
 	}, [email, fullName, dateOfBirth, password, repeatPassword, term]);
 
 	return (
-		<main css={mainWrapper}>
-			<section css={sectionWrapper}>
-				<div css={headerWrapper}>
-					<h2>회원가입</h2>
-				</div>
-				<Form onFinish={onSubmitForm}>
-					<div css={inputWrapper}>
-						<input
-							type="text"
-							placeholder="이메일"
-							name="email"
-							value={email}
-							required
-							onChange={onChangeEmail}
-						/>
-						<input
-							type="text"
-							placeholder="이름"
-							name="fullName"
-							value={fullName}
-							required
-							onChange={onChangeFullName}
-						/>
-						<input
-							type="text"
-							placeholder="생년월일"
-							name="dateOfBirth"
-							value={dateOfBirth}
-							required
-							onChange={onChangeDateOfBirth}
-						/>
-						<input
-							type="password"
-							placeholder="비밀번호"
-							name="password"
-							value={password}
-							required
-							onChange={onChangePassword}
-						/>
-						<input
-							type="password"
-							placeholder="비밀번호 확인"
-							name="repeatPassword"
-							value={repeatPassword}
-							required
-							onChange={onChangeRepeatPassword}
-						/>
-
-						<span>
+		<AppLayout>
+			<main css={mainWrapper}>
+				<section css={sectionWrapper}>
+					<div css={headerWrapper}>
+						<h2>회원가입</h2>
+					</div>
+					<Form onFinish={onSubmitForm}>
+						<div css={inputWrapper}>
 							<input
-								type="checkbox"
-								name="term"
-								value={term}
-								onChange={onChangeTerm}
+								type="text"
+								placeholder="이메일"
+								name="email"
+								value={email}
+								required
+								onChange={onChangeEmail}
 							/>
-							약관에 동의합니다.
-						</span>
-					</div>
-					<div css={buttonWrapper}>
-						<input type="submit" value="회원가입" />
-						<input type="button" value="취소" />
-					</div>
-				</Form>
-			</section>
-		</main>
+							<input
+								type="text"
+								placeholder="이름"
+								name="fullName"
+								value={fullName}
+								required
+								onChange={onChangeFullName}
+							/>
+							<input
+								type="text"
+								placeholder="생년월일"
+								name="dateOfBirth"
+								value={dateOfBirth}
+								required
+								onChange={onChangeDateOfBirth}
+							/>
+							<input
+								type="password"
+								placeholder="비밀번호"
+								name="password"
+								value={password}
+								required
+								onChange={onChangePassword}
+							/>
+							<input
+								type="password"
+								placeholder="비밀번호 확인"
+								name="repeatPassword"
+								value={repeatPassword}
+								required
+								onChange={onChangeRepeatPassword}
+							/>
+
+							<span>
+								<input
+									type="checkbox"
+									name="term"
+									value={term}
+									onChange={onChangeTerm}
+								/>
+								약관에 동의합니다.
+							</span>
+						</div>
+						<div css={buttonWrapper}>
+							<input type="submit" value="회원가입" />
+							<input type="button" value="취소" />
+						</div>
+					</Form>
+				</section>
+			</main>
+		</AppLayout>
 	);
 };
 

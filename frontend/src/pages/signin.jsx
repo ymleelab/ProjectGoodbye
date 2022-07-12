@@ -1,27 +1,48 @@
+import React, { useCallback } from 'react';
 import { css } from '@emotion/react';
+import { Form } from 'antd';
+import useInput from '../hooks/useInput';
+import AppLayout from '../components/AppLayout';
 
 const SignIn = () => {
+	const [email, onChangeEmail] = useInput('');
+	const [password, onChangePassword] = useInput('');
+
 	return (
-		<main css={mainWrapper}>
-			<section css={sectionWrapper}>
-				<div css={headerWrapper}>
-					<h2>로그인</h2>
-				</div>
-				<div css={inputWrapper}>
-					<input type="text" placeholder="이메일" name="email" />
-					<input
-						type="password"
-						placeholder="비밀번호"
-						name="password"
-					/>
-				</div>
-				<div css={forgetWrapper}>비밀번호 찾기</div>
-				<div css={buttonWrapper}>
-					<input type="submit" value="로그인" />
-					<input type="button" value="구글로그인" />
-				</div>
-			</section>
-		</main>
+		<AppLayout>
+			<main css={mainWrapper}>
+				<section css={sectionWrapper}>
+					<div css={headerWrapper}>
+						<h2>로그인</h2>
+					</div>
+					<Form>
+						<div css={inputWrapper}>
+							<input
+								type="text"
+								placeholder="이메일"
+								name="email"
+								value={email}
+								onChange={onChangeEmail}
+								required
+							/>
+							<input
+								type="password"
+								placeholder="비밀번호"
+								name="password"
+								value={password}
+								onChange={onChangePassword}
+								required
+							/>
+						</div>
+						<div css={forgetWrapper}>비밀번호 찾기</div>
+						<div css={buttonWrapper}>
+							<input type="submit" value="로그인" />
+							<input type="button" value="구글로그인" />
+						</div>
+					</Form>
+				</section>
+			</main>
+		</AppLayout>
 	);
 };
 
