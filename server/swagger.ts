@@ -4,7 +4,7 @@ const options = {
     swaggerDefinition: {
         openapi: '3.0.0',
         info: {
-            title: 'Put Your API Name',
+            title: 'Project Goodbye API',
             version: '1.0.0',
             description: 'Example docs',
         },

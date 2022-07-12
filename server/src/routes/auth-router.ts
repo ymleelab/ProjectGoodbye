@@ -24,6 +24,7 @@ const checkUserValidity = (req: Request, userId:string)=>{
 }
 
 const authRouter = Router();
+
 authRouter.get('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
         if (!req.user){

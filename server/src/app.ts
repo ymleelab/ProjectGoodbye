@@ -63,11 +63,5 @@ app.use((err: Error, req: Request, res: Response) => {
     // res.status(err.status || 500);
     res.render('error');
 });
-/**
- * @swagger
- * path: 
- *  /api/users/register
- *   post:
- *       summary: 유저 회원가입
- */
+
 export { app };

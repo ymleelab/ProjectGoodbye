@@ -6,6 +6,61 @@ import { userService } from '../services/user-service';
 const usersRouter = Router();
 
 /* GET users listing. */
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Register:
+ *       type: Object
+ *       required:
+ *         - fullName
+ *         - email
+ *         - password
+ *         - repeatPassword
+ *         - dateOfBirth
+ *       properties:
+ *         fullName:
+ *           type: string
+ *         email:
+ *           type: string
+ *         password:
+ *           type: string
+ *         repeatPassword:
+ *           type: string
+ *         dateOfBirth:
+ *           type: string
+ *       example:
+ *         fullName: Steve Baek
+ *         email: email@email.com
+ *         password: abcde123
+ *         repeatPassword: abcde123
+ *         dateOfBirth: 970623
+ */
+
+/**
+ * @swagger
+ * /api/users/register:
+ *   post:
+ *     tags:
+ *     - "users"
+ *     summary: Register a new user in the DB.
+ *     description: 유저가 회원가입 post요청 시, fullName, email, password, repeatPassword, dateOfBirth를 req.body로 받아 유저 등록
+ *     consumes:
+ *     - "application/json"
+ *     produces:
+ *     - "application/json"
+ *     parameters:
+ *     - in: "body"
+ *       name: "body"
+ *       description: "User post form request body"
+ *       required: true
+ *       schema:
+ *         $ref: '#/components/schemas/Register'
+ *     responses:
+ *       200:
+ *         description: newUser as JSON
+ *
+ */
 usersRouter.post(
     '/register',
     async (req: Request, res: Response, next: NextFunction) => {
@@ -28,7 +83,19 @@ usersRouter.post(
         }
     },
 );
-
+/**
+ * @swagger
+ * /api/users/login:
+ *   post:
+ *     tags:
+ *     - users
+ *     summary: Register a new user in the DB.
+ *     description: 유저가 회원가입 post요청 시, fullName, email, password, repeatPassword, dateOfBirth를 req.body로 받아 유저 등록
+ *     responses:
+ *       200:
+ *         description: newUser as JSON
+ *
+ */
 usersRouter.post(
     '/login',
     async (req: Request, res: Response, next: NextFunction) => {
