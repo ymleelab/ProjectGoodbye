@@ -4,7 +4,6 @@ import path from 'path';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
 import swaggerUi from 'swagger-ui-express';
-import swaggerJSDoc from 'swagger-jsdoc';
 
 import {
     indexRouter,
@@ -15,7 +14,6 @@ import {
 import { passportConfiguration, JWTConfiguration } from './services';
 import { loginRequired } from './middlewares/login-required';
 import { specs } from '../swagger';
-
 
 const app = express();
 
@@ -42,11 +40,7 @@ app.use(
 app.use('/', indexRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/auth', loginRequired, authRouter);
-// app.use('/api/remembrances', remembranceRouter);
-// app.use('/api/users', usersRouter);
-// app.use('/api/auth', loginRequired, authRouter);
 app.use('/api/remembrances', remembranceRouter);
-
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
