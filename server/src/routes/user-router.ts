@@ -35,30 +35,62 @@ const usersRouter = Router();
  *         password: abcde123
  *         repeatPassword: abcde123
  *         dateOfBirth: 970623
+ *     UserLogin:
+ *       type: Object
+ *       required:
+ *         - email
+ *         - password
+ *       properties:
+ *         email:
+ *           type: string
+ *         password:
+ *           type: string
+ *       example:
+ *         email: email@email.com
+ *         password: abcde123
+ *     User:
+ *       type: Object
+ *       properties:
+ *         email:
+ *           type: string
+ *         fullName:
+ *           type: string
+ *         password:
+ *           type: string
+ *         dateOfBirth:
+ *           type: string
+ *         wills:
+ *           type: array
+ *         receivers:
+ *           type: array
+ *         _id:
+ *           type: string
+ *         createdAt:
+ *           type: string
+ *         updatedAt:
+ *           type: string
  */
 
 /**
  * @swagger
  * /api/users/register:
  *   post:
- *     tags:
- *     - "users"
+ *     tags: [Users]
  *     summary: Register a new user in the DB.
  *     description: 유저가 회원가입 post요청 시, fullName, email, password, repeatPassword, dateOfBirth를 req.body로 받아 유저 등록
- *     consumes:
- *     - "application/json"
- *     produces:
- *     - "application/json"
- *     parameters:
- *     - in: "body"
- *       name: "body"
- *       description: "User post form request body"
+ *     requestBody:
  *       required: true
- *       schema:
- *         $ref: '#/components/schemas/Register'
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Register'
  *     responses:
  *       200:
  *         description: newUser as JSON
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
  *
  */
 usersRouter.post(
@@ -87,13 +119,22 @@ usersRouter.post(
  * @swagger
  * /api/users/login:
  *   post:
- *     tags:
- *     - users
- *     summary: Register a new user in the DB.
- *     description: 유저가 회원가입 post요청 시, fullName, email, password, repeatPassword, dateOfBirth를 req.body로 받아 유저 등록
+ *     tags: [Users]
+ *     summary: 유저의 이메일 주소와 비밀번호로 유저를 로그인시키는 API
+ *     description: 유저의 이메일 주소와 비밀번호를 Request Body로 받아서 유저를 로그인 - user의 JWT token을 생성 후 유저아이디와 함께 반환
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UserLogin'
  *     responses:
  *       200:
- *         description: newUser as JSON
+ *         description: user token과 userId를 JSON 형태로 반환
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
  *
  */
 usersRouter.post(
