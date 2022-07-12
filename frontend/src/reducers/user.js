@@ -45,7 +45,9 @@ const reducer = (state = initialState, action) =>
 				break;
 			case LOG_IN_SUCCESS:
 				draft.logInLoading = false;
-				draft.me = action.data;
+				sessionStorage.setItem('token', action.data.token);
+				sessionStorage.setItem('userId', action.data.userId);
+				draft.userId = action.data.userId;
 				draft.logInDone = true;
 				break;
 			case LOG_IN_FAILURE:
