@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { useSelector } from 'react-redux';
 
 import { css } from '@emotion/react';
-import styled from '@emotion/styled'
+import styled from '@emotion/styled';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'antd/dist/antd.css';
 
@@ -9,7 +10,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import AppLayout from '../components/AppLayout';
 import Pagination from "../components/Pagination";
-import { Button, Card } from "antd";
+import { Card } from "antd";
 
 
 /* 
@@ -23,11 +24,13 @@ const MyWill = () => {
     const [isLogIn, setIsLogIn] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
 
-    
+    const { willList } = useSelector(state => state.will);
 
+
+    // 임시 로그인 토글 설정
     const loginBtnHandler = useCallback(() => {
         setIsLogIn((prev) => !prev);
-    },[]);
+    }, []);
 
     const clickPagination = useCallback(setCurrentPage, []);
 
@@ -38,7 +41,7 @@ const MyWill = () => {
                     <div css={adContentStyle}>
                         <h2>나의 유언장</h2>
                         <p>유언장을 작성하거나 아래 항목에서 유언장을 확인하세요</p>
-                        <Button type="primary" css={buttonStyle}>유언장 작성하기</Button>
+                        <Button>유언장 작성하기</Button>
                     </div>
                     <div css={imageStyle}>
                         <Image
@@ -53,19 +56,18 @@ const MyWill = () => {
                     <NoticeBox>
                         <p>유언장을 열람하시거나 작성하려면 로그인이나 회원가입을 해주세요!</p>
                         <NoticeBtnGroup>
-                            <Button css={buttonStyle} onClick={loginBtnHandler}>로그인하기</Button>
-                            <Button css={buttonStyle}>회원가입하기</Button>
+                            <Button onClick={loginBtnHandler}>로그인하기</Button>
+                            <Button>회원가입하기</Button>
                         </NoticeBtnGroup>
                     </NoticeBox>
-                    : 
+                    :
                     <>
                         <CardGroup>
-                            {Array(6).fill('').map((x, i) =>
-                                <Card   
-                                    title={`${i + 1}번째 유언장`}
+                            {willList.map((will, i) =>
+                                <Card
+                                    title={will.title}
                                     extra={
                                         <CardBtnGroup>
-                                            <button type="button" css={buttonStyle}>펼쳐보기</button>
                                             <Link href="#"><a css={aTagStyle}>유언장 상세보기</a></Link>
                                         </CardBtnGroup>
                                     }
@@ -73,7 +75,17 @@ const MyWill = () => {
                                         width: '20rem',
                                     }}
                                     key={`card-${i}`}
-                                >친구 리스트</Card>)}
+                                >{
+                                    <ReceiverListWrap>
+                                        <Button type="button" css={ListSpreadBtnStyle}>펼쳐보기</Button>
+                                        <div>
+                                            {will.receivers.map((content, i) =>
+                                                <span key={content+`${i}`}>{content}</span>
+                                            )}
+                                        </div>
+                                    </ReceiverListWrap>
+                                }
+                                </Card>)}
                         </CardGroup>
                         <Pagination
                             currPage={currentPage}
@@ -120,7 +132,7 @@ const imageStyle = css`
 
 //==========================
 
-const buttonStyle = css`
+const Button = styled.button`
     color: #3E606F;           
     background-color: #D1DBBD;
     border: none;
@@ -170,4 +182,13 @@ const CardBtnGroup = styled.div`
     button:first-of-type {
         margin-bottom: 10px;
     }
+`
+
+const ReceiverListWrap = styled.div`
+    
+`
+
+const ListSpreadBtnStyle = css`
+    position: relative;
+    // left: 24px;
 `

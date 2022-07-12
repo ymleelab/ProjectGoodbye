@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 import styled from '@emotion/styled';
 
-import { Button } from '../../utils/common_styles';
+import { Button } from '../util/common_styles';
 
 const Header = () => {
     // 로그인 정보를 받을 예정
