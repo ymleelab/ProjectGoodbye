@@ -1,15 +1,24 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { Form } from 'antd';
 import { css } from '@emotion/react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { LOG_IN_REQUEST } from '../reducers/user';
 import useInput from '../hooks/useInput';
 import AppLayout from '../components/AppLayout';
+import Router from 'next/router';
 
 const SignIn = () => {
 	const dispatch = useDispatch();
 	const [email, onChangeEmail] = useInput('');
 	const [password, onChangePassword] = useInput('');
+	const { userId } = useSelector((state) => state.user);
+
+	useEffect(() => {
+		console.log('userId : ' + userId);
+		if (userId) {
+			Router.replace('/');
+		}
+	}, [userId]);
 
 	const onSubmitForm = useCallback(() => {
 		return dispatch({
