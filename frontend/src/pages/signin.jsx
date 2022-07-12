@@ -1,13 +1,25 @@
 import React, { useCallback } from 'react';
-import { css } from '@emotion/react';
 import { Form } from 'antd';
+import { css } from '@emotion/react';
+import { useDispatch } from 'react-redux';
+import { LOG_IN_REQUEST } from '../reducers/user';
 import useInput from '../hooks/useInput';
 import AppLayout from '../components/AppLayout';
 
 const SignIn = () => {
+	const dispatch = useDispatch();
 	const [email, onChangeEmail] = useInput('');
 	const [password, onChangePassword] = useInput('');
 
+	const onSubmitForm = useCallback(() => {
+		return dispatch({
+			type: LOG_IN_REQUEST,
+			data: {
+				email,
+				password,
+			},
+		});
+	}, [email, password]);
 	return (
 		<AppLayout>
 			<main css={mainWrapper}>
@@ -15,7 +27,7 @@ const SignIn = () => {
 					<div css={headerWrapper}>
 						<h2>로그인</h2>
 					</div>
-					<Form>
+					<Form onFinish={onSubmitForm}>
 						<div css={inputWrapper}>
 							<input
 								type="text"
