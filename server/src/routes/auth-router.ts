@@ -23,6 +23,7 @@ const checkUserValidity = (req: Request, userId:string)=>{
     return true;
 }
 
+
 const authRouter = Router();
 
 authRouter.get('/', async (req: Request, res: Response, next: NextFunction) => {
@@ -37,6 +38,37 @@ authRouter.get('/', async (req: Request, res: Response, next: NextFunction) => {
         next(error);
     }
 });
+
+/**
+ * @swagger
+ * /api/auth/{userId}:
+ *   patch:
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         required: true
+ *     security:
+ *       - bearerAuth: []
+ *     tags: [AuthUser]
+ *     summary: 유저의 회원 정보 수정 시 사용하는 API
+ *     description: 유저가 회원가입 post요청 시, fullName, email, password, repeatPassword, dateOfBirth를 req.body로 받아 유저 등록
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Register'
+ *     responses:
+ *       200:
+ *         description: newUser as JSON
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *
+ */
 
 authRouter.patch(
     '/:userId',

@@ -9,6 +9,11 @@ const usersRouter = Router();
 /**
  * @swagger
  * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  *   schemas:
  *     Register:
  *       type: Object
@@ -34,7 +39,7 @@ const usersRouter = Router();
  *         email: email@email.com
  *         password: abcde123
  *         repeatPassword: abcde123
- *         dateOfBirth: 970623
+ *         dateOfBirth: "970623"
  *     UserLogin:
  *       type: Object
  *       required:
@@ -76,7 +81,7 @@ const usersRouter = Router();
  * /api/users/register:
  *   post:
  *     tags: [Users]
- *     summary: Register a new user in the DB.
+ *     summary: 유저 회원가입 용 API, 유저 정보를 DB에 등록
  *     description: 유저가 회원가입 post요청 시, fullName, email, password, repeatPassword, dateOfBirth를 req.body로 받아 유저 등록
  *     requestBody:
  *       required: true
