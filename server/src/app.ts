@@ -1,5 +1,5 @@
 import createError from 'http-errors';
-import express, {Request, Response} from 'express';
+import express, { Request, Response } from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
@@ -8,10 +8,11 @@ import {
     indexRouter,
     usersRouter,
     authRouter,
-    // remembranceRouter,
+    remembranceRouter,
 } from './routes';
 import { passportConfiguration, JWTConfiguration } from './services';
-import { loginRequired } from './middlewares';
+import { loginRequired } from './middlewares/login-required';
+
 
 const app = express();
 
@@ -34,6 +35,10 @@ app.use('/', indexRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/auth', loginRequired, authRouter);
 // app.use('/api/remembrances', remembranceRouter);
+// app.use('/api/users', usersRouter);
+// app.use('/api/auth', loginRequired, authRouter);
+app.use('/api/remembrances', remembranceRouter);
+
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
