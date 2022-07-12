@@ -53,16 +53,16 @@ authRouter.get('/', async (req: Request, res: Response, next: NextFunction) => {
  *       - bearerAuth: []
  *     tags: [AuthUser]
  *     summary: 유저의 회원 정보 수정 시 사용하는 API
- *     description: 유저가 회원가입 post요청 시, fullName, email, password, repeatPassword, dateOfBirth를 req.body로 받아 유저 등록
+ *     description: 유저가 회원가입 post요청 시, currentPassword로 password 확인 후 관련된 정보 들을 req.body로 받아 유저 정보 수정하는 API
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Register'
+ *             $ref: '#/components/schemas/UserUpdate'
  *     responses:
  *       200:
- *         description: newUser as JSON
+ *         description: Updated User as JSON
  *         content:
  *           application/json:
  *             schema:

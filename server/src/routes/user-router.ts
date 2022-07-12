@@ -15,6 +15,27 @@ const usersRouter = Router();
  *       scheme: bearer
  *       bearerFormat: JWT
  *   schemas:
+ *     UserUpdate:
+ *       type: Object
+ *       required:
+ *         - currentPassword
+ *       properties:
+ *         fullName:
+ *           type: string
+ *         password:
+ *           type: string
+ *         photo:
+ *           type: string
+ *         dateOfBirth:
+ *           type: string
+ *         currentPassword:
+ *           type: string
+ *       example:
+ *         fullName: Steve Baek
+ *         password: "12345"
+ *         photo: imageURL
+ *         currentPassword: "12345"
+ *         dateOfBirth: "970623"
  *     Register:
  *       type: Object
  *       required:
