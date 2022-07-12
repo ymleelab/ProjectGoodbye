@@ -14,7 +14,9 @@ class RemembranceService {
     async addRemembrance(userId: string, remembranceInfo: object) {
         // 추모 대상자 확인을 위해 유저 정보 조회
         const user = await userService.getUser(userId);
-
+        if( !user ){
+            throw new Error("해당유저를 찾을 수 없습니다.")
+        }
         const newInfo = {
             ...remembranceInfo,
             fullName: user.fullName,
