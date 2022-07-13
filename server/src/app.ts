@@ -1,5 +1,6 @@
 // import createError from 'http-errors';
 import express from 'express';
+import cors from 'cors';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
@@ -17,6 +18,8 @@ import { specs } from '../swagger';
 
 const app = express();
 
+// cors error
+app.use(cors());
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
