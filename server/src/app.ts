@@ -1,5 +1,5 @@
-import createError from 'http-errors';
-import express, { Request, Response } from 'express';
+// import createError from 'http-errors';
+import express from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
@@ -12,7 +12,7 @@ import {
     remembranceRouter,
 } from './routes';
 import { passportConfiguration, JWTConfiguration } from './services';
-import { loginRequired } from './middlewares/login-required';
+import { loginRequired, errorHandler, notFoundHandler } from './middlewares';
 import { specs } from '../swagger';
 
 const app = express();
@@ -45,19 +45,24 @@ app.use('/api/auth', loginRequired, authRouter);
 app.use('/api/remembrances', remembranceRouter);
 
 // catch 404 and forward to error handler
-app.use((req, res, next) => {
-    next(createError(404));
-});
+// app.use((req, res, next) => {
+//     next(createError(404));
+// });
 
 // error handler
-app.use((err: Error, req: Request, res: Response) => {
-    // set locals, only providing error in development
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
+// app.use((err: Error, req: Request, res: Response) => {
+//     // set locals, only providing error in development
+//     res.locals.message = err.message;
+//     res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-    // render the error page
-    // res.status(err.status || 500);
-    res.render('error');
-});
+//     // render the error page
+//     // res.status(err.status || 500);
+//     res.render('error');
+// });
 
+// 404 handler
+app.use(notFoundHandler);
+
+// error handler
+app.use(errorHandler);
 export { app };
