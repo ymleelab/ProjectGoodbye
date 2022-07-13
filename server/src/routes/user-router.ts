@@ -82,7 +82,7 @@ const usersRouter = Router();
  *           type: string
  *       example:
  *         email: email@email.com
- *         password: abcde123
+ *         password: "12345"
  *     User:
  *       type: Object
  *       properties:
