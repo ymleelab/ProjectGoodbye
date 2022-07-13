@@ -1,34 +1,37 @@
 import React, { useCallback, useEffect } from 'react';
 import { Form } from 'antd';
 import { css } from '@emotion/react';
-import { useDispatch, useSelector } from 'react-redux';
-import { LOG_IN_REQUEST } from '../reducers/user';
 import useInput from '../hooks/useInput';
 import AppLayout from '../components/AppLayout';
 import Router from 'next/router';
+import axios from 'axios';
 
 const SignIn = () => {
-	const dispatch = useDispatch();
+	//const dispatch = useDispatch();
 	const [email, onChangeEmail] = useInput('');
 	const [password, onChangePassword] = useInput('');
-	const { userId } = useSelector((state) => state.user);
+	//const { userId } = useSelector((state) => state.user);
 
 	useEffect(() => {
-		console.log('userId : ' + userId);
-		if (userId) {
+		const token = sessionStorage.getItem('token');
+		//console.log(token);
+		if (token) {
 			Router.replace('/');
 		}
-	}, [userId]);
+	}, []);
 
-	const onSubmitForm = useCallback(() => {
-		return dispatch({
-			type: LOG_IN_REQUEST,
-			data: {
-				email,
-				password,
-			},
-		});
+	const onSubmitForm = useCallback(async () => {
+		const data = { email, password };
+		const result = await axios.post('/api/users/login', data);
+
+		//console.log(result.data);
+		if (result.data.token) {
+			sessionStorage.setItem('token', result.data.token);
+			sessionStorage.setItem('userId', result.data.userId);
+			Router.replace('/');
+		}
 	}, [email, password]);
+
 	return (
 		<AppLayout>
 			<main css={mainWrapper}>
