@@ -1,10 +1,12 @@
 import React, { useCallback, useState } from 'react';
 import { Form } from 'antd';
 import { css } from '@emotion/react';
-import { useDispatch } from 'react-redux';
-import { SIGN_UP_REQUEST } from '../reducers/user';
 import useInput from '../hooks/useInput';
 import AppLayout from '../components/AppLayout';
+import axios from 'axios';
+import Router from 'next/router';
+//import { useDispatch, useSelector } from 'react-redux';
+//import userSlice from '../reducers/user';
 
 const SignUp = () => {
 	const dispatch = useDispatch();
@@ -14,18 +16,23 @@ const SignUp = () => {
 	const [password, onChangePassword] = useInput('');
 	const [repeatPassword, onChangeRepeatPassword] = useInput('');
 	const [term, onChangeTerm] = useState(false);
+	// const userId = useSelector((state) => {
+	// 	return state.userId;
+	// });
 
-	const onSubmitForm = useCallback(() => {
-		return dispatch({
-			type: SIGN_UP_REQUEST,
-			data: {
-				email,
-				fullName,
-				dateOfBirth,
-				password,
-				repeatPassword,
-			},
-		});
+	const onSubmitForm = useCallback(async () => {
+		const data = { email, fullName, dateOfBirth, password, repeatPassword };
+		const result = await axios.post('/api/users/register', data);
+
+		console.log(result.data);
+		if (result.data._id) {
+			alert(
+				`${result.data.fullName}님 회원가입을 축하합니다. 로그인을 먼저 해주세요.`,
+			);
+			Router.replace('/signin');
+		}
+
+		//dispatch(userSlice.actions.signUp(userId));
 	}, [email, fullName, dateOfBirth, password, repeatPassword, term]);
 
 	return (
@@ -84,6 +91,7 @@ const SignUp = () => {
 									name="term"
 									value={term}
 									onChange={onChangeTerm}
+									required
 								/>
 								약관에 동의합니다.
 							</span>
