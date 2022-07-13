@@ -24,6 +24,7 @@
     "next": "12.2.0",
     "next-redux-wrapper": "^7.0.5",
     "prop-types": "^15.8.1",
+    "rc-virtual-list": "^3.4.8",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.4.0",

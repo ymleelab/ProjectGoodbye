@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
+
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 
 import { Modal, List, Skeleton, Avatar } from "antd";
+import VirtualList from 'rc-virtual-list';
 
 
 
@@ -17,61 +19,26 @@ function showCoverList(people) {
 
 const ReceiverList = ({ will }) => {
     const [showList, setShowList] = useState(false);
+    const [data, setData] = useState([...will.receivers]);
 
-    const count = 3;
-    const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat,picture&noinfo`;
-    const [initLoading, setInitLoading] = useState(true);
-    const [loading, setLoading] = useState(false);
-    const [data, setData] = useState([]);
-    const [list, setList] = useState([]);
-    useEffect(() => {
-        fetch(fakeDataUrl)
-            .then((res) => res.json())
-            .then((res) => {
-                setInitLoading(false);
-                setData(res.results);
-                setList(res.results);
-            });
-    }, []);
+    const ContainerHeight = 400;
 
-    const onLoadMore = () => {
-        setLoading(true);
-        setList(
-            data.concat(
-                [...new Array(count)].map(() => ({
-                    loading: true,
-                    name: {},
-                    picture: {},
-                })),
-            ),
-        );
-        fetch(fakeDataUrl)
-            .then((res) => res.json())
-            .then((res) => {
-                const newData = data.concat(res.results);
-                setData(newData);
-                setList(newData);
-                setLoading(false); 
-
-                window.dispatchEvent(new Event('resize'));
-            });
+    // useEffect(() => {
+    //     setData([...will.receivers]);
+    // }, []);
+    
+    // 끝까지 스크롤 할 때 어떤 동작이 필요할까..
+    // const appendData = () => {
+    //     setData(...will.receivers);
+    // }
+    const onScroll = (e) => {
+        if (e.currentTarget.scrollHeight - e.currentTarget.scrollTop === ContainerHeight) {
+            // appendData();
+        }
     };
 
-    const loadMore =
-        !initLoading && !loading ? (
-            <div
-                style={{
-                    textAlign: 'center',
-                    marginTop: 12,
-                    height: 32,
-                    lineHeight: '32px',
-                }}
-            >
-                <Button onClick={onLoadMore}>loading more</Button>
-            </div>
-        ) : null;
 
-
+    // VirtualList에 itemKey도 유니크하게 수정해야됨
     return (
         <ListWrapper>
             <HumanList>
@@ -87,27 +54,25 @@ const ReceiverList = ({ will }) => {
                     </>
                 }
                 <Modal title="ReceiverList Modal" visible={showList} onCancel={() => setShowList(false)}>
-                    <List
-                        className="demo-loadmore-list"
-                        loading={initLoading}
-                        itemLayout="horizontal"
-                        loadMore={loadMore}
-                        dataSource={list}
-                        renderItem={(item) => (
-                            <List.Item
-                                actions={[<a key="list-loadmore-edit">edit</a>, <a key="list-loadmore-more">more</a>]}
-                            >
-                                <Skeleton avatar title={false} loading={item.loading} active>
+                    <List>
+                        <VirtualList
+                            data={data}
+                            height={ContainerHeight}
+                            itemHeight={47}
+                            itemKey="email"
+                            onScroll={onScroll}
+                        >
+                            {(item) => (
+                                <List.Item key={item}>
                                     <List.Item.Meta
-                                        avatar={<Avatar src={item.picture.large} />}
-                                        title={<a href="https://ant.design">{item.name?.last}</a>}
-                                        description="Ant Design, a design language for background applications, is refined by Ant UED Team"
+                                        title={<a href="#">{item}</a>}
+                                        description={item}
                                     />
-                                    <div>content</div>
-                                </Skeleton>
-                            </List.Item>
-                        )}
-                    />
+                                    <div>Content</div>
+                                </List.Item>
+                            )}
+                        </VirtualList>
+                    </List>
                 </Modal>
             </HumanList>
             <Button type="button"
