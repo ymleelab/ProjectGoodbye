@@ -4,9 +4,9 @@ const options = {
     swaggerDefinition: {
         openapi: '3.0.0',
         info: {
-            title: 'Put Your API Name',
+            title: 'Project Good-Bye',
             version: '1.0.0',
-            description: 'Example docs',
+            description: '온라인 유언장 서비스 API Docs',
         },
         servers: [
             {
@@ -14,8 +14,9 @@ const options = {
             },
         ],
     },
-    apis: ['./src/routes/*.ts'],
+    apis: ['./src/routes/*.ts', './src/swagger/*'],
 };
+
 const specs = swaggerJSDoc(options);
 
-export { specs }
+export { specs };
