@@ -48,6 +48,13 @@ export class RemembranceModel {
         return remembrance;
     }
 
+    // userId를 이용해 특정 추모글 조회
+    async findByUserId(userId: string) {
+        const remembrances = await this.Remembrance.find({ userId });
+
+        return remembrances;
+    }
+
     // 추모 데이터 수정
     async update(remembranceId: string, update: IUpdateRemembrance) {
         const filter = { _id: remembranceId };

@@ -10,6 +10,12 @@ class RemembranceService {
 
     // 새 추모 생성
     async addRemembrance(userId: string, dateOfDeath: string) {
+        // 해당 유저의 추모 데이터가 존재하는지 확인
+        const remembrances = await this.remembranceModel.findByUserId(userId);
+        if (remembrances) {
+            throw new Error('해당 유저의 추모 데이터가 이미 존재합니다.');
+        }
+
         // 추모 대상자 확인을 위해 유저 정보 조회
         const user = await userService.getUser(userId);
         if (!user) {
@@ -17,6 +23,7 @@ class RemembranceService {
         }
 
         const remembranceInfo = {
+            userId,
             fullName: user.fullName,
             dateOfBirth: user.dateOfBirth,
             dateOfDeath,

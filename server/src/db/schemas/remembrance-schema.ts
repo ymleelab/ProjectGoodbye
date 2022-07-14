@@ -2,6 +2,7 @@ import { Schema } from 'mongoose';
 import { CommentSchema, IComment } from './comment-schema';
 
 export interface IRemembrance {
+    userId: string;
     fullName: string;
     dateOfBirth: string;
     dateOfDeath?: string;
@@ -12,6 +13,11 @@ export interface IRemembrance {
 
 const RemembranceSchema: Schema<IRemembrance> = new Schema(
     {
+        userId: {
+            type: String,
+            required: true,
+            unique: true,
+        },
         fullName: {
             type: String,
             required: true,
