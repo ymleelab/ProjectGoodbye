@@ -2,6 +2,15 @@ import { Model, model } from 'mongoose';
 import { IComment } from '../schemas/comment-schema';
 import { RemembranceSchema, IRemembrance } from '../schemas/remembrance-schema';
 
+export interface IUpdateRemembrance {
+    fullName?: string;
+    dateOfBirth?: string;
+    dateOfDeath?: string;
+    isPublic?: boolean;
+    photo?: string;
+    comments?: Array<IComment>;
+}
+
 export class RemembranceModel {
     Remembrance: Model<IRemembrance>;
 
@@ -39,25 +48,8 @@ export class RemembranceModel {
         return remembrance;
     }
 
-    // 전체 추모글 조회 함수 따로 필요한가? ↑ 얘로 충분?
-
-    // ObjectId를 이용해 특정 추모글 조회
-    async findCommentById(remembranceId: string, commentId: string) {
-        const comment = await this.Remembrance.findOne(
-            {
-                _id: remembranceId,
-                'comments._id': commentId,
-            },
-            {
-                'comments.$': true,
-            },
-        );
-
-        return comment;
-    }
-
     // 추모 데이터 수정
-    async update(remembranceId: string, update: object) {
+    async update(remembranceId: string, update: IUpdateRemembrance) {
         const filter = { _id: remembranceId };
         const option = { returnOriginal: false };
 
@@ -69,63 +61,6 @@ export class RemembranceModel {
 
         return updatedRemembrance;
     }
-
-    // 추모글 추가
-    async createComment(remembranceId: string, commentInfo: IComment) {
-        const filter = { _id: remembranceId };
-        const option = { returnOriginal: false };
-
-        const updatedRemembrance = await this.Remembrance.findOneAndUpdate(
-            filter,
-            {
-                $push: {
-                    comments: commentInfo,
-                },
-            },
-            option,
-        );
-
-        return updatedRemembrance;
-    }
-
-    // 추모글 수정
-    async updateComment(
-        remembranceId: string,
-        commentId: string,
-        update: IComment,
-    ) {
-        const filter = {
-            _id: remembranceId,
-            'comments._id': commentId,
-        };
-        const option = { returnOriginal: false };
-
-        const updatedRemembrance = await this.Remembrance.findOneAndUpdate(
-            filter,
-            { $set: { 'comments.$': update } },
-            option,
-        );
-
-        return updatedRemembrance;
-    }
-
-    // 추모글 삭제
-    async deleteComment(remembranceId: string, commentId: string) {
-        const filter = { _id: remembranceId };
-
-        const deletedRemembrance = await this.Remembrance.findOneAndUpdate(
-            filter,
-            {
-                $pull: {
-                    comments: { _id: commentId },
-                },
-            },
-        );
-
-        return deletedRemembrance;
-    }
-
-    // 추모 데이터 삭제 필요?
 }
 
 const remembranceModel = new RemembranceModel();

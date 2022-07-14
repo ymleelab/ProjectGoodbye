@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { remembranceService } from '../services';
+import { remembranceService, commentService } from '../services';
 
 const remembranceRouter = Router();
 
@@ -48,9 +48,7 @@ remembranceRouter.post('/', async (req, res, next) => {
 
         const newRemembrance = await remembranceService.addRemembrance(
             userId as string,
-            {
-                dateOfDeath,
-            },
+            dateOfDeath,
         );
 
         res.status(201).json(newRemembrance);
@@ -175,17 +173,14 @@ remembranceRouter.get('/:remembranceId', async (req, res, next) => {
  *                comments:
  *                  $ref: "#/components/schemas/Remembrance/properties/comments"
  */
-// 특정 추모 글 조회
+// 특정 추모글 조회
 remembranceRouter.get(
     '/:remembranceId/comments/:commentId',
     async (req, res, next) => {
         try {
-            const { remembranceId, commentId } = req.params;
+            const { commentId } = req.params;
 
-            const comment = await remembranceService.getCommentById(
-                remembranceId,
-                commentId,
-            );
+            const comment = await commentService.getCommentById(commentId);
 
             res.status(200).json(comment);
         } catch (error) {
@@ -303,10 +298,9 @@ remembranceRouter.patch('/:remembranceId', async (req, res, next) => {
 // 추모 글 추가
 remembranceRouter.post('/:remembranceId/comments', async (req, res, next) => {
     try {
-        const { remembranceId } = req.params;
         const { writer, title, content, password } = req.body;
 
-        const newComment = await remembranceService.addComment(remembranceId, {
+        const newComment = await commentService.addComment({
             writer,
             title,
             content,
@@ -369,18 +363,16 @@ remembranceRouter.put(
     '/:remembranceId/comments/:commentId',
     async (req, res, next) => {
         try {
-            const { remembranceId, commentId } = req.params;
+            const { commentId } = req.params;
             const { writer, title, content, password } = req.body;
 
-            const comment = await remembranceService.setCommet(
-                remembranceId,
+            const comment = await commentService.setCommet(
                 commentId,
                 password,
                 {
                     writer,
                     title,
                     content,
-                    password,
                 },
             );
 
@@ -429,11 +421,10 @@ remembranceRouter.delete(
     '/:remembranceId/comments/:commentId',
     async (req, res, next) => {
         try {
-            const { remembranceId, commentId } = req.params;
+            const { commentId } = req.params;
             const { password } = req.body;
 
-            const remembrance = await remembranceService.deleteComment(
-                remembranceId,
+            const remembrance = await commentService.deleteComment(
                 commentId,
                 password,
             );
