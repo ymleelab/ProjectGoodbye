@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import { IComment } from '../db/schemas/comment-schema';
 import { commentModel, CommentModel, IUpdateComment } from '../db';
+import { remembranceService } from './remembrance-service';
 
 class CommentService {
     commentModel: CommentModel;
@@ -10,9 +11,12 @@ class CommentService {
     }
 
     // 새 추모글 생성
-    async addComment(commentInfo: IComment) {
+    async addComment(remembranceId: string, commentInfo: IComment) {
         const { password } = commentInfo;
-        const hashedPassword = await bcrypt.hash(password as string, 10);
+        const hashedPassword = await bcrypt.hash(
+            password as string,
+            Number(process.env.SALT_OR_ROUNDS),
+        );
 
         const newInfo = {
             ...commentInfo,
@@ -20,6 +24,7 @@ class CommentService {
         };
 
         const comment = await this.commentModel.create(newInfo);
+        remembranceService.setComment(remembranceId, comment._id, 'add');
 
         return comment;
     }
@@ -65,7 +70,11 @@ class CommentService {
     }
 
     // 추모글 삭제
-    async deleteComment(commentId: string, currentPassword: string) {
+    async deleteComment(
+        remembranceId: string,
+        commentId: string,
+        currentPassword: string,
+    ) {
         // 작성자 확인을 위해 해당 추모글의 비밀번호 조회
         const comment = await this.getCommentById(commentId);
         const hashedPassword = comment.password;
@@ -81,8 +90,17 @@ class CommentService {
         }
 
         const deletedComment = await this.commentModel.delete(commentId);
+        if (deletedComment) {
+            remembranceService.setComment(
+                remembranceId,
+                deletedComment._id,
+                'delete',
+            );
 
-        return deletedComment;
+            return { result: 'success' };
+        }
+
+        throw new Error('추모글이 삭제되지 않았습니다.');
     }
 }
 

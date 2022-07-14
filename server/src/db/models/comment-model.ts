@@ -2,9 +2,9 @@ import { Model, model } from 'mongoose';
 import { CommentSchema, IComment } from '../schemas/comment-schema';
 
 export interface IUpdateComment {
-    writer: string;
-    title: string;
-    content: string;
+    writer?: string;
+    title?: string;
+    content?: string;
 }
 
 export class CommentModel {

@@ -235,7 +235,7 @@ remembranceRouter.get(
  *            schema:
  *              $ref: "#/components/schemas/Remembrance"
  */
-// 추모 수정
+// 추모 수정 - fullName, dateOfBirth, photo는 user data -> 언제 어떻게 변경?
 remembranceRouter.patch('/:remembranceId', async (req, res, next) => {
     try {
         const { remembranceId } = req.params;
@@ -302,9 +302,10 @@ remembranceRouter.patch('/:remembranceId', async (req, res, next) => {
 // 추모 글 추가
 remembranceRouter.post('/:remembranceId/comments', async (req, res, next) => {
     try {
+        const { remembranceId } = req.params;
         const { writer, title, content, password } = req.body;
 
-        const newComment = await commentService.addComment({
+        const newComment = await commentService.addComment(remembranceId, {
             writer,
             title,
             content,
@@ -363,7 +364,7 @@ remembranceRouter.post('/:remembranceId/comments', async (req, res, next) => {
  *              $ref: "#/components/schemas/Remembrance"
  */
 // 추모 글 수정
-remembranceRouter.put(
+remembranceRouter.patch(
     '/:remembranceId/comments/:commentId',
     async (req, res, next) => {
         try {
@@ -374,9 +375,9 @@ remembranceRouter.put(
                 commentId,
                 password,
                 {
-                    writer,
-                    title,
-                    content,
+                    ...(writer && { writer }),
+                    ...(title && { title }),
+                    ...(content && { content }),
                 },
             );
 
@@ -425,16 +426,16 @@ remembranceRouter.delete(
     '/:remembranceId/comments/:commentId',
     async (req, res, next) => {
         try {
-            const { commentId } = req.params;
+            const { remembranceId, commentId } = req.params;
             const { password } = req.body;
 
-            const remembrance = await commentService.deleteComment(
+            const result = await commentService.deleteComment(
+                remembranceId,
                 commentId,
                 password,
             );
-            if (remembrance) {
-                res.status(201).json({ result: 'success' });
-            }
+
+            res.status(201).json(result);
         } catch (error) {
             next(error);
         }

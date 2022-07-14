@@ -1,5 +1,4 @@
-import { Model, model } from 'mongoose';
-import { IComment } from '../schemas/comment-schema';
+import { Model, model, UpdateQuery } from 'mongoose';
 import { RemembranceSchema, IRemembrance } from '../schemas/remembrance-schema';
 
 export interface IUpdateRemembrance {
@@ -8,7 +7,6 @@ export interface IUpdateRemembrance {
     dateOfDeath?: string;
     isPublic?: boolean;
     photo?: string;
-    comments?: Array<IComment>;
 }
 
 export class RemembranceModel {
@@ -67,6 +65,16 @@ export class RemembranceModel {
         );
 
         return updatedRemembrance;
+    }
+
+    // 추모글 추가 및 삭제
+    async updateComment(
+        remembranceId: string,
+        query: UpdateQuery<IRemembrance>,
+    ) {
+        const filter = { _id: remembranceId };
+
+        await this.Remembrance.findByIdAndUpdate(filter, query);
     }
 }
 

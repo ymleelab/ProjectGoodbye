@@ -1,3 +1,4 @@
+import { Types } from 'mongoose';
 import { IUpdateRemembrance, RemembranceModel, remembranceModel } from '../db';
 import { userService } from './user-service';
 
@@ -12,7 +13,7 @@ class RemembranceService {
     async addRemembrance(userId: string, dateOfDeath: string) {
         // 해당 유저의 추모 데이터가 존재하는지 확인
         const remembrances = await this.remembranceModel.findByUserId(userId);
-        if (remembrances) {
+        if (remembrances.length) {
             throw new Error('해당 유저의 추모 데이터가 이미 존재합니다.');
         }
 
@@ -64,6 +65,28 @@ class RemembranceService {
         );
 
         return remembrance;
+    }
+
+    // 추모글 추가 및 삭제
+    setComment(remembranceId: string, commentId: Types.ObjectId, type: string) {
+        switch (type) {
+            case 'add':
+                this.remembranceModel.updateComment(remembranceId, {
+                    $push: {
+                        comments: commentId,
+                    },
+                });
+                break;
+            case 'delete':
+                this.remembranceModel.updateComment(remembranceId, {
+                    $pull: {
+                        comments: commentId,
+                    },
+                });
+                break;
+            default:
+                throw new Error('type이 잘못 지정되었습니다.');
+        }
     }
 }
 

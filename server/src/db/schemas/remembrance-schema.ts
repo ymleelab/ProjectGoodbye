@@ -1,5 +1,4 @@
-import { Schema } from 'mongoose';
-import { CommentSchema, IComment } from './comment-schema';
+import { Schema, Types } from 'mongoose';
 
 export interface IRemembrance {
     userId: string;
@@ -8,7 +7,7 @@ export interface IRemembrance {
     dateOfDeath?: string;
     isPublic?: boolean;
     photo?: string;
-    comments?: Array<IComment>;
+    comments?: Array<Types.ObjectId>;
 }
 
 const RemembranceSchema: Schema<IRemembrance> = new Schema(
@@ -39,7 +38,7 @@ const RemembranceSchema: Schema<IRemembrance> = new Schema(
             required: false,
         },
         comments: {
-            type: [CommentSchema],
+            type: [Types.ObjectId],
             required: false,
         },
     },
