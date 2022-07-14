@@ -16,7 +16,7 @@ components:
         _id:
           type: string
           description: '추모 objectId'
-          example: '62c7dc5863bae168010c0113'
+          example: '62d05d9f1eed1cb973a7f36c'
         userId:
           type: string
           description: '유저 objectId'
@@ -61,7 +61,7 @@ components:
         _id:
           type: string
           description: '추모글 objectId'
-          example: '62c7ead09e9ddd0155095ace'
+          example: '62d0661abd3ff204df02a869'
         writer:
           type: string
           description: '추모글 작성자'
