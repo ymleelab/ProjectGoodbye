@@ -71,13 +71,13 @@ const MyWill = () => {
     //     .catch(err => console.log(err));
     // }, [])
 
-    // // 유언장에 데이터 넣기 예시
+    // 유언장에 데이터 넣기 예시
     // useEffect(() => {
     //     const userId = sessionStorage.getItem('userId');
     //     const token = sessionStorage.getItem('token');
     //     axios.post(`/api/auth/${userId}/will`, {
-    //         title: '유언장-5',
-    //         content: '유언장-5 내용~',
+    //         title: '유언장-4',
+    //         content: '유언장-4 내용~',
     //         userId: userId,
     //         receivers: Array(50).fill('').map((item, i) => `친구 ${i + 1}`)
     //     }, {
@@ -85,53 +85,76 @@ const MyWill = () => {
     //             Authorization: `Bearer ${token}`
     //         }
     //     })
-    //     .then(res => console.log(res))
-    //     .catch(err => console.log(err));
+    //         .then(res => console.log(res))
+    //         .catch(err => console.log(err));
     // }, [])
 
     // 컴포넌트 첫 렌더링 시 동작
     useEffect(() => {
         getWillsList();
+        // console.log(willList);
+        // // 현재 페이지를 삭제 했다면 현재 페이지 번호 앞으로 이동
+        // setCurrentPage((curPageNum) => {
+        //     // const updatePageNum = 
+        //     console.log(willList[curPageNum - 1], curPageNum);
+        //     if (willList[curPageNum - 1] === undefined) {
+        //         return curPageNum - 1;
+        //     } else {
+        //         return curPageNum;
+        //     }
+        // })
     }, [])
 
 
-    function getWillsList() {
+    const currentPageList = (pageNum) => {
+        console.log(pageNum, willList[pageNum - 1], willList); 
+        // 현재 페이지를 삭제 했다면 현재 페이지 번호 앞으로 이동
+        // setCurrentPage((curPageNum) => {
+        //     // const updatePageNum = 
+        //     console.log(willList[curPageNum - 1], curPageNum);
+        //     if (willList[curPageNum - 1] === undefined) {
+        //         return curPageNum - 1;
+        //     } else {
+        //         return curPageNum;
+        //     }
+        // })
+
+        // 현재 페이지 번호 수정해야됨
+        if (willList[pageNum - 1] === undefined) return willList[pageNum - 2]
+        return willList[pageNum - 1];
+    }
+
+    async function getWillsList() {
         const token = sessionStorage.getItem('token');
         const userId = sessionStorage.getItem('userId');
-        axios.get(`/api/auth/${userId}/wills`, {
+        await axios.get(`/api/auth/${userId}/wills`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
         })
-            .then(res => dispatch(WillACTIONS.getWills({ lists: res.data })))
-            .catch(err => console.log(err));
+        .then(res => dispatch(WillACTIONS.getWills({ lists: res.data })))
+        .catch(err => console.log(err));
     }
 
 
-    // console.log(willList);              
-
-    const clickPageList = (pageCount) => {
-        console.log(pageCount, willList[pageCount - 1], willList);
-        return willList[pageCount - 1];
-    }
-
-
-    const onClickDelete = (will) => {
+    const onClickDelete = async (will) => {
         console.log(will);
         const token = sessionStorage.getItem('token');
         const userId = sessionStorage.getItem('userId');
 
         window.confirm('정말 제거하시겠습니까?');
-        axios.delete(`/api/auth/${userId}/wills/${will._id}`, {
+        await axios.delete(`/api/auth/${userId}/wills/${will._id}`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
         })
-            .then(res => {
-                dispatch(WillACTIONS.removeWill({ will }));
-                getWillsList();
-            })
-            .catch(err => console.log(err));
+        .then(res => {
+            dispatch(WillACTIONS.removeWill({ will }));
+            console.log('확인3');
+
+            getWillsList();
+        })
+        .catch(err => console.log(err));
     }
 
 
@@ -164,8 +187,8 @@ const MyWill = () => {
                     :
                     <>
                         <CardGroup>
-                            {willList.length !== 0 ?
-                                clickPageList(currentPage).map((will, i) => (
+                            {willList.length > 0 ?
+                                currentPageList(currentPage).map((will, i) => (
                                     <Card
                                         title={will.title}
                                         extra={

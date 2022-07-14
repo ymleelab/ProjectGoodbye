@@ -20,7 +20,8 @@ function showCoverList(people) {
 const ReceiverList = ({ will }) => {
     const [showList, setShowList] = useState(false);
     const [data, setData] = useState([...will.receivers]);
-
+    
+    console.log(will);
     const ContainerHeight = 400;
 
     // useEffect(() => {
@@ -68,7 +69,8 @@ const ReceiverList = ({ will }) => {
                                         title={<a href="#">{item}</a>}
                                         description={item}
                                     />
-                                    <div>Content</div>
+                                    <Button type='button'>이메일 수정</Button>
+                                    <Button type='button'>리스트 삭제</Button>
                                 </List.Item>
                             )}
                         </VirtualList>
