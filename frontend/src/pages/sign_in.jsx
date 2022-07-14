@@ -5,16 +5,17 @@ import useInput from '../hooks/useInput';
 import AppLayout from '../components/AppLayout';
 import Router from 'next/router';
 import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { USERACTIONS } from '../reducers/user';
 
 const SignIn = () => {
-	//const dispatch = useDispatch();
+	const dispatch = useDispatch();
 	const [email, onChangeEmail] = useInput('');
 	const [password, onChangePassword] = useInput('');
-	//const { userId } = useSelector((state) => state.user);
+	const userToken = useSelector((state) => state.user.token);
 
 	useEffect(() => {
 		const token = sessionStorage.getItem('token');
-		//console.log(token);
 		if (token) {
 			Router.replace('/');
 		}
@@ -24,10 +25,11 @@ const SignIn = () => {
 		const data = { email, password };
 		const result = await axios.post('/api/users/login', data);
 
-		//console.log(result.data);
 		if (result.data.token) {
 			sessionStorage.setItem('token', result.data.token);
 			sessionStorage.setItem('userId', result.data.userId);
+			dispatch(USERACTIONS.setToken(result.data.token));
+
 			Router.replace('/');
 		}
 	}, [email, password]);
