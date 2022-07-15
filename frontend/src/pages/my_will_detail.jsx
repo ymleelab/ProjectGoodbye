@@ -75,6 +75,29 @@ const MyWillDetail = () => {
 			.catch((err) => alert(err.response.data.reason));
 	});
 
+	//유언장 등록
+	const onSubmitForm = useCallback(() => {
+		const userId = sessionStorage.getItem('userId');
+		const token = sessionStorage.getItem('token');
+
+		axios
+			.post(
+				`/api/auth/${userId}/will`,
+				{ title, content, receivers },
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				},
+			)
+			.then((res) => {
+				console.log(res);
+				alert('성공적으로 유언장이 등록되었습니다.');
+				Router.replace('/my_will');
+			})
+			.catch((err) => alert(err.response.data.reason));
+	});
+
 	return (
 		<AppLayout>
 			{/* <div css={adBoxStyle}>
@@ -147,7 +170,7 @@ const MyWillDetail = () => {
 							</Button>
 						</Modal>
 					</div>
-					<Form>
+					<Form onFinish={onSubmitForm}>
 						<div css={letterWrapper}>
 							<div css={headerWrapper}>
 								<input
