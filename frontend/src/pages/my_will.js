@@ -16,7 +16,6 @@ import { Card } from "antd";
 import ReceiverList from "../components/ReceiverList";
 
 import { WillACTIONS } from "../reducers/will";
-import useDidMountEffect from "../hooks/useDidMountEffect";
 
 /* 
     로그인 한 상태에서만 유언장 페이지에 접근가능
@@ -32,12 +31,7 @@ const MyWill = () => {
     const dispatch = useDispatch();
     const { willList } = useSelector(state => state.will);
 
-
-    // 유언장 리스트 테스트 state
-    // const [testList, setTestList] = useState(null);
-
-
-    // 임시 로그인 토글 설정
+    
     const loginBtnHandler = useCallback(() => {
         setIsLogIn((prev) => !prev);
     }, []);
@@ -157,7 +151,7 @@ const MyWill = () => {
                     <div css={adContentStyle}>
                         <h2>나의 유언장</h2>
                         <p>유언장을 작성하거나 아래 항목에서 유언장을 확인하세요</p>
-                        <Button>유언장 작성하기</Button>
+                        <Link href="/my_will_detail"><Button>유언장 작성하기</Button></Link>
                     </div>
                     <div css={imageStyle}>
                         <Image
