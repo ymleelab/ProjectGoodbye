@@ -1,13 +1,7 @@
 import multerS3 from 'multer-s3';
 import multer from 'multer';
-import { S3 } from 'aws-sdk';
 import { Request } from 'express';
-
-const s3 = new S3({
-    accessKeyId: process.env.AWS_ACCESS_KEY,
-    secretAccessKey: process.env.AWS_SECRET_KEY,
-    region: process.env.AWS_REGION,
-});
+import { s3 } from '../config/s3';
 
 const uploadImage = multer({
     storage: multerS3({
@@ -15,11 +9,19 @@ const uploadImage = multer({
         bucket: 'elice-good-bye-project',
         contentType: multerS3.AUTO_CONTENT_TYPE,
         acl: 'public-read-write',
-        key: (req: Request, file, cd: any) => {
+        key: (req: Request, file, callback: any) => {
             const fileName = `photo/${Date.now()}.jpg`;
-            cd(null, fileName);
+            callback(null, fileName);
         },
     }),
+    fileFilter(req, file, callback) {
+        const extension = file.mimetype.split('/')[1];
+        if (!['png', 'jpg', 'jpeg', 'gif', 'bmp'].includes(extension)) {
+            return callback(new Error('이미지 파일을 등록해 주세요.'));
+        }
+
+        return callback(null, true);
+    },
 });
 
 export { uploadImage };
