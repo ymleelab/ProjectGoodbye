@@ -1,5 +1,6 @@
 import { willModel, WillModel } from '../db/models/will-model';
 import type { InterfaceWill } from '../db/schemas/will-schema';
+
 class WillService {
     willModel: WillModel;
 
@@ -34,6 +35,14 @@ class WillService {
     async findWillsForOneUser(userId: string) {
         const foundWills = await this.willModel.findWillsByUserId(userId);
         return foundWills;
+    }
+
+    async deleteReceiver(willId: string, receiverId: string) {
+        const updatedWill = await this.willModel.deleteReceiver(
+            willId,
+            receiverId,
+        );
+        return updatedWill;
     }
 }
 

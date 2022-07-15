@@ -182,6 +182,7 @@ authRouter.delete(
             const deletedUserInfo = await userService.deleteUser(
                 userInfoRequired,
             );
+            // 유저 관련 유언장과 수신자, 추모 정보 삭제 필요...
             // 만약에 정상적으로 delete가 되어서 delete한 유저 정보가 있다면,
             if (deletedUserInfo) {
                 res.status(200).json({ result: 'success' });
@@ -374,7 +375,7 @@ authRouter.patch(
                 title,
                 content,
                 receivers,
-            })
+            });
             const toUpdate = {
                 ...(title && { title }),
                 ...(content && { content }),
@@ -535,9 +536,21 @@ authRouter.delete(
                 userId,
                 receiverId,
             );
-            console.log(updatedUser);
             // wills들 중, receiver가 들어가 있다면, 모든 해당하는 유언장에서 지워야함.
             // 이부분은 좀 있다가 수정하자..
+            // const updatedWills
+            const user = await userService.getUser(userId);
+            if (user) {
+                const { wills } = user;
+                if (wills) {
+                    console.log(user.wills);
+                    wills.forEach(async (willId) => {
+                        await willService.deleteReceiver(willId, receiverId);
+                    });
+                }
+            }
+            // console.log('wills: ' +wills);
+
             res.status(200).json({ result: 'success' });
         } catch (error) {
             next(error);
