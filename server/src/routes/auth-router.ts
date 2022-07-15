@@ -180,10 +180,23 @@ authRouter.delete(
             }
 
             const userInfoRequired = { userId, currentPassword };
+            //유저 정보 유저 변수에 저장
+            const user: any = await userService.getUser(userId);
+            //유저 삭제
             const deletedUserInfo = await userService.deleteUser(
                 userInfoRequired,
             );
-            // 유저 관련 유언장과 수신자, 추모 정보 삭제 필요...
+            // 해당 유저의 유언장과 수신자 정보 삭제
+            const { wills, receivers } = user;
+            wills.forEach(async (willId: string) => {
+                await willService.deleteWill(willId);
+            });
+            receivers.forEach(async (receiverId: string) => {
+                await receiverService.deleteReceiver(receiverId);
+            });
+            
+            // 유저 관련 유언장과 수신자삭제 완료
+            // 추모도 삭제해야하나?
             // 만약에 정상적으로 delete가 되어서 delete한 유저 정보가 있다면,
             if (deletedUserInfo) {
                 res.status(200).json({ result: 'success' });
