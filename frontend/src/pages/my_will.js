@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo, useRef } from "react";
+    import React, { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 
@@ -185,7 +185,7 @@ const MyWill = () => {
                                         title={will.title}
                                         extra={
                                             <CardBtnGroup>
-                                                <Link href="/willdetail"><a css={aTagStyle}>유언장 상세보기</a></Link>
+                                                <Link href="/my_will_detail"><a css={aTagStyle}>유언장 상세보기</a></Link>
                                                 <Button type='button' onClick={() => onClickDelete(will)}>유언장 제거하기</Button>
                                             </CardBtnGroup>
                                         }
