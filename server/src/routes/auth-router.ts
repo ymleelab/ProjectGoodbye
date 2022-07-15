@@ -11,6 +11,7 @@ import {
     updateWillJoiSchema,
 } from '../db/schemas/joi-schemas/will-joi-schema';
 import { userUpdateJoiSchema } from '../db/schemas/joi-schemas/user-joi-schema';
+import { InterfaceUserResult } from '../db/schemas/user-schema';
 // ts-node에서 typeRoot인지 type인지는 모르겠으나, --file 옵션을 package.json이나 file:true를 tsconfig에 해주지 않으면 적용이 안된다고 함.
 declare global {
     namespace Express {
@@ -539,16 +540,14 @@ authRouter.delete(
             // wills들 중, receiver가 들어가 있다면, 모든 해당하는 유언장에서 지워야함.
             // 이부분은 좀 있다가 수정하자..
             // const updatedWills
-            const user = await userService.getUser(userId);
-            if (user) {
-                const { wills } = user;
-                if (wills) {
-                    console.log(user.wills);
-                    wills.forEach(async (willId) => {
-                        await willService.deleteReceiver(willId, receiverId);
-                    });
-                }
-            }
+            const user: any = await userService.getUser(userId);
+
+            const { wills } = user;
+            console.log(user.wills);
+            wills.forEach(async (willId: string) => {
+                await willService.deleteReceiver(willId, receiverId);
+            });
+
             // console.log('wills: ' +wills);
 
             res.status(200).json({ result: 'success' });
