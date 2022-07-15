@@ -36,6 +36,25 @@ const MyPage = () => {
 			.catch((err) => alert(err.response.data.reason));
 	}, [currentPassword, password]);
 
+	const onDeleteUser = useCallback(async () => {
+		const userId = sessionStorage.getItem('userId');
+		const token = sessionStorage.getItem('token');
+
+		await axios
+			.delete(`/api/auth/${userId}`, {
+				headers: { Authorization: `Bearer ${token}` },
+				data: { currentPassword: currentPassword },
+			})
+			.then((res) => {
+				console.log(res);
+				alert('성공적으로 회원 탈퇴 되었습니다.');
+				sessionStorage.removeItem('userId');
+				sessionStorage.removeItem('token');
+				Router.replace('/');
+			})
+			.catch((err) => alert(err.response.data.reason));
+	}, [currentPassword]);
+
 	return (
 		<AppLayout>
 			<div css={adBoxStyle}>
@@ -91,7 +110,11 @@ const MyPage = () => {
 							/>
 							<div css={buttonWrapper}>
 								<input type="submit" value="수정완료" />
-								<input type="button" value="회원탈퇴" />
+								<input
+									type="button"
+									value="회원탈퇴"
+									onClick={onDeleteUser}
+								/>
 							</div>
 						</div>
 					</Form>
