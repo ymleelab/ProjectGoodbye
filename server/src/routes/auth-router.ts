@@ -1,9 +1,22 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { userService } from '../services/user-service';
-import { willService } from '../services/will-service';
-import { receiverService } from '../services/receiver-service';
-
-//ts-node에서 typeRoot인지 type인지는 모르겠으나, --file 옵션을 package.json이나 file:true를 tsconfig에 해주지 않으면 적용이 안된다고 함.
+import {
+    userService,
+    willService,
+    receiverService,
+    ImageService,
+} from '../services';
+import {
+    createReceiverJoiSchema,
+    updateReceiverJoiSchema,
+} from '../db/schemas/joi-schemas/receiver-joi-schema';
+import {
+    createWillJoiSchema,
+    updateWillJoiSchema,
+} from '../db/schemas/joi-schemas/will-joi-schema';
+import { userUpdateJoiSchema } from '../db/schemas/joi-schemas/user-joi-schema';
+import { uploadImage } from '../middlewares';
+import { InterfaceUserResult } from '../db/schemas/user-schema';
+// ts-node에서 typeRoot인지 type인지는 모르겠으나, --file 옵션을 package.json이나 file:true를 tsconfig에 해주지 않으면 적용이 안된다고 함.
 declare global {
     namespace Express {
         interface User {
@@ -11,9 +24,9 @@ declare global {
         }
     }
 }
-const checkUserValidity = (req: Request, userId:string)=>{
-    if (!req.user){
-        throw new Error('유저가 존재하지 않습니다.')
+const checkUserValidity = (req: Request, userId: string) => {
+    if (!req.user) {
+        throw new Error('유저가 존재하지 않습니다.');
     }
     const loggedInUserId = req.user._id.toString();
     const isUserIdValid = loggedInUserId === userId;
@@ -21,14 +34,12 @@ const checkUserValidity = (req: Request, userId:string)=>{
         throw new Error('유저 토큰 정보가 일치하지 않습니다.');
     }
     return true;
-}
-
-
+};
 const authRouter = Router();
 
 authRouter.get('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        if (!req.user){
+        if (!req.user) {
             throw new Error('유저가 존재하지 않습니다.');
         }
         const userId = req.user._id;
@@ -72,6 +83,7 @@ authRouter.get('/', async (req: Request, res: Response, next: NextFunction) => {
 
 authRouter.patch(
     '/:userId',
+    uploadImage.single('photo'),
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             // is로 req.body 확인 필요?
@@ -89,8 +101,20 @@ authRouter.patch(
             checkUserValidity(req, userId);
 
             // body data 로부터 업데이트할 사용자 정보를 추출함.
-            const { fullName, password, dateOfBirth, photo, currentPassword } =
+            const { fullName, password, dateOfBirth, currentPassword } =
                 req.body;
+            // s3에 이미지 업로드 후 url 반환
+            const photo = ImageService.addImage(
+                req.file as Express.MulterS3.File,
+            );
+
+            const isValid = await userUpdateJoiSchema.validateAsync({
+                fullName,
+                password,
+                dateOfBirth,
+                currentPassword,
+                photo,
+            });
             // currentPassword 없을 시, 진행 불가
             if (currentPassword === password) {
                 throw new Error(
@@ -166,9 +190,23 @@ authRouter.delete(
             }
 
             const userInfoRequired = { userId, currentPassword };
+            //유저 정보 유저 변수에 저장
+            const user: any = await userService.getUser(userId);
+            //유저 삭제
             const deletedUserInfo = await userService.deleteUser(
                 userInfoRequired,
             );
+            // 해당 유저의 유언장과 수신자 정보 삭제
+            const { wills, receivers } = user;
+            wills.forEach(async (willId: string) => {
+                await willService.deleteWill(willId);
+            });
+            receivers.forEach(async (receiverId: string) => {
+                await receiverService.deleteReceiver(receiverId);
+            });
+            
+            // 유저 관련 유언장과 수신자삭제 완료
+            // 추모도 삭제해야하나?
             // 만약에 정상적으로 delete가 되어서 delete한 유저 정보가 있다면,
             if (deletedUserInfo) {
                 res.status(200).json({ result: 'success' });
@@ -250,10 +288,15 @@ authRouter.post(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { userId } = req.params;
-            checkUserValidity(req,userId);
+            checkUserValidity(req, userId);
             // will collection에 추가
             // receivers 부분을 클라이언트가 잘 찾아서 바디에 넣기가 쉽나? 그러면 전혀 문제가 없을 듯
             const { title, content, receivers } = req.body;
+            const isValid = await createWillJoiSchema.validateAsync({
+                title,
+                content,
+                receivers,
+            });
             const newWill = await willService.addWill({
                 title,
                 content,
@@ -352,6 +395,11 @@ authRouter.patch(
             const { userId, willId } = req.params;
             checkUserValidity(req, userId);
             const { title, content, receivers } = req.body;
+            const isValid = await updateWillJoiSchema.validateAsync({
+                title,
+                content,
+                receivers,
+            });
             const toUpdate = {
                 ...(title && { title }),
                 ...(content && { content }),
@@ -444,6 +492,12 @@ authRouter.post(
             checkUserValidity(req, userId);
             // receiver collection에 추가
             const { fullName, emailAddress, relation, role } = req.body;
+            const isValid = await createReceiverJoiSchema.validateAsync({
+                fullName,
+                emailAddress,
+                relation,
+                role,
+            });
             const newReceiver = await receiverService.addReceiver({
                 fullName,
                 emailAddress,
@@ -506,9 +560,19 @@ authRouter.delete(
                 userId,
                 receiverId,
             );
-            console.log(updatedUser);
             // wills들 중, receiver가 들어가 있다면, 모든 해당하는 유언장에서 지워야함.
             // 이부분은 좀 있다가 수정하자..
+            // const updatedWills
+            const user: any = await userService.getUser(userId);
+
+            const { wills } = user;
+            console.log(user.wills);
+            wills.forEach(async (willId: string) => {
+                await willService.deleteReceiver(willId, receiverId);
+            });
+
+            // console.log('wills: ' +wills);
+
             res.status(200).json({ result: 'success' });
         } catch (error) {
             next(error);
@@ -547,13 +611,18 @@ authRouter.delete(
  *
  */
 authRouter.patch(
-
     '/:userId/receivers/:receiverId',
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { userId, receiverId } = req.params;
             checkUserValidity(req, userId);
             const { fullName, emailAddress, relation, role } = req.body;
+            const isValid = await updateReceiverJoiSchema.validateAsync({
+                fullName,
+                emailAddress,
+                relation,
+                role,
+            });
             const toUpdate = {
                 ...(fullName && { fullName }),
                 ...(emailAddress && { emailAddress }),
