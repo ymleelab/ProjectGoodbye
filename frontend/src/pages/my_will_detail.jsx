@@ -12,6 +12,7 @@ import Router, { useRouter } from 'next/router';
 const MyWillDetail = () => {
 	const router = useRouter();
 	const { willList } = useSelector((state) => state.will);
+
 	//const params = new URLSearchParams(window.location.search);
 	//const id = params.get('id');
 
@@ -23,6 +24,8 @@ const MyWillDetail = () => {
 
 	const [receivers, setReceivers] = useState([]); //receiver Id 목록
 	const [receiverList, setReceiverList] = useState([]); //To 목록
+
+	const [willId, setWillId] = useState('');
 
 	//팝업 띄우기 관련
 	const [isModalVisible, setIsModalVisible] = useState(false);
@@ -43,6 +46,7 @@ const MyWillDetail = () => {
 			setTitle(willList[0][id].title);
 			setContent(willList[0][id].content);
 			setReceivers(willList[0][id].receivers);
+			setWillId(willList[0][id]._id);
 		}
 	}, []);
 
@@ -87,13 +91,17 @@ const MyWillDetail = () => {
 	});
 
 	//유언장 등록
-	const onSubmitForm = useCallback(() => {
+	const onSubmitForm = useCallback((httpMethod) => {
 		const userId = sessionStorage.getItem('userId');
 		const token = sessionStorage.getItem('token');
 
+		let url = `/api/auth/${userId}/will`;
+		if (willList.length > 0) {
+			url = `/api/auth/${userId}/wills/${willId}`;
+		}
 		axios
-			.post(
-				`/api/auth/${userId}/will`,
+			.httpMethod(
+				url,
 				{ title, content, receivers },
 				{
 					headers: {
@@ -181,7 +189,7 @@ const MyWillDetail = () => {
 							</Button>
 						</Modal>
 					</div>
-					<Form onFinish={onSubmitForm}>
+					<Form>
 						<div css={letterWrapper}>
 							<div css={headerWrapper}>
 								<input
@@ -214,13 +222,28 @@ const MyWillDetail = () => {
 										type="submit"
 										value="생성"
 										style={{ cursor: 'pointer' }}
+										onClick={() => {
+											onSubmitForm('post');
+										}}
 									/>
 								</div>
 							)}
 							{willList.length > 0 && (
 								<div>
-									<input type="button" value="삭제" />
-									<input type="submit" value="수정" />
+									<input
+										type="button"
+										value="삭제"
+										onClick={() => {
+											onSubmitForm('delete');
+										}}
+									/>
+									<input
+										type="submit"
+										value="수정"
+										onClick={() => {
+											onSubmitForm('patch');
+										}}
+									/>
 								</div>
 							)}
 						</div>
