@@ -11,10 +11,8 @@ import Router, { useRouter } from 'next/router';
 
 const MyWillDetail = () => {
 	const router = useRouter();
-	const { willList } = useSelector((state) => state.will);
 
-	//const params = new URLSearchParams(window.location.search);
-	//const id = params.get('id');
+	const { willList } = useSelector((state) => state.will);
 
 	const [title, onChangeTitle, setTitle] = useInput('');
 	const [content, onChangeContent, setContent] = useInput('');
@@ -26,6 +24,7 @@ const MyWillDetail = () => {
 	const [receiverList, setReceiverList] = useState([]); //To 목록
 
 	const [willId, setWillId] = useState('');
+	const [idParam, setIdParam] = useState('');
 
 	//팝업 띄우기 관련
 	const [isModalVisible, setIsModalVisible] = useState(false);
@@ -41,8 +40,9 @@ const MyWillDetail = () => {
 
 	useEffect(() => {
 		const { id } = router.query;
-		console.log(willList);
-		if (willList.length > 0) {
+		//console.log(id);
+		if (id) {
+			setIdParam(id);
 			setTitle(willList[0][id].title);
 			setContent(willList[0][id].content);
 			setReceivers(willList[0][id].receivers);
@@ -52,8 +52,7 @@ const MyWillDetail = () => {
 
 	//받는 사람 선택 팝업
 	const addReceiver = useCallback(() => {
-		const userId = sessionStorage.getItem('userId');
-		const token = sessionStorage.getItem('token');
+		const { userId, headerAuth } = getData();
 		const fullName = name;
 		const emailAddress = email;
 		const role = 'receiver';
@@ -66,11 +65,7 @@ const MyWillDetail = () => {
 					relation,
 					role,
 				},
-				{
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
-				},
+				headerAuth,
 			)
 			.then((res) => {
 				//To 항목에 보여줄 수신자 목록
@@ -90,28 +85,57 @@ const MyWillDetail = () => {
 			.catch((err) => alert(err.response.data.reason));
 	});
 
-	//유언장 등록
-	const onSubmitForm = useCallback((httpMethod) => {
+	//API 사용을 위한 공통 데이터
+	const getData = () => {
 		const userId = sessionStorage.getItem('userId');
 		const token = sessionStorage.getItem('token');
+		const headerAuth = {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		};
+		return { userId, headerAuth };
+	};
 
-		let url = `/api/auth/${userId}/will`;
-		if (willList.length > 0) {
-			url = `/api/auth/${userId}/wills/${willId}`;
-		}
+	//유언장 등록
+	const RegisterForm = useCallback(() => {
+		const { userId, headerAuth } = getData();
+		const url = `/api/auth/${userId}/will`;
+		const data = { title, content, receivers };
+
 		axios
-			.httpMethod(
-				url,
-				{ title, content, receivers },
-				{
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
-				},
-			)
-			.then((res) => {
-				console.log(res);
+			.post(url, data, headerAuth)
+			.then(() => {
 				alert('성공적으로 유언장이 등록되었습니다.');
+				Router.replace('/my_will');
+			})
+			.catch((err) => alert(err.response.data.reason));
+	});
+
+	//유언장 수정
+	const ChangeForm = useCallback(() => {
+		const { userId, headerAuth } = getData();
+		const url = `/api/auth/${userId}/wills/${willId}`;
+		const data = { title, content, receivers };
+
+		axios
+			.patch(url, data, headerAuth)
+			.then(() => {
+				alert('성공적으로 유언장이 수정되었습니다.');
+				Router.replace('/my_will');
+			})
+			.catch((err) => alert(err.response.data.reason));
+	});
+
+	//유언장 삭제
+	const DeleteForm = useCallback(() => {
+		const { userId, headerAuth } = getData();
+		const url = `/api/auth/${userId}/wills/${willId}`;
+
+		axios
+			.delete(url, headerAuth)
+			.then(() => {
+				alert('성공적으로 유언장이 삭제되었습니다.');
 				Router.replace('/my_will');
 			})
 			.catch((err) => alert(err.response.data.reason));
@@ -208,7 +232,7 @@ const MyWillDetail = () => {
 							/>
 						</div>
 						<div css={buttonWrapper}>
-							{willList.length <= 0 && (
+							{!idParam && (
 								<div>
 									<input
 										type="button"
@@ -222,27 +246,21 @@ const MyWillDetail = () => {
 										type="submit"
 										value="생성"
 										style={{ cursor: 'pointer' }}
-										onClick={() => {
-											onSubmitForm('post');
-										}}
+										onClick={RegisterForm}
 									/>
 								</div>
 							)}
-							{willList.length > 0 && (
+							{idParam && (
 								<div>
 									<input
 										type="button"
 										value="삭제"
-										onClick={() => {
-											onSubmitForm('delete');
-										}}
+										onClick={DeleteForm}
 									/>
 									<input
 										type="submit"
 										value="수정"
-										onClick={() => {
-											onSubmitForm('patch');
-										}}
+										onClick={ChangeForm}
 									/>
 								</div>
 							)}
