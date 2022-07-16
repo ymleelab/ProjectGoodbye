@@ -10,16 +10,18 @@ import axios from 'axios';
 
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import { Card } from 'antd';
 import 'antd/dist/antd.css';
 
 import Image from 'next/image';
 import Link from 'next/link';
 import AppLayout from '../components/AppLayout';
 import Pagination from '../components/Pagination';
-import { Card } from 'antd';
-
 import ReceiverList from '../components/ReceiverList';
+
+import { Button } from '../util/common_styles';
+import userLoginCheck from '../util/userLoginCheck';
+
 
 import { WillACTIONS } from '../reducers/will';
 
@@ -29,67 +31,26 @@ import { WillACTIONS } from '../reducers/will';
 */
 
 const MyWill = () => {
-	const [isLogIn, setIsLogIn] = useState(false);
-	const [currentPage, setCurrentPage] = useState(1);
-
 	const dispatch = useDispatch();
 	const { willList } = useSelector((state) => state.will);
+	const [isLogIn, setIsLogIn] = useState(null);
+	const [currentPage, setCurrentPage] = useState(1);
 
-	const loginBtnHandler = useCallback(() => {
-		setIsLogIn((prev) => !prev);
-	}, []);
-
+	
 	const clickPagination = useCallback(setCurrentPage, []);
 
-	// 로그인 예시 useEffect
-	// useEffect(() => {
-	//     // axios.post('/api/users/register', {
-	//     //     email: 'test@email.com',
-	//     //     fullName: '테스트',
-	//     //     password: '1234',
-	//     //     repeatPassword: '1234',
-	//     //     dateOfBirth: '01.24'
-	//     // }, {
-	//     //     headers: {
-	//     //         'Content-Type': 'application/json'
-	//     //     }
-	//     // })
-	//     // .then(res => console.log(res))
-	//     // .catch(err => console.log(err));
+    const setLoginValue = async () => {
+		const checkValue = await userLoginCheck();
+		setIsLogIn(checkValue);
+	}
 
-	//     axios.post('/api/users/login', {
-	//         email: 'test@email.com',
-	//         password: '1234'
-	//     })
-	//     .then(res => {
-	//         console.log(res);
-	//         sessionStorage.setItem('token', res.data.token);
-	//         sessionStorage.setItem('userId', res.data.userId)
-	//     })
-	//     .catch(err => console.log(err));
-	// }, [])
-
-	// 유언장에 데이터 넣기 예시
-	// useEffect(() => {
-	//     const userId = sessionStorage.getItem('userId');
-	//     const token = sessionStorage.getItem('token');
-	//     axios.post(`/api/auth/${userId}/will`, {
-	//         title: '유언장-21',
-	//         content: '유언장-21 내용~',
-	//         userId: userId,
-	//         receivers: Array(50).fill('').map((item, i) => `친구 ${i + 1}`)
-	//     }, {
-	//         headers: {
-	//             Authorization: `Bearer ${token}`
-	//         }
-	//     })
-	//     .then(res => console.log(res))
-	//     .catch(err => console.log(err));
-	// }, [])
 
 	useEffect(() => {
 		console.log('렌더링a');
 		getWillsList();
+
+		// 로그인 확인 부분
+		setLoginValue();
 	}, []);
 
 	console.log(willList, currentPage, willList.length);
@@ -174,10 +135,14 @@ const MyWill = () => {
 							회원가입을 해주세요!
 						</p>
 						<NoticeBtnGroup>
-							<Button onClick={loginBtnHandler}>
-								로그인하기
-							</Button>
-							<Button>회원가입하기</Button>
+							<Link href="/sign_in">
+								<Button>
+									로그인하기
+								</Button>
+							</Link>
+							<Link href="/sign_up">
+								<Button>회원가입하기</Button>
+							</Link>
 						</NoticeBtnGroup>
 					</NoticeBox>
 				) : (
@@ -265,11 +230,11 @@ const imageStyle = css`
 
 //==========================
 
-const Button = styled.button`
-	color: #3e606f;
-	background-color: #d1dbbd;
-	border: none;
-`;
+// const Button = styled.button`
+// 	color: #3e606f;
+// 	background-color: #d1dbbd;
+// 	border: none;
+// `;
 
 const aTagStyle = css`
 	color: #3e606f;
