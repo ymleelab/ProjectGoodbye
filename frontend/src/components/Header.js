@@ -25,7 +25,7 @@ const Header = () => {
 
     const setLoginValue = async () => {
 		const checkValue = await userLoginCheck();
-		console.log(checkValue);
+		// console.log(checkValue);
 		setIsLogIn(checkValue);
 	}
 

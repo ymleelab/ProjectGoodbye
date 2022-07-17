@@ -21,39 +21,72 @@ import ReceiverList from '../components/ReceiverList';
 
 import { Button } from '../util/common_styles';
 import userLoginCheck from '../util/userLoginCheck';
-
-
 import { WillACTIONS } from '../reducers/will';
+import { RECEIVERACTIONS } from '../reducers/receivers';
+import getUserIdToken from '../util/getUserIdToken';
+
+
 
 /* 
-    로그인 한 상태에서만 유언장 페이지에 접근가능
-    로그인 하지 않은 상태에서는 로그인, 회원가입 유도 화면 보여줌
+	로그인 한 상태에서만 유언장 페이지에 접근가능
+	로그인 하지 않은 상태에서는 로그인, 회원가입 유도 화면 보여줌
 */
 
 const MyWill = () => {
 	const dispatch = useDispatch();
-	const { willList } = useSelector((state) => state.will);
+
+	// receiverIdList는 사실상 이 페이지 내에서는 안 쓰고 유언장 등록 부분에 필요
+	// 추후 재사용 필요
+	const [ willList, allReceiverList] = useSelector((state) => {
+		return [state.will.willList, state.receivers.allReceiverList];
+	});
 	const [isLogIn, setIsLogIn] = useState(null);
 	const [currentPage, setCurrentPage] = useState(1);
 
-	
 	const clickPagination = useCallback(setCurrentPage, []);
 
-    const setLoginValue = async () => {
+	const loadValues = async () => {
 		const checkValue = await userLoginCheck();
+		
+		// 로그인 했을 경우 정보 불러오기
+		if (checkValue) {
+			getWillsList();
+			getReceiverIdList();
+		}
 		setIsLogIn(checkValue);
 	}
 
 
+
 	useEffect(() => {
-		console.log('렌더링a');
-		getWillsList();
+		
+		// 테스트 값 넣기
+		const { userId, token } = getUserIdToken();
+		// axios.post(`/api/auth/${userId}/will`, {
+		// 	title: 'test1....유언장-21',
+		// 	content: '유언장-21 내용~',
+		// 	userId: userId,
+		// 	receivers: ['62d3baea2a0a7050008fbf7b',
+		// 				'62d3baf42a0a7050008fbf81',
+		// 				'62d3baff2a0a7050008fbf87',
+		// 				'62d3bb0a2a0a7050008fbf8d',
+		// 				'62d3bb292a0a7050008fbf93'			
+		// 			]
+		// }, {
+		// 	headers: {
+		// 		Authorization: `Bearer ${token}`
+		// 	}
+		// })
+		// .then(res => console.log(res))
+		// .catch(err => console.log(err));
 
 		// 로그인 확인 부분
-		setLoginValue();
+		loadValues();
 	}, []);
 
-	console.log(willList, currentPage, willList.length);
+    // console.log(receiverIdList);	
+
+	// console.log(willList, currentPage, willList.length);
 
 	const pageListUpdate = () => {
 		// 마지막 페이지를 삭제 했다면 현재 페이지 번호 앞으로 이동
@@ -68,8 +101,21 @@ const MyWill = () => {
 		});
 	};
 
+	const getReceiverIdList = () => {
+		const token = sessionStorage.getItem('token');
+		const userId = sessionStorage.getItem('userId');
+		axios.get(`/api/auth/${userId}/receivers`, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		}).then(res => {
+			console.log(res);
+			dispatch(RECEIVERACTIONS.getReceivers({ lists: res.data }));
+		}).catch(err => console.log(err));
+	}
+
 	const getWillsList = () => {
-		console.log('겟윌함수');
+		// console.log('겟윌함수');
 		const token = sessionStorage.getItem('token');
 		const userId = sessionStorage.getItem('userId');
 		axios
@@ -98,7 +144,6 @@ const MyWill = () => {
 				},
 			})
 			.then(() => {
-				// dispatch(WillACTIONS.removeWill({ will }));
 				console.log('확인3');
 				getWillsList();
 			})
@@ -150,39 +195,39 @@ const MyWill = () => {
 						<CardGroup>
 							{willList.length > 0
 								? willList[currentPage - 1].map((will, i) => (
-										<Card
-											title={will.title}
-											extra={
-												<CardBtnGroup>
-													<Link
-														href={{
-															pathname:
-																'/my_will_detail',
-															query: `id=${i}`,
-														}}
-													>
-														<a css={aTagStyle}>
-															유언장 상세보기
-														</a>
-													</Link>
-													<Button
-														type="button"
-														onClick={() =>
-															onClickDelete(will)
-														}
-													>
-														유언장 제거하기
-													</Button>
-												</CardBtnGroup>
-											}
-											style={{
-												width: '20rem',
-											}}
-											key={`card-${i}`}
-										>
-											<ReceiverList will={will} />
-										</Card>
-								  ))
+									<Card
+										title={will.title}
+										extra={
+											<CardBtnGroup>
+												<Link
+													href={{
+														pathname:
+															'/my_will_detail',
+														query: `id=${i}`,
+													}}
+												>
+													<a css={aTagStyle}>
+														유언장 상세보기
+													</a>
+												</Link>
+												<Button
+													type="button"
+													onClick={() =>
+														onClickDelete(will)
+													}
+												>
+													유언장 제거하기
+												</Button>
+											</CardBtnGroup>
+										}
+										style={{
+											width: '20rem',
+										}}
+										key={`card-${i}`}
+									>
+										<ReceiverList receiverIdList={will.receivers} />
+									</Card>
+								))
 								: '유언장 정보가 없습니다..'}
 						</CardGroup>
 						<Pagination
