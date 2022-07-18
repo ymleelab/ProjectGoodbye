@@ -227,6 +227,7 @@ const buttonWrapper = css`
 		border: none;
 		width: 49%;
 		padding: 10px;
+		cursor: pointer;
 	}
 `;
 export default MyPage;

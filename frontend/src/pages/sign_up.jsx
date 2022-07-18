@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect } from 'react';
-
+import Link from 'next/link';
 import { Form } from 'antd';
 import { css } from '@emotion/react';
 import useInput from '../hooks/useInput';
@@ -8,7 +8,6 @@ import axios from 'axios';
 import Router from 'next/router';
 
 import userLoginCheck from '../util/userLoginCheck';
-
 
 const SignUp = () => {
 	// const [isLogIn, setIsLogIn] = useState(null);
@@ -23,15 +22,15 @@ const SignUp = () => {
 	useEffect(() => {
 		// 로그인한 유저가 접속하지 못하게 하는 부분
 		preventUserAccess();
-	}, [])
+	}, []);
 
-    const preventUserAccess = async () => {
-        const isLogIn = await userLoginCheck();		
+	const preventUserAccess = async () => {
+		const isLogIn = await userLoginCheck();
 		if (isLogIn) {
 			alert('이미 로그인 되어있습니다..');
 			Router.replace('/');
 		}
-	}
+	};
 
 	const onSubmitForm = useCallback(() => {
 		const data = { email, fullName, dateOfBirth, password, repeatPassword };
@@ -115,7 +114,9 @@ const SignUp = () => {
 						</div>
 						<div css={buttonWrapper}>
 							<input type="submit" value="회원가입" />
-							<input type="button" value="취소" />
+							<Link href={'/'}>
+								<input type="button" value="취소" />
+							</Link>
 						</div>
 					</Form>
 				</section>
@@ -176,6 +177,7 @@ const buttonWrapper = css`
 		border: none;
 		width: 49%;
 		padding: 10px;
+		cursor: pointer;
 	}
 `;
 

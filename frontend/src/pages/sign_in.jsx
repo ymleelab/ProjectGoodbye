@@ -132,17 +132,13 @@ const forgetWrapper = css`
 const buttonWrapper = css`
 	width: 100%;
 
-	& > input[type='submit'] {
-		margin-right: 2%;
-		background-color: #3e606f;
-	}
-
 	& > input {
-		background-color: #91aa9d;
+		background-color: #3e606f;
 		color: white;
 		border: none;
 		width: 100%;
 		padding: 10px;
+		cursor: pointer;
 	}
 `;
 
