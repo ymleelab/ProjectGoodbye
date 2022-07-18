@@ -329,7 +329,7 @@ const buttonWrapper = css`
 	width: 100%;
 	margin-top: 3rem;
 	& > div > input[type='submit'] {
-		margin-right: 2%;
+		margin-right: 0.5em;
 		background-color: #3e606f;
 	}
 
@@ -340,34 +340,8 @@ const buttonWrapper = css`
 		border: none;
 		width: 5rem;
 		padding: 10px;
-		border-radius: 1rem;
+		border-radius: 0.2rem;
 	}
 `;
 
-const adBoxStyle = css`
-	display: flex;
-	width: 100%;
-	height: 30rem;
-	margin: 10rem 0;
-	padding: 2rem;
-	align-item: center;
-	&:nth-of-type(even) {
-		flex-direction: row-reverse;
-	}
-`;
-
-const adContentStyle = css`
-	width: 50%;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-`;
-
-const imageStyle = css`
-	position: relative;
-	width: 50%;
-	line-height: 10rem;
-	background-color: silver;
-`;
 export default MyWillDetail;
