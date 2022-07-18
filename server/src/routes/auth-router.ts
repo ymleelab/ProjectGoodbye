@@ -37,18 +37,39 @@ const checkUserValidity = (req: Request, userId: string) => {
 };
 const authRouter = Router();
 
-authRouter.get('/', async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        if (!req.user) {
-            throw new Error('유저가 존재하지 않습니다.');
+/**
+ * @swagger
+ * /api/auth/{userId}/isLoggedIn:
+ *   get:
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         required: true
+ *     security:
+ *       - bearerAuth: []
+ *     tags: [AuthUser]
+ *     summary: 유저가 로그인이 되어있다면, result-"success"를 반환하는 API
+ *     description: 유저가 로그인이 되어있다면, result- "success"를 반환 (jwt token 값이 올바르다면)
+ *     responses:
+ *       200:
+ *         description: result success
+ *
+ */
+
+authRouter.get(
+    '/:userId/isLoggedIn',
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { userId } = req.params;
+            checkUserValidity(req, userId);
+            res.status(200).json({ result: 'success' });
+        } catch (error) {
+            next(error);
         }
-        const userId = req.user._id;
-        // const userIdReal= req.user._id;
-        res.status(200).json({ userId });
-    } catch (error) {
-        next(error);
-    }
-});
+    },
+);
 
 /**
  * @swagger
@@ -190,9 +211,9 @@ authRouter.delete(
             }
 
             const userInfoRequired = { userId, currentPassword };
-            //유저 정보 유저 변수에 저장
+            // 유저 정보 유저 변수에 저장
             const user: any = await userService.getUser(userId);
-            //유저 삭제
+            // 유저 삭제
             const deletedUserInfo = await userService.deleteUser(
                 userInfoRequired,
             );
@@ -204,7 +225,7 @@ authRouter.delete(
             receivers.forEach(async (receiverId: string) => {
                 await receiverService.deleteReceiver(receiverId);
             });
-            
+
             // 유저 관련 유언장과 수신자삭제 완료
             // 추모도 삭제해야하나?
             // 만약에 정상적으로 delete가 되어서 delete한 유저 정보가 있다면,
