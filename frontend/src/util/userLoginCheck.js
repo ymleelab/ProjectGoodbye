@@ -15,8 +15,6 @@ const userLoginCheck = async () => {
                             Authorization: `Bearer ${token}`
                         }
                     });
-        
-        console.log(res);
         return true;
     } catch (error) {
         // alert('로그인 상태가 아니거나 유효하지 않은 접근입니다.');
