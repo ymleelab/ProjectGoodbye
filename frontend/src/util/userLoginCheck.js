@@ -7,6 +7,7 @@ const userLoginCheck = async () => {
 
     if (!userId || !token) return false;
 
+
     // 서버에서 로그인 인증 
     try {
         const res = await axios.get(`/api/auth/${userId}/receivers`, {
@@ -14,6 +15,7 @@ const userLoginCheck = async () => {
                             Authorization: `Bearer ${token}`
                         }
                     });
+        
         console.log(res);
         return true;
     } catch (error) {

@@ -51,7 +51,7 @@ const MyWill = () => {
 		// 로그인 했을 경우 정보 불러오기
 		if (checkValue) {
 			getWillsList();
-			getReceiverIdList();
+			getReceiverList();
 		}
 		setIsLogIn(checkValue);
 	}
@@ -90,7 +90,7 @@ const MyWill = () => {
 
 	const pageListUpdate = () => {
 		// 마지막 페이지를 삭제 했다면 현재 페이지 번호 앞으로 이동
-		console.log('페이지업뎃 함수', currentPage);
+		// console.log('페이지업뎃 함수', currentPage);
 		setCurrentPage((currentPageNum) => {
 			const updatePageNum =
 				willList[currentPageNum - 1] === undefined
@@ -101,7 +101,7 @@ const MyWill = () => {
 		});
 	};
 
-	const getReceiverIdList = () => {
+	const getReceiverList = () => {
 		const token = sessionStorage.getItem('token');
 		const userId = sessionStorage.getItem('userId');
 		axios.get(`/api/auth/${userId}/receivers`, {
@@ -109,7 +109,7 @@ const MyWill = () => {
 				Authorization: `Bearer ${token}`,
 			},
 		}).then(res => {
-			console.log(res);
+			// console.log(res);
 			dispatch(RECEIVERACTIONS.getReceivers({ lists: res.data }));
 		}).catch(err => console.log(err));
 	}
@@ -225,7 +225,7 @@ const MyWill = () => {
 										}}
 										key={`card-${i}`}
 									>
-										<ReceiverList receiverIdList={will.receivers} />
+										<ReceiverList will={will} />
 									</Card>
 								))
 								: '유언장 정보가 없습니다..'}
