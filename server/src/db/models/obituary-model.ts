@@ -30,8 +30,13 @@ export class ObituaryModel {
         const obituary = await this.Obituary.findOne({
             _id: obituaryId,
         });
+        if (!obituary) {
+            throw new Error(
+                '해당 부고는 존재하지 않습니다. 다시 확인해 주세요.',
+            );
+        }
 
-        return obituary as IObituary;
+        return obituary;
     }
 
     // 부고 수정
@@ -47,8 +52,11 @@ export class ObituaryModel {
             update,
             option,
         );
+        if (!updatedObituary) {
+            throw new Error('부고 수정에 실패했습니다.');
+        }
 
-        return updatedObituary as IObituary;
+        return updatedObituary;
     }
 
     // 부고 삭제
@@ -56,8 +64,11 @@ export class ObituaryModel {
         const filter = { _id: obituaryId };
 
         const deletedObituary = await this.Obituary.findOneAndDelete(filter);
+        if (!deletedObituary) {
+            throw new Error('부고 삭제에 실패했습니다.');
+        }
 
-        return deletedObituary as IObituary;
+        return deletedObituary;
     }
 }
 
