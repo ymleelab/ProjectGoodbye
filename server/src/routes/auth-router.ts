@@ -16,6 +16,7 @@ import {
 import { userUpdateJoiSchema } from '../db/schemas/joi-schemas/user-joi-schema';
 import { uploadImage } from '../middlewares';
 import { InterfaceUserResult } from '../db/schemas/user-schema';
+import { sendMailTest } from '../services/mail-service';
 // ts-node에서 typeRoot인지 type인지는 모르겠으나, --file 옵션을 package.json이나 file:true를 tsconfig에 해주지 않으면 적용이 안된다고 함.
 declare global {
     namespace Express {
@@ -121,13 +122,13 @@ authRouter.patch(
                 req.file as Express.MulterS3.File,
             );
 
-            const isValid = await userUpdateJoiSchema.validateAsync({
-                fullName,
-                password,
-                dateOfBirth,
-                currentPassword,
-                photo,
-            });
+            // const isValid = await userUpdateJoiSchema.validateAsync({
+            //     fullName,
+            //     password,
+            //     dateOfBirth,
+            //     currentPassword,
+            //     photo,
+            // });
             // currentPassword 없을 시, 진행 불가
             if (currentPassword === password) {
                 throw new Error(
@@ -159,24 +160,116 @@ authRouter.patch(
         }
     },
 );
-// AuthRouter의 user Patch나 Post요청과 비슷한 느낌?
+// AuthRouter의 user Patch 시 비슷한 느낌?
 // 회원이 자신의 유언장 전송 권한을 줄 api -post 요청과 조금 다른 느낌인데 다른 api를 사용해야 할려나?
 // 로직이 나의 trusted-user가 될 사람에게 서비스 관련 이메일과 회원가입 내용이 담긴 이메일을 보냄
-// confirmed? true, false로 보여지게 해야하나? 
-
-//UserRouter -이메일의 링크를 따라서 온 경우...
+// confirmed? true, false로 보여지게 해야하나? - user schema에 userTrust 관련 정보를 등록 (userId없이, confirmed false)
+// UserRouter -이메일의 링크를 따라서 온 경우...
 // Query를 사용...
-// 회원가입이 안되어 있다면 
+// register post 요청
+// 회원가입이 안되어 있다면
 // (이메일 안의 url에 해당 회원의 아이디를 넣어서 post요청하는 방식?)..
 // 성공적인 post요청 이후 confirmation 페이지로 redirect하는 등의 방식..
-// 회원 가입이 되어 있다면 login post 요청에 회원의 아이디 정보를 넣을까.. 이것또한 redirect하는 방식으로
-//redirect 이후는 authRouter 통해야 하고..  
 
+// 회원 가입이 되어 있다면 login post 요청에 회원의 아이디 정보를 넣을까.. 이것또한 redirect하는 방식으로
+// redirect 이후는 authRouter 통해야 하고..
 
 // trusted 회원이 남을 위해서 회원가입하고, 서비스 가입을 함 (확정을 누르게 되는 시점)
 // managedUsers 부분에도 confirmed가 들어가 있어야 하나?
 // 회원 가입 이 후, 자신이 확정을 한다면 자신의 managedUsers에 회원 아이디 추가, 해당되는 유저의 trustedUser의 confirmed 를 true,
-// confirmed란 사실과 trustedUser의 아이디를 추가. 
+// confirmed란 사실과 trustedUser의 아이디를 추가.
+
+///  이메일을 받은 사람이 유언장 발송 권한을 confirm하기전에 query로 받아온 정보로 managedUsers에 추가하는 api
+authRouter.patch(
+    '/:userId/managedUsers',
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { userId } = req.params;
+            checkUserValidity(req, userId);
+
+            // body data 로부터 업데이트할 사용자 정보를 추출함.
+            const { email, managedUserId } = req.query; // query로 받아온다고 가정
+
+            // const isValid = await userUpdateJoiSchema.validateAsync({
+            //     fullName,
+            //     password,
+            //     dateOfBirth,
+            //     currentPassword,
+            //     photo,
+            // });
+            const managedUser = {
+                email,
+                userId: managedUserId,
+                confirm: false,
+            };
+
+            // 위 데이터가 undefined가 아니라면, 즉, 프론트에서 업데이트를 위해
+            // 보내주었다면, 업데이트용 객체에 삽입함.
+
+            // 사용자 정보를 업데이트함.
+            const updatedUserInfo = await userService.setManagedUsers(
+                userId,
+                managedUser,
+            );
+            console.log(updatedUserInfo);
+
+            // 업데이트 이후의 유저 데이터를 프론트에 보내 줌
+            res.status(200).json(updatedUserInfo);
+        } catch (error) {
+            next(error);
+        }
+    },
+);
+// 유저가 확정을 지어서 trusted user를 확정한 경우 유저 정보를 두명 다 업데이트 하는 api
+authRouter.patch(
+    '/:userId/confirmation',
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            // 이메일 받아서 가입한 유저 아이디 확인
+            const { userId } = req.params;
+            checkUserValidity(req, userId);
+            const { managedUserId }: any = req.query; // or body?
+
+            // const isValid = await userUpdateJoiSchema.validateAsync({
+            //     fullName,
+            //     password,
+            //     dateOfBirth,
+            //     currentPassword,
+            //     photo,
+            // });
+            /// / confirm을 누른 사용자의 정보 변경
+            const userInfo: any = await userService.getUser(userId);
+            const { managedUsers } = userInfo;
+            managedUsers.map((el) => {
+                if (el.userId === managedUserId) {
+                    el.confirmed = true;
+                    return el;
+                }
+            });
+            const toUpdateManagedUsers = { managedUsers };
+            const trustedUserInfo = await userService.confirmManagedUsers(
+                userId,
+                toUpdateManagedUsers,
+            );
+            // 이제 자신의 유언장을 보내줄 사람이 정해진 사람 관련 유저 정보 변경
+            const toUpdateTrustedUser = {
+                userId,
+                confirmed: true,
+            };
+            const managedUserInfo = await userService.confirmManagedUsers(
+                managedUserId,
+                toUpdateTrustedUser,
+            );
+            const result = { mainUserInfo: managedUserInfo, trustedUserInfo };
+            res.status(200).json(result);
+        } catch (error) {
+            next(error);
+        }
+    },
+);
+
+// 자신이 유언장 전송 권한을 주고 싶은 email 주소를 입력하여서 그 이메일 주소를 trusted user 정보에 등록하고,
+// 그 이메일 주소로 서비스 관련 이메일 전송
 
 // 회원 탈퇴 api
 
@@ -557,7 +650,9 @@ authRouter.get(
         try {
             const { userId, receiverId } = req.params;
             checkUserValidity(req, userId);
-            const receiverFound = await receiverService.findReceiver(receiverId);
+            const receiverFound = await receiverService.findReceiver(
+                receiverId,
+            );
             res.status(200).json(receiverFound);
         } catch (error) {
             next(error);

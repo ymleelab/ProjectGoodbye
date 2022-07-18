@@ -177,13 +177,13 @@ usersRouter.post(
 
             const { fullName, email, password, repeatPassword, dateOfBirth } =
                 req.body;
-            const isValid = await registerJoiSchema.validateAsync({
-                fullName,
-                email,
-                password,
-                repeatPassword,
-                dateOfBirth,
-            });
+            // const isValid = await registerJoiSchema.validateAsync({
+            //     fullName,
+            //     email,
+            //     password,
+            //     repeatPassword,
+            //     dateOfBirth,
+            // });
 
             const newUser = await userService.addUser({
                 fullName,
@@ -255,6 +255,7 @@ usersRouter.post(
                                 expiresIn: '7d',
                             },
                         );
+
                         res.status(200).json({
                             token,
                             userId: user._id,
