@@ -26,7 +26,7 @@ const usersRouter = Router();
  *       example:
  *         currentPassword: "12345"
  *     UserUpdate:
- *       type: Object
+ *       type: object
  *       required:
  *         - currentPassword
  *       properties:
@@ -36,6 +36,7 @@ const usersRouter = Router();
  *           type: string
  *         photo:
  *           type: string
+ *           format: binary
  *         dateOfBirth:
  *           type: string
  *         currentPassword:
