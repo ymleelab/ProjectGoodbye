@@ -1,4 +1,8 @@
 import bcrypt from 'bcrypt';
+import {
+    createObituaryJoiSchema,
+    updateObituaryJoiSchema,
+} from '../db/schemas/joi-schemas';
 import { IUpdateObituary, obituaryModel, ObituaryModel } from '../db';
 import { IFamily, IObituary } from '../db/schemas/obituary-schema';
 
@@ -39,6 +43,7 @@ class ObituaryService {
             age,
             password: hashedPassword,
         };
+        await createObituaryJoiSchema.validateAsync(newInfo);
 
         const obituary = await this.obituaryModel.create(newInfo);
 
@@ -58,10 +63,15 @@ class ObituaryService {
         currentPassword: string,
         update: IUpdateObituary,
     ): Promise<IObituary> {
-        // 해당 부고의 비밀번호 조회
+        // 해당 부고 조회
         const obituary = await this.getObituaryById(obituaryId);
-        const hashedPassword = obituary.password;
+        const {
+            dateOfBirth: originBirth,
+            dateOfDeath: originDeath,
+            password: hashedPassword,
+        } = obituary;
 
+        // 비밀번호 일치하는지 확인
         const isPasswordCorrect = await bcrypt.compare(
             currentPassword,
             hashedPassword,
@@ -72,9 +82,25 @@ class ObituaryService {
             );
         }
 
+        // 탄생일 혹은 사망일 수정 시 age 수정
+        const { dateOfBirth: newBirth, dateOfDeath: newDeath } = update;
+        const dateOfBirth = newBirth || originBirth;
+        const dateOfDeath = newDeath || originDeath;
+
+        const age =
+            new Date(dateOfDeath).getFullYear() -
+            new Date(dateOfBirth).getFullYear() +
+            1;
+
+        const newInfo = {
+            ...update,
+            age,
+        };
+        await updateObituaryJoiSchema.validateAsync(newInfo);
+
         const updatedObituary = await this.obituaryModel.update(
             obituaryId,
-            update,
+            newInfo,
         );
 
         return updatedObituary;
