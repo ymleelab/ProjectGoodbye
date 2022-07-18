@@ -9,7 +9,7 @@ import 'antd/dist/antd.css';
 const ObituaryList = () => {
 	return (
 		<AppLayout>
-			<div css={imageStyle}>
+			<div css={titleImageStyle}>
 				<p>부고 리스트</p>
 			</div>
 			<div css={listWrapper}>
@@ -41,10 +41,11 @@ const listWrapper = css`
 	margin: 2rem;
 	padding: 5rem;
 `;
-const imageStyle = css`
+const titleImageStyle = css`
 	position: relative;
 	width: 100%;
 	height: 300px;
+	margin: 2rem 0;
 	background-image: url('https://images.unsplash.com/photo-1618927483829-2d16941299e8?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1486&q=80');
 	background-repeat: no-repeat;
 	background-size: cover;

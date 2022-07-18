@@ -57,6 +57,9 @@ const MyPage = () => {
 
 	return (
 		<AppLayout>
+			<div css={titleImageStyle}>
+				<p>마이페이지</p>
+			</div>
 			<div css={adBoxStyle}>
 				<div css={adContentStyle}>
 					<h2>나의 영정 사진</h2>
@@ -133,6 +136,26 @@ const MyPage = () => {
 const onChange = (checked) => {
 	console.log(`switch to ${checked}`);
 };
+
+const titleImageStyle = css`
+	position: relative;
+	width: 100%;
+	height: 300px;
+	margin: 2rem 0;
+	background-image: url('https://images.unsplash.com/photo-1601479604588-68d9e6d386b5?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1413&q=80');
+	background-repeat: no-repeat;
+	background-size: cover;
+	text-align: center;
+
+	& > p {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		color: #fff;
+		font-size: 1.5rem;
+	}
+`;
 
 const mainWrapper = css`
 	display: flex;
