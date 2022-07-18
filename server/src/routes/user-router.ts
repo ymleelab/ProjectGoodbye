@@ -266,6 +266,7 @@ usersRouter.post(
         }
     },
 );
+// 결국에는 한 유저의 유언장 목록을 전체 전송해야 할텐데, 이부분을 back에서 다 찾아서 전송하는 api가 맞을까, front가 client에서 여러번 요청을 하는게 나을까
 
 usersRouter.post(
     '/sendEmail',
