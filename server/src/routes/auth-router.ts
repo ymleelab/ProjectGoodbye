@@ -180,6 +180,36 @@ authRouter.patch(
 // confirmed란 사실과 trustedUser의 아이디를 추가.
 
 ///  이메일을 받은 사람이 유언장 발송 권한을 confirm하기전에 query로 받아온 정보로 managedUsers에 추가하는 api
+/**
+ * @swagger
+ * /api/auth/{userId}/managedUsers:
+ *   patch:
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         required: true
+ *       - in: query
+ *         name: email
+ *         schema:
+ *           type: string
+ *           required: true
+ *       - in: query
+ *         name: managedUserId
+ *         schema:
+ *           type: string
+ *           required: true
+ *     security:
+ *       - bearerAuth: []
+ *     tags: [AuthTrustAndManage]
+ *     summary: 유저에게서 이메일을 받아서 trusted user가 된 사람이 로그인 혹은 회원 가입 후, url query에서 받은 정보로 managedUsers에 초기 등록하는 API
+ *     description: 예를 들어서 유저 A가 B가 아들이어서 trusted user로 아들 이메일을 등록, 관련 이메일을 받은 아들 B가 메일의 링크를 따라서 신규 회원을 등록 그 이후에는 A의 trustedUser가 되겠냐는 confirm을 아직 안한 상황에서 우선 B의 정보에 아버지 A의 이메일과 userId 정보가 들어가게 되는 API
+ *     responses:
+ *       200:
+ *         description: 로그인한 유저가 patch 된 이후의 유저 정보 as JSON
+ *
+ */
 authRouter.patch(
     '/:userId/managedUsers',
     async (req: Request, res: Response, next: NextFunction) => {
@@ -221,6 +251,31 @@ authRouter.patch(
     },
 );
 // 유저가 확정을 지어서 trusted user를 확정한 경우 유저 정보를 두명 다 업데이트 하는 api
+/**
+ * @swagger
+ * /api/auth/{userId}/confirmation:
+ *   patch:
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         required: true
+ *       - in: query
+ *         name: managedUserId
+ *         schema:
+ *           type: string
+ *           required: true
+ *     security:
+ *       - bearerAuth: []
+ *     tags: [AuthTrustAndManage]
+ *     summary: 유저가 자신에게 할당된 managedUser에 대하여 confirm 버튼을 눌러서 생사여부 관한 책임을 지겠다고 선언했을 때, 본인과 해당하는 유저 정보 모두 confirmed를 true로 변환하고, 관련 정보를 업데이트하는 API.
+ *     description: 예를 들어서 유저 A가 B가 아들이어서 trusted user로 아들 이메일을 등록, B는 로그인 등의 과정을 모두 마친후 A의 생사여부 권한을 받기로 확정, 이 때의 A의 trustedUser의 userId와 confirmed true로 정보를 업데이트하고, 아들 B의 managedUsers의 A에 해당하는 managedUser object의 confirmed 정보 또한 true로 변경하게 되는 API.
+ *     responses:
+ *       200:
+ *         description: mainUserInfo-trustedUser를 처음 신청한 A의 정보, trustedUserInfo- trustedUser가 된 B의 정보 as JSON
+ *
+ */
 authRouter.patch(
     '/:userId/confirmation',
     async (req: Request, res: Response, next: NextFunction) => {
@@ -285,6 +340,32 @@ authRouter.patch(
 
 // 자신이 유언장 전송 권한을 주고 싶은 email 주소를 입력하여서 그 이메일 주소를 trusted user 정보에 등록하고,
 // 그 이메일 주소로 서비스 관련 이메일 전송
+/**
+ * @swagger
+ * /api/auth/{userId}/trustedUser:
+ *   patch:
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         required: true
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             $ref: '#/components/schemas/TrustedUserInfo'
+ *     tags: [AuthTrustAndManage]
+ *     summary: 유저가 자신의 유언장 전송, 생사여부를 변경 가능 권한을 주고 싶은 사람의 이메일과 현재 자신 계정의 비밀번호를 입력하면, 해당 이메일 주소로 관련 내용의 이메일을 보내면서, 자신의 trustedUser 정보를 업데이트 하는 API
+ *     description: 예를 들어서 유저 A가 B가 아들이어서 B에게 권한을 부여하기로 결정, B의 이메일 주소와 A 계정의 비밀번호를 확인 받고 A의 trustedUser 부분의 email부분이 아들 이메일로 등록됨, 아들은 ProjectGoodbye 서비스 관련 정보가 담긴 이메일을 받고, 이메일에는 링크등을 활용하여 신규유저인 경우 회원 가입, 기존 유저인 경우는 로그인을 해달라는 부탁을 받게 됨. 아직 HTML 부분은 API에서 크게 구현을 안했기 때문에 프론트 분들이 html을 이미 작성하신 양식이 있다면 비슷하게 작성해주시거나 같이 상의해보아요.
+ *     responses:
+ *       200:
+ *         description: 수정된 A의 정보 as JSON
+ *
+ */
 authRouter.patch(
     '/:userId/trustedUser',
     async (req: Request, res: Response, next: NextFunction) => {

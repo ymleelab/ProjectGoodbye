@@ -86,6 +86,19 @@ const usersRouter = Router();
  *       example:
  *         email: email@email.com
  *         password: "12345"
+ *     TrustedUserInfo:
+ *       type: Object
+ *       required:
+ *         - email
+ *         - currentPassword
+ *       properties:
+ *         email:
+ *           type: string
+ *         currentPassword:
+ *           type: string
+ *       example:
+ *         email: example@email.com
+ *         currentPassword: '12345678'
  *     User:
  *       type: Object
  *       properties:
