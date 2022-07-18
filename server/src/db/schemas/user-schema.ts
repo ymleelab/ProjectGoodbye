@@ -9,6 +9,8 @@ interface InterfaceUser {
     photo?: string;
     wills?: string[];
     receivers?: string[];
+    trustedUser?: string;
+    managedUsers?: string[];
 }
 
 interface InterfaceUserResult extends InterfaceUser {
@@ -52,6 +54,15 @@ const UserSchema = new Schema<InterfaceUser>(
             default: [],
         },
         receivers: {
+            type: [String],
+            required: false,
+            default: [],
+        },
+        trustedUser: {
+            type: String,
+            required: false,
+        },
+        managedUsers: {
             type: [String],
             required: false,
             default: [],
