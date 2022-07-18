@@ -105,6 +105,8 @@ const Wrapper = styled.header`
 		margin: 0;
 		line-height: 30px;
 		text-align: center;
+		font-size: 1.5em;
+		font-weight: bold;
 	}
 	h1:hover {
 		cursor: pointer;
