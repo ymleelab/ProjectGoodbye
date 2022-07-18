@@ -94,6 +94,8 @@ class ObituaryService {
 
         const newInfo = {
             ...update,
+            dateOfBirth,
+            dateOfDeath,
             age,
         };
         await updateObituaryJoiSchema.validateAsync(newInfo);
