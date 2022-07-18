@@ -270,7 +270,38 @@ authRouter.patch(
 
 // 자신이 유언장 전송 권한을 주고 싶은 email 주소를 입력하여서 그 이메일 주소를 trusted user 정보에 등록하고,
 // 그 이메일 주소로 서비스 관련 이메일 전송
+authRouter.patch(
+    '/:userId/trustedUser',
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            // 우선은 한번 설정하면 수정이 불가능하게 해야하나...?
+            // 이메일 받아서 가입한 유저 아이디 확인
+            const { userId } = req.params;
+            checkUserValidity(req, userId);
+            // body로 이메일 정보 + 현재 비밀번호 받아오기
+            const { email, currentPassword } = req.body;
+            const userInfoRequired = { userId, currentPassword };
+            const newTrustedUser = { email, confirmed: false };
+            const toUpdate = { trustedUser: newTrustedUser };
+            const updatedUserInfo = await userService.setUser(
+                userInfoRequired,
+                toUpdate,
+            );
+            // mail 전송하는 부분을 여기서 작성하는게 편할까?
+            const user = await userService.getUser(userId);
+            const { fullName } : any = user;
+            const receivers = [email];
+            const subject = `Project Goodbye 서비스의 ${fullName}님이 고객님에게 관리자 역할을 요청하였습니다.`;
+            const html = `<h1>아무말 대잔치..</h1>`
+            sendMailTest(receivers, subject, html);
 
+            // 업데이트 이후의 유저 데이터를 프론트에 보내 줌
+            res.status(200).json(updatedUserInfo);
+        } catch (error) {
+            next(error);
+        }
+    },
+);
 // 회원 탈퇴 api
 
 /**
