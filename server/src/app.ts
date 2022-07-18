@@ -14,7 +14,7 @@ import {
 } from './routes';
 import { passportConfiguration, JWTConfiguration } from './services';
 import { loginRequired, errorHandler, notFoundHandler } from './middlewares';
-import { specs } from '../swagger';
+import { swaggerSpecs } from '../swagger';
 
 const app = express();
 
@@ -38,7 +38,7 @@ JWTConfiguration();
 app.use(
     '/api-docs',
     swaggerUi.serve,
-    swaggerUi.setup(specs, { explorer: true }),
+    swaggerUi.setup(swaggerSpecs, { explorer: true }),
 );
 
 // routers
