@@ -2,8 +2,9 @@ import AppLayout from '../components/AppLayout';
 import Image from 'next/image';
 import Link from 'next/link';
 import { css } from '@emotion/react';
-import { Button, Pagination, Empty } from 'antd';
+import { Pagination, Empty } from 'antd';
 import 'antd/dist/antd.css';
+import { Button } from './../util/common_styles';
 // import chrysanthemum from '/images/chrysanthemum.jpg';
 
 const ObituaryList = () => {
@@ -26,7 +27,9 @@ const ObituaryList = () => {
 					}
 				>
 					<Link href={'/obituary_detail'}>
-						<Button type="primary">작성하기</Button>
+						<Button type="primary" style={{ marginTop: '2em' }}>
+							작성하기
+						</Button>
 					</Link>
 				</Empty>
 			</div>

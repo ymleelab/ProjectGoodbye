@@ -1,9 +1,10 @@
 import AppLayout from '../components/AppLayout';
 import Link from 'next/link';
 import { css } from '@emotion/react';
-import { Form, Button, Divider, Select, Input } from 'antd';
+import { Form, Divider, Select, Input } from 'antd';
 const { Search } = Input;
 import 'antd/dist/antd.css';
+import { Button } from './../util/common_styles';
 
 const ObituaryDetail = () => {
 	const onSearch = (value) => console.log(value);
@@ -101,8 +102,8 @@ const ObituaryDetail = () => {
 
 				<Divider orientation="left"></Divider>
 				<section css={sectionWrapper}>
-					<div style={{ float: 'right' }}>
-						<Button type="primary">등록</Button>
+					<div css={ButtonWrapper}>
+						<Button className="register">등록하기</Button>
 						<Link href={'/obituary_list'}>
 							<Button>목록</Button>
 						</Link>
@@ -122,12 +123,22 @@ const sectionWrapper = css`
 	width: 70vw;
 	margin: 2rem;
 
-	& > div > Button {
-		margin-right: 1rem;
-	}
-
 	&:last-child {
 		margin-bottom: 20vh;
+	}
+`;
+
+const ButtonWrapper = css`
+	float: right;
+	font-size: 1.1em;
+	font-weight: bold;
+
+	& > Button {
+		padding: 0.3rem 0.8rem;
+	}
+
+	& > .register {
+		margin-right: 1rem;
 	}
 `;
 const titleImageStyle = css`
