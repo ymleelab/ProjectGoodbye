@@ -2,7 +2,7 @@ import joi from 'joi';
 
 const createObituaryJoiSchema = joi.object({
     deceased: joi.string().required(),
-    dateOfBirth: joi.date().max(joi.ref('dateOfDeath')).iso().required(),
+    dateOfBirth: joi.date().iso().required(),
     dateOfDeath: joi
         .date()
         .min(joi.ref('dateOfBirth'))
@@ -17,7 +17,7 @@ const createObituaryJoiSchema = joi.object({
 
 const updateObituaryJoiSchema = joi.object({
     deceased: joi.string(),
-    dateOfBirth: joi.date().max(joi.ref('dateOfDeath')).iso(),
+    dateOfBirth: joi.date().iso(),
     dateOfDeath: joi.date().min(joi.ref('dateOfBirth')).max('now').iso(),
     age: joi.number(),
     family: joi.array(),

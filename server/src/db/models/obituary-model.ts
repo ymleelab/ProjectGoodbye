@@ -5,7 +5,7 @@ export interface IUpdateObituary {
     deceased?: string;
     dateOfBirth?: string;
     dateOfDeath?: string;
-    age?: number;
+    age: number;
     family?: Array<IFamily>;
     funeral?: string;
     dateOfCremate?: string;

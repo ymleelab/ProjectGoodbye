@@ -23,4 +23,3 @@ export * from './models/receiver-model';
 export * from './models/remembrance-model';
 export * from './models/comment-model';
 export * from './models/obituary-model';
-export * from './schemas/joi-schemas';
