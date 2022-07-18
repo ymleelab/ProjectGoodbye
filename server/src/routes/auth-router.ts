@@ -252,15 +252,30 @@ authRouter.patch(
                 toUpdateManagedUsers,
             );
             // 이제 자신의 유언장을 보내줄 사람이 정해진 사람 관련 유저 정보 변경
-            const toUpdateTrustedUser = {
+            const managedUserInfo: any = await userService.getUser(
+                managedUserId,
+            );
+            const { trustedUser } = managedUserInfo;
+            const { email } = trustedUser;
+            const updatedTrustedUser = {
+                email,
                 userId,
                 confirmed: true,
             };
-            const managedUserInfo = await userService.confirmManagedUsers(
-                managedUserId,
-                toUpdateTrustedUser,
-            );
-            const result = { mainUserInfo: managedUserInfo, trustedUserInfo };
+            const toUpdateTrustedUser = {
+                trustedUser: updatedTrustedUser,
+            };
+            console.log(toUpdateTrustedUser);
+            const updatedManagedUserInfo =
+                await userService.confirmManagedUsers(
+                    managedUserId,
+                    toUpdateTrustedUser,
+                );
+            console.log(managedUserInfo);
+            const result = {
+                mainUserInfo: updatedManagedUserInfo,
+                trustedUserInfo,
+            };
             res.status(200).json(result);
         } catch (error) {
             next(error);
@@ -289,10 +304,10 @@ authRouter.patch(
             );
             // mail 전송하는 부분을 여기서 작성하는게 편할까?
             const user = await userService.getUser(userId);
-            const { fullName } : any = user;
+            const { fullName }: any = user;
             const receivers = [email];
             const subject = `Project Goodbye 서비스의 ${fullName}님이 고객님에게 관리자 역할을 요청하였습니다.`;
-            const html = `<h1>아무말 대잔치..</h1>`
+            const html = `<h1>아무말 대잔치..</h1>`;
             sendMailTest(receivers, subject, html);
 
             // 업데이트 이후의 유저 데이터를 프론트에 보내 줌
