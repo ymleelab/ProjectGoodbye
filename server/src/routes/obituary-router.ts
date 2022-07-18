@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { obituaryService } from 'services';
+import { obituaryService } from '../services';
 
 const obituaryRouter = Router();
 
@@ -15,7 +15,7 @@ obituaryRouter.post('/', async (req, res, next) => {
             dateOfCremate,
             password,
         } = req.body;
-
+        
         const newObituary = await obituaryService.addObituary({
             deceased,
             dateOfBirth,

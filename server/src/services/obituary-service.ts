@@ -35,7 +35,7 @@ class ObituaryService {
             1;
         const hashedPassword = await bcrypt.hash(
             password as string,
-            Number(saltOrRounds),
+            saltOrRounds,
         );
 
         const newInfo = {

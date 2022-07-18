@@ -1,0 +1,239 @@
+tags:
+  - name: Obituaries
+    description: '부고 관련 API'
+
+components:
+  schemas:
+    Obituary:
+      type: object
+      required:
+        - deceased
+        - dateOfBirth
+        - dateOfDeath
+        - age
+        - family
+        - funeral
+        - dateOfCremate
+        - password
+      properties:
+        _id:
+          type: string
+          description: '부고 objectId'
+          example: '62d567dfd4d86996e6973c9e'
+        deceased:
+          type: string
+          description: '고인 이름'
+          example: '홍길동'
+        dateOfBirth:
+          type: string
+          format: date
+          description: '고인 탄생일'
+          example: '1999-12-30'
+        dateOfDeath:
+          type: string
+          format: date
+          description: '고인 사망일'
+          example: '2022-01-01'
+        age:
+          type: number
+          description: '고인 나이'
+          example: 100
+        family:
+          type: array
+          items:
+            $ref: "#/components/schemas/Family"
+          description: '상주 리스트'
+        funeral:
+          type: string
+          description: '장례식장 이름'
+          example: '편안한 장례식장'
+        dateOfCremate:
+          type: string
+          format: date
+          description: '발인 날짜'
+          example: '2099-01-04'
+        password:
+          type: string
+          description: '부고 비밀번호'
+          example: 'qwerty'
+    Family:
+      type: object
+      required:
+      - relation
+      - fullName
+      properties:
+        relation:
+          type: string
+          description: '고인과의 관계'
+          example: '장남'
+        fullName:
+          type: string
+          description: '상주 이름'
+          example: '홍철수'
+    ObituaryCreate:
+      type: object
+      required:
+        - deceased
+        - dateOfBirth
+        - dateOfDeath
+        - family
+        - funeral
+        - dateOfCremate
+        - password
+      properties:
+        deceased:
+          type: string
+          description: '고인 이름'
+          example: '홍길동'
+        dateOfBirth:
+          type: string
+          format: date
+          description: '고인 탄생일'
+          example: '1999-12-30'
+        dateOfDeath:
+          type: string
+          format: date
+          description: '고인 사망일'
+          example: '2099-01-01'
+        family:
+          type: array
+          items:
+            $ref: "#/components/schemas/Family"
+          description: '상주 리스트'
+        funeral:
+          type: string
+          description: '장례식장 이름'
+          example: '편안한 장례식장'
+        dateOfCremate:
+          type: string
+          format: date
+          description: '발인 날짜'
+          example: '2099-01-04'
+        password:
+          type: string
+          description: '부고 비밀번호'
+          example: 'qwerty'
+    ObituaryUpdate:
+      type: object
+      required:
+        - password
+      properties:
+        deceased:
+          type: string
+          description: '고인 이름'
+          example: '홍길동'
+        dateOfBirth:
+          type: string
+          format: date
+          description: '고인 탄생일'
+          example: '1999-12-30'
+        dateOfDeath:
+          type: string
+          format: date
+          description: '고인 사망일'
+          example: '2099-01-01'
+        family:
+          type: array
+          items:
+            $ref: "#/components/schemas/Family"
+          description: '상주 리스트'
+        funeral:
+          type: string
+          description: '장례식장 이름'
+          example: '편안한 장례식장'
+        dateOfCremate:
+          type: string
+          format: date
+          description: '발인 날짜'
+          example: '2099-01-04'
+        password:
+          type: string
+          description: '부고 비밀번호'
+          example: 'qwerty'
+  parameters:
+    obituaryIdParam:
+      name: obituaryId
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/Obituary/properties/_id"
+  responses:
+    obituaryRes:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Obituary"
+
+paths:
+  /api/obituaries:
+    post:
+      tags:
+      - Obituaries
+      summary: "부고 데이터 생성"
+      description: "사망자 정보 및 장례식장 정보 등을 입력받아 부고 데이터 생성"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ObituaryCreate"
+      responses:
+        201:
+          description: "부고 데이터 생성"
+          $ref: "#/components/responses/obituaryRes"
+  /api/obituaries/{obituaryId}:
+    get:
+      tags:
+      - Obituaries
+      summary: "특정 부고 데이터 조회"
+      description: "부고 objectId를 이용해 특정 부고 데이터 조회"
+      parameters:
+      - $ref: "#/components/parameters/obituaryIdParam"
+      responses:
+        200:
+          description: "하나의 부고 데이터 조회"
+          $ref: "#/components/responses/obituaryRes"
+    patch:
+      tags:
+      - Obituaries
+      summary: "부고 데이터 수정"
+      description: "objectId를 이용해 부고 데이터 조회 후 일부 수정"
+      parameters:
+      - $ref: "#/components/parameters/obituaryIdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ObituaryUpdate"
+      responses:
+        201:
+          description: "부고 데이터 일부 수정"
+          $ref: "#/components/responses/obituaryRes"
+    delete:
+      tags:
+      - Obituaries
+      summary: "부고 데이터 삭제"
+      description: "objectId를 이용해 부고 데이터 조회 수 삭제"
+      parameters:
+      - $ref: "#/components/parameters/obituaryIdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  $ref: "#/components/schemas/Obituary/properties/password"
+      responses:
+        201:
+          description: "부고 데이터 삭제"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "success"
