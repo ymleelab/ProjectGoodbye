@@ -75,7 +75,7 @@ const MyPage = () => {
 					/>
 				</div>
 			</div>
-			<div css={adBoxStyle}>
+			{/* <div css={adBoxStyle}>
 				<div css={adContentStyle}>
 					<h2>추억할 영상 업로드</h2>
 					<p>유언장과 함께 추억을 전하세요</p>
@@ -88,7 +88,7 @@ const MyPage = () => {
 						layout="fill"
 					/>
 				</div>
-			</div>
+			</div> */}
 
 			<div css={mainWrapper}>
 				<section css={sectionWrapper}>
@@ -193,9 +193,9 @@ const adBoxStyle = css`
 	margin: 10rem 0;
 	padding: 2rem;
 	align-item: center;
-	&:nth-of-type(even) {
-		flex-direction: row-reverse;
-	}
+	// &:nth-of-type(even) {
+	// 	flex-direction: row-reverse;
+	// }
 `;
 
 const adContentStyle = css`
