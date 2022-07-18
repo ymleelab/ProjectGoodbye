@@ -111,14 +111,6 @@ authRouter.patch(
             // params로부터 id를 가져옴
             // 이부분을 따로 함수같이 빼는 것을 고려
             const { userId } = req.params;
-            // if (!req.user){
-            //     throw new Error('유저가 존재하지 않습니다.')
-            // }
-            // const loggedInUserId = req.user._id.toString();
-            // const isUserIdValid = loggedInUserId === userId;
-            // if (!isUserIdValid) {
-            //     throw new Error('유저 토큰 정보가 일치하지 않습니다.');
-            // }
             checkUserValidity(req, userId);
 
             // body data 로부터 업데이트할 사용자 정보를 추출함.
@@ -167,6 +159,24 @@ authRouter.patch(
         }
     },
 );
+// AuthRouter의 user Patch나 Post요청과 비슷한 느낌?
+// 회원이 자신의 유언장 전송 권한을 줄 api -post 요청과 조금 다른 느낌인데 다른 api를 사용해야 할려나?
+// 로직이 나의 trusted-user가 될 사람에게 서비스 관련 이메일과 회원가입 내용이 담긴 이메일을 보냄
+// confirmed? true, false로 보여지게 해야하나? 
+
+//UserRouter -이메일의 링크를 따라서 온 경우...
+// Query를 사용...
+// 회원가입이 안되어 있다면 
+// (이메일 안의 url에 해당 회원의 아이디를 넣어서 post요청하는 방식?)..
+// 성공적인 post요청 이후 confirmation 페이지로 redirect하는 등의 방식..
+// 회원 가입이 되어 있다면 login post 요청에 회원의 아이디 정보를 넣을까.. 이것또한 redirect하는 방식으로
+//redirect 이후는 authRouter 통해야 하고..  
+
+
+// trusted 회원이 남을 위해서 회원가입하고, 서비스 가입을 함 (확정을 누르게 되는 시점)
+// managedUsers 부분에도 confirmed가 들어가 있어야 하나?
+// 회원 가입 이 후, 자신이 확정을 한다면 자신의 managedUsers에 회원 아이디 추가, 해당되는 유저의 trustedUser의 confirmed 를 true,
+// confirmed란 사실과 trustedUser의 아이디를 추가. 
 
 // 회원 탈퇴 api
 
