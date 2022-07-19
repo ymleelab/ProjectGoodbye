@@ -1,4 +1,6 @@
-import React, { useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
+import { useSelector, useDispatch } from 'react-redux';
+import { OBITUARYACTIONS } from '../reducers/obituary'
 import Link from 'next/link';
 import axios from 'axios';
 
@@ -10,17 +12,25 @@ import { css } from '@emotion/react';
 import { Form, Divider, Select, Input, Button } from 'antd';
 const { Search, TextArea } = Input;
 import 'antd/dist/antd.css';
-import { useEffect } from 'react';
 
 const SelectFamily = (props) => {
+	const dispatch = useDispatch();
+	const { flag } = useSelector((state) => state.obituary)
 	const [fullName, onChangeFullName, setFullName] = useInput('');
 	const [relation, setRelation] = useState('');
 	const [directRelation, onChangeDirectRelation, setDirectRelation] = useInput('');
 	const [showDirectRelation, setShowDirectRelation] = useState(false);
 
 	useEffect(() => {
-		console.log(props.index)
-	},[])
+		console.log('flag: ' + flag)
+		console.log('fullName' + fullName)
+		if(flag && fullName && (relation || directRelation)) {
+			dispatch(OBITUARYACTIONS.setFamily({relation, fullName, directRelation}))
+		}
+		// return () => {
+		// 	dispatch(OBITUARYACTIONS.getFamily)
+		// }
+	},[flag])
 	//고인간의 관계 Select 직접입력 toggle
 	const onChangeRelation = useCallback((e) => {
 		setRelation(e)
@@ -54,6 +64,9 @@ const SelectFamily = (props) => {
 
 
 const ObituaryDetail = () => {
+	const dispatch = useDispatch();
+	const { family } = useSelector((state) => state.obituary)
+
 	const [deceased, onChangeDeceased, setDeceased] = useInput('');
 	const [dateOfBirth, onChangeDateOfBirth, setDateOfBirth] = useInput('');
 	const [dateOfDeath, onChangeDateOfDeath, setDateOfDeath] = useInput('');
@@ -62,7 +75,6 @@ const ObituaryDetail = () => {
 	const [dateOfCremate, onChangeDateOfCremate, setDateOfCremate] = useInput('');
 	const [comment, onChangeComment, setComment] = useInput('');
 	const [password, onChangePassword, setPassword] = useInput('');
-	const [family, setFamily] = useState([])
 
 
 	//성별 Select
@@ -75,17 +87,25 @@ const ObituaryDetail = () => {
 
 
 	//부고 생성
-	const registerObituary = useCallback(() => {
-		console.log('test')
-		console.log(sex)
+	const registerObituary = useCallback(async () => {
+		//family 값 가져오기
+		//dispatch(OBITUARYACTIONS.getFamily)
+		dispatch(OBITUARYACTIONS.setFlag({ flag: true }))
+		console.log('family Before ==========================: ' + family.length)
 		
-		console.log(relation)
-		if(relation === '직접입력') {
-			console.log(directRelation)
-		}
-		console.log(fullName)
-		setFamily({relation, fullName})
-
+		//dispatch(OBITUARYACTIONS.clearFamily)
+		//dispatch(OBITUARYACTIONS.setFlag({ flag: false }))
+		console.log('family After ========================== : ' + family.length)
+		//console.log('test')
+		//console.log(sex)
+		
+		//console.log(relation)
+		// if(relation === '직접입력') {
+		// 	console.log(directRelation)
+		// }
+		//console.log(fullName)
+		//setFamily({relation, fullName})
+		dispatch(OBITUARYACTIONS.getFamily)
 		console.log(family)
 		// const data = { deceased,
 		// 				dateOfBirth,
@@ -120,7 +140,7 @@ const ObituaryDetail = () => {
 				<h1 css={headerWrapper}>부고 작성</h1>
 				<Divider orientation="left">상주</Divider>
 				<section css={sectionWrapper}>
-					<SelectFamily index="0" />
+					<SelectFamily index="0"  />
 					<SelectFamily index="1" />
 				</section>
 				<section css={sectionWrapper}>
