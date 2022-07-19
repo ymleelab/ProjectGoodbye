@@ -18,17 +18,16 @@ const SignIn = () => {
 	useEffect(() => {
 		// 로그인한 유저가 접속하지 못하게 하는 부분
 		preventUserAccess();
-	}, [])
+	}, []);
 
-    const preventUserAccess = async () => {
-        const isLogIn = await userLoginCheck();	
-		console.log(isLogIn);	
+	const preventUserAccess = async () => {
+		const isLogIn = await userLoginCheck();
+		console.log(isLogIn);
 		if (isLogIn) {
 			alert('이미 로그인 되어있습니다..');
 			Router.replace('/');
 		}
-	}
-
+	};
 
 	const onSubmitForm = useCallback(() => {
 		const data = { email, password };
@@ -40,11 +39,13 @@ const SignIn = () => {
 					sessionStorage.setItem('userId', res.data.userId);
 					const { fullName, token, userId } = res.data;
 					// console.log(res, res.data, fullName);
-					dispatch(USERACTIONS.setUserData({
-						fullName,
-						token,
-						userId,
-					}));
+					dispatch(
+						USERACTIONS.setUserData({
+							fullName,
+							token,
+							userId,
+						}),
+					);
 					console.log('확인');
 					Router.replace('/');
 				}
@@ -78,10 +79,9 @@ const SignIn = () => {
 								required
 							/>
 						</div>
-						<div css={forgetWrapper}>비밀번호 찾기</div>
+						{/* <div css={forgetWrapper}>비밀번호 찾기</div> */}
 						<div css={buttonWrapper}>
 							<input type="submit" value="로그인" />
-							<input type="button" value="구글로그인" />
 						</div>
 					</Form>
 				</section>
@@ -132,17 +132,13 @@ const forgetWrapper = css`
 const buttonWrapper = css`
 	width: 100%;
 
-	& > input[type='submit'] {
-		margin-right: 2%;
-		background-color: #3e606f;
-	}
-
 	& > input {
-		background-color: #91aa9d;
+		background-color: #3e606f;
 		color: white;
 		border: none;
-		width: 49%;
+		width: 100%;
 		padding: 10px;
+		cursor: pointer;
 	}
 `;
 
