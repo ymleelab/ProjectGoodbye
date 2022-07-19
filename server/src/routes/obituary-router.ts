@@ -10,19 +10,23 @@ obituaryRouter.post('/', async (req, res, next) => {
             deceased,
             dateOfBirth,
             dateOfDeath,
+            sex,
             family,
             funeral,
             dateOfCremate,
+            comment,
             password,
         } = req.body;
-        
+
         const newObituary = await obituaryService.addObituary({
             deceased,
             dateOfBirth,
             dateOfDeath,
+            sex,
             family,
             funeral,
             dateOfCremate,
+            comment,
             password,
         });
 
@@ -53,9 +57,11 @@ obituaryRouter.patch('/:obituaryId', async (req, res, next) => {
             deceased,
             dateOfBirth,
             dateOfDeath,
+            sex,
             family,
             funeral,
             dateOfCremate,
+            comment,
             password,
         } = req.body;
 
@@ -66,9 +72,11 @@ obituaryRouter.patch('/:obituaryId', async (req, res, next) => {
                 ...(deceased && { deceased }),
                 ...(dateOfBirth && { dateOfBirth }),
                 ...(dateOfDeath && { dateOfDeath }),
+                ...(sex && { sex }),
                 ...(family && { family }),
                 ...(funeral && { funeral }),
                 ...(dateOfCremate && { dateOfCremate }),
+                ...(comment && { comment }),
             },
         );
 

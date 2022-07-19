@@ -10,9 +10,11 @@ export interface IObituary {
     dateOfBirth: string;
     dateOfDeath: string;
     age: number;
+    sex: string;
     family: Array<IFamily>;
     funeral: string;
-    dateOfCremate: string;
+    dateOfCremate?: string;
+    comment?: string;
     password: string;
 }
 
@@ -51,6 +53,11 @@ const ObituarySchema: Schema<IObituary> = new Schema(
             type: Number,
             required: true,
         },
+        sex: {
+            type: String,
+            enum: ['남자', '여자'],
+            required: true,
+        },
         family: {
             type: [FamilySchema],
             required: true,
@@ -61,7 +68,11 @@ const ObituarySchema: Schema<IObituary> = new Schema(
         },
         dateOfCremate: {
             type: String,
-            required: true,
+            required: false,
+        },
+        comment: {
+            type: String,
+            required: false,
         },
         password: {
             type: String,

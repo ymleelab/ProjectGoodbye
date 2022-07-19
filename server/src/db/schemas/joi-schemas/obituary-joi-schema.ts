@@ -10,6 +10,7 @@ const createObituaryJoiSchema = joi.object({
         .iso()
         .required(),
     age: joi.number().required(),
+    sex: joi.string().valid('남자', '여자').required(),
     family: joi
         .array()
         .items(
@@ -20,7 +21,8 @@ const createObituaryJoiSchema = joi.object({
         )
         .required(),
     funeral: joi.string().required(),
-    dateOfCremate: joi.date().min(joi.ref('dateOfDeath')).iso().required(),
+    dateOfCremate: joi.date().min(joi.ref('dateOfDeath')).iso(),
+    comment: joi.string().min(10),
     password: joi.string(),
 });
 
@@ -29,6 +31,7 @@ const updateObituaryJoiSchema = joi.object({
     dateOfBirth: joi.date().min('1900-01-01').iso(),
     dateOfDeath: joi.date().min(joi.ref('dateOfBirth')).max('now').iso(),
     age: joi.number(),
+    sex: joi.string().valid('남자', '여자'),
     family: joi.array().items(
         joi.object().keys({
             relation: joi.string().required(),
@@ -37,6 +40,7 @@ const updateObituaryJoiSchema = joi.object({
     ),
     funeral: joi.string(),
     dateOfCremate: joi.date().min(joi.ref('dateOfDeath')).iso(),
+    comment: joi.string().min(10),
 });
 
 export { createObituaryJoiSchema, updateObituaryJoiSchema };

@@ -6,9 +6,11 @@ export interface IUpdateObituary {
     dateOfBirth?: string;
     dateOfDeath?: string;
     age: number;
+    sex?: string;
     family?: Array<IFamily>;
     funeral?: string;
     dateOfCremate?: string;
+    comment?: string;
 }
 
 export class ObituaryModel {

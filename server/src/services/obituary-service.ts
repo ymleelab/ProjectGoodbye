@@ -10,9 +10,11 @@ export interface ICreateObituary {
     deceased: string;
     dateOfBirth: string;
     dateOfDeath: string;
+    sex: string;
     family: Array<IFamily>;
     funeral: string;
-    dateOfCremate: string;
+    dateOfCremate?: string;
+    comment?: string;
     password: string;
 }
 
@@ -86,7 +88,6 @@ class ObituaryService {
         const { dateOfBirth: newBirth, dateOfDeath: newDeath } = update;
         const dateOfBirth = newBirth || originBirth;
         const dateOfDeath = newDeath || originDeath;
-
         const age =
             new Date(dateOfDeath).getFullYear() -
             new Date(dateOfBirth).getFullYear() +
@@ -127,10 +128,9 @@ class ObituaryService {
             );
         }
 
-        const deletedObituary = await this.obituaryModel.delete(obituaryId);
-        const status = deletedObituary ? 'success' : 'fail';
+        await this.obituaryModel.delete(obituaryId);
 
-        return { result: status };
+        return { result: 'success' };
     }
 }
 
