@@ -363,27 +363,6 @@ components:
             $ref: "#/components/schemas/Obituary"
 
 paths:
-  /api/remembrances:
-    post:
-      tags:
-      - Remembrances
-      summary: "추모 데이터 생성"
-      description: "로그인한 유저의 userId로 데이터 조회 후 해당 유저의 추모 데이터 생성"
-      security:
-      - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                dateOfDeath:
-                  $ref: '#/components/schemas/Remembrance/properties/dateOfDeath'
-      responses:
-        201:
-          description: "추모 데이터 생성"
-          $ref: "#/components/responses/remembranceRes"
   /api/remembrances?count={count}:
     get:
       tags:

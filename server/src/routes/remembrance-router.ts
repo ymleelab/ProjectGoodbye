@@ -1,29 +1,7 @@
 import { Router } from 'express';
-import { loginRequired } from '../middlewares';
 import { remembranceService, commentService } from '../services';
 
 const remembranceRouter = Router();
-
-// 추모 데이터 생성 - 언제?
-remembranceRouter.post('/', loginRequired, async (req, res, next) => {
-    try {
-        // loginRequired 이용해서 로그인한 사용자의 id 받아오기
-        if (!req.user) {
-            throw new Error('로그인 먼저 진행해 주세요.');
-        }
-        const { _id: userId } = req.user;
-        const { dateOfDeath } = req.body; // death 받아오나? - 생성 시점에 따라 다를듯 일단 받아오기
-
-        const newRemembrance = await remembranceService.addRemembrance(
-            userId,
-            dateOfDeath,
-        );
-
-        res.status(201).json(newRemembrance);
-    } catch (error) {
-        next(error);
-    }
-});
 
 // 최근 업데이트된 추모 조회
 remembranceRouter.get('/', async (req, res, next) => {

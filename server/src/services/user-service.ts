@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import { UserModel, userModel } from '../db/models/user-model';
 import type { InterfaceUserInfoRequired } from '../db/schemas/user-schema';
 import { ImageService } from './image-service';
+import { remembranceService } from './remembrance-service';
 
 class UserService {
     // 본 파일의 맨 아래에서, new UserService(userModel) 하면, 이 함수의 인자로 전달됨
@@ -45,6 +46,15 @@ class UserService {
 
         // db에 저장
         const createdNewUser = await this.userModel.create(newUserInfo);
+
+        // 생성된 유저 정보로 추모 데이터 생성
+        const userId = createdNewUser._id.toString();
+        await remembranceService.addRemembrance({
+            userId,
+            fullName,
+            dateOfBirth,
+        });
+
         return createdNewUser;
     }
 
