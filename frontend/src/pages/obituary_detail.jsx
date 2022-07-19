@@ -1,13 +1,107 @@
-import AppLayout from '../components/AppLayout';
+import React, { useState, useCallback } from 'react'
 import Link from 'next/link';
+import axios from 'axios';
+
+import AppLayout from '../components/AppLayout';
+import { Button as CommonButton } from './../util/common_styles';
+import useInput from '../hooks/useInput';
+
 import { css } from '@emotion/react';
-import { Form, Divider, Select, Input } from 'antd';
-const { Search } = Input;
+import { Form, Divider, Select, Input, Button } from 'antd';
+const { Search, TextArea } = Input;
 import 'antd/dist/antd.css';
-import { Button } from './../util/common_styles';
+import { useEffect } from 'react';
+
+const SelectFamily = (props) => {
+	const [fullName, onChangeFullName, setFullName] = useInput('');
+	const [relation, setRelation] = useState('');
+	const [directRelation, onChangeDirectRelation, setDirectRelation] = useInput('');
+	const [showDirectRelation, setShowDirectRelation] = useState(false);
+
+	useEffect(() => {
+		console.log(props.index)
+	},[])
+	//고인간의 관계 Select 직접입력 toggle
+	const onChangeRelation = useCallback((e) => {
+		setRelation(e)
+		setShowDirectRelation(false);
+		if(e === '직접입력') {
+			setShowDirectRelation(true);
+		}
+	},[showDirectRelation])
+
+	return (
+		<Form.Item label="고인간의 관계 | 상주명" required>
+			<Select style={{width: '20vw', marginRight: '0.5vw'}} name="relation" onChange={onChangeRelation} >
+				<Select.Option value="배우자">배우자</Select.Option>
+				<Select.Option value="아들">아들</Select.Option>
+				<Select.Option value="딸">딸</Select.Option>
+				<Select.Option value="며느리">며느리</Select.Option>
+				<Select.Option value="사위">사위</Select.Option>
+				<Select.Option value="손자">손자</Select.Option>
+				<Select.Option value="손녀">손녀</Select.Option>
+				<Select.Option value="외손자">외손자</Select.Option>
+				<Select.Option value="외손녀">외손녀</Select.Option>
+				<Select.Option value="직접입력">
+					직접입력
+				</Select.Option>
+			</Select>
+			<Input placeholder="상주명" name="fullName" value={fullName} onChange={onChangeFullName} style={{width: '20vw'}}  />
+			{showDirectRelation && <Input placeholder="고인간의 관계" name="directRelation" value={directRelation} onChange={onChangeDirectRelation} style={{width: '20vw', marginTop: '1vh'}} />}
+		</Form.Item>
+	)
+}
+
 
 const ObituaryDetail = () => {
+	const [deceased, onChangeDeceased, setDeceased] = useInput('');
+	const [dateOfBirth, onChangeDateOfBirth, setDateOfBirth] = useInput('');
+	const [dateOfDeath, onChangeDateOfDeath, setDateOfDeath] = useInput('');
+	const [sex, setSex] = useState('');
+	const [funeral, onChangeFuneral, setFuneral] = useInput('');
+	const [dateOfCremate, onChangeDateOfCremate, setDateOfCremate] = useInput('');
+	const [comment, onChangeComment, setComment] = useInput('');
+	const [password, onChangePassword, setPassword] = useInput('');
+	const [family, setFamily] = useState([])
+
+
+	//성별 Select
+	const onChangeSex = useCallback((e) => {
+		setSex(e)
+	})
+
+	//주소검색
 	const onSearch = (value) => console.log(value);
+
+
+	//부고 생성
+	const registerObituary = useCallback(() => {
+		console.log('test')
+		console.log(sex)
+		
+		console.log(relation)
+		if(relation === '직접입력') {
+			console.log(directRelation)
+		}
+		console.log(fullName)
+		setFamily({relation, fullName})
+
+		console.log(family)
+		// const data = { deceased,
+		// 				dateOfBirth,
+		// 				dateOfDeath,
+		// 				sex,
+		// 				family,
+		// 				funeral,
+		// 				dateOfCremate,
+		// 				comment,
+		// 				password }
+		// axios.post(`/api/obituaries`, data)
+		// 	.then((res) => {
+		// 		console.log(res)
+		// 	})
+		// 	.catch((err) => alert(err.response.data.reason))
+	})
 
 	return (
 		<AppLayout>
@@ -21,44 +115,33 @@ const ObituaryDetail = () => {
 				wrapperCol={{
 					span: 50,
 				}}
+				onFinish={registerObituary}
 			>
 				<h1 css={headerWrapper}>부고 작성</h1>
 				<Divider orientation="left">상주</Divider>
 				<section css={sectionWrapper}>
-					<Form.Item label="고인간의 관계" required>
-						<Select>
-							<Select.Option value="배우자">배우자</Select.Option>
-							<Select.Option value="아들">아들</Select.Option>
-							<Select.Option value="딸">딸</Select.Option>
-							<Select.Option value="며느리">며느리</Select.Option>
-							<Select.Option value="사위">사위</Select.Option>
-							<Select.Option value="손자">손자</Select.Option>
-							<Select.Option value="손녀">손녀</Select.Option>
-							<Select.Option value="외손자">외손자</Select.Option>
-							<Select.Option value="외손녀">외손녀</Select.Option>
-							<Select.Option value="직접입력">
-								직접입력
-							</Select.Option>
-						</Select>
-					</Form.Item>
-					<Form.Item label="상주명" required>
-						<Input placeholder="상주명" />
-					</Form.Item>
-					<Form.Item label="연락처" required>
-						<Input placeholder="010-1234-1234" />
-					</Form.Item>
+					<SelectFamily index="0" />
+					<SelectFamily index="1" />
+				</section>
+				<section css={sectionWrapper}>
+					<div css={ButtonWrapper}>
+						<Button onClick={() => {
+							
+						}} style={{marginRight: '0.5vw'}}>추가</Button>
+						<Button>삭제</Button>
+					</div>
 				</section>
 				<Divider orientation="left">고인 정보</Divider>
 				<section css={sectionWrapper}>
 					<Form.Item label="고인명" required>
-						<Input placeholder="고인명" />
+						<Input placeholder="고인명" name="deceased" value={deceased} onChange={onChangeDeceased} />
 					</Form.Item>
-					<Form.Item label="나이" required>
-						<Input placeholder="나이" />
+					<Form.Item label="탄생일" required>
+						<Input placeholder="탄생일" name="dateOfBirth" value={dateOfBirth} onChange={onChangeDateOfBirth} />
 					</Form.Item>
 
 					<Form.Item label="성별" required>
-						<Select>
+						<Select name="sex" onChange={onChangeSex}>
 							<Select.Option value="남자">남자</Select.Option>
 							<Select.Option value="여자">여자</Select.Option>
 						</Select>
@@ -66,46 +149,47 @@ const ObituaryDetail = () => {
 				</section>
 				<Divider orientation="left">장례 정보</Divider>
 				<section css={sectionWrapper}>
-					<Form.Item label="장례식장 이름" required>
-						<Input placeholder="장례식장 이름" />
-					</Form.Item>
-					<Form.Item label="빈소" required>
-						<Input placeholder="빈소" />
-					</Form.Item>
 					<Form.Item label="장례식장 주소" required>
 						<Search
 							placeholder="장례식장 주소"
 							onSearch={onSearch}
-							enterButton
+							name="funeral" value={funeral} onChange={onChangeFuneral} 
 						/>
 					</Form.Item>
-					<Form.Item label="장례식장 연락처" required>
-						<Input placeholder="010-1234-1234" />
-					</Form.Item>
-
 					<Form.Item label="임종일">
-						<Input placeholder="임종일" />
-					</Form.Item>
-					<Form.Item label="입관일">
-						<Input placeholder="입관일" />
+						<Input placeholder="임종일" name="dateOfDeath" value={dateOfDeath} onChange={onChangeDateOfDeath} />
 					</Form.Item>
 					<Form.Item label="발인일">
-						<Input placeholder="발인일" />
+						<Input placeholder="발인일" name="dateOfCremate" value={dateOfCremate} onChange={onChangeDateOfCremate}  />
 					</Form.Item>
-					<Form.Item label="장지">
-						<Input placeholder="장지" />
+					</section>
+				<Divider orientation="left">전하는 말</Divider>
+				
+				<section css={sectionWrapper}>
+					<Form.Item label="전하는 말">
+						{/* <Input placeholder="전할말" /> */}
+						<TextArea
+							placeholder="전하는 말"
+							showCount
+							maxLength={1000}
+							style={{
+							height: 120,
+							}}
+							name="comment" value={comment} onChange={onChangeComment} 
+							// onChange={onChange}
+						/>
 					</Form.Item>
-					<Form.Item label="전할말">
-						<Input placeholder="전할말" />
+					<Form.Item label="비밀번호">
+						<Input placeholder="비밀번호" type="password"  name="password" value={password} onChange={onChangePassword} />
 					</Form.Item>
 				</section>
 
 				<Divider orientation="left"></Divider>
 				<section css={sectionWrapper}>
 					<div css={ButtonWrapper}>
-						<Button className="register">등록하기</Button>
+						<CommonButton className="register" type="submit">등록하기</CommonButton>
 						<Link href={'/obituary_list'}>
-							<Button>목록</Button>
+							<CommonButton>목록</CommonButton>
 						</Link>
 					</div>
 				</section>
