@@ -1,5 +1,4 @@
 import { Types } from 'mongoose';
-import { updateRemembranceJoiSchema } from '../db/schemas/joi-schemas/remembrance-joi-schema';
 import { IUpdateRemembrance, RemembranceModel, remembranceModel } from '../db';
 
 interface ICreateRemembrance {
