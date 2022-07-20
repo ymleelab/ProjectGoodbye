@@ -3,22 +3,18 @@ import { Form } from 'antd';
 import { css } from '@emotion/react';
 import useInput from '../hooks/useInput';
 import AppLayout from '../components/AppLayout';
-import Router from 'next/router';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { USERACTIONS } from '../reducers/user';
+import Router, { useRouter } from 'next/router';
 
 import userLoginCheck from '../util/userLoginCheck';
 
 const SignIn = () => {
+	const router = useRouter();
 	const dispatch = useDispatch();
 	const [email, onChangeEmail] = useInput('');
 	const [password, onChangePassword] = useInput('');
-
-	useEffect(() => {
-		// 로그인한 유저가 접속하지 못하게 하는 부분
-		preventUserAccess();
-	}, []);
 
 	const preventUserAccess = async () => {
 		const isLogIn = await userLoginCheck();
@@ -52,6 +48,15 @@ const SignIn = () => {
 			})
 			.catch((error) => alert(error.response.data.reason));
 	}, [email, password]);
+
+	useEffect(() => {
+		// 로그인한 유저가 접속하지 못하게 하는 부분
+		preventUserAccess();
+
+		if (!router.isReady) return;
+		const { redirectUrl } = router.query;
+		//console.log('query : ' + redirectUrl);
+	}, [router.isReady]);
 
 	return (
 		<AppLayout>
