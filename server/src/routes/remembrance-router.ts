@@ -37,6 +37,11 @@ remembranceRouter.get('/:remembranceId', async (req, res, next) => {
         const remembrance = await remembranceService.getRemembranceById(
             remembranceId,
         );
+        if (!remembrance.dateOfDeath) {
+            throw new Error(
+                '아직 사망하지 않은 유저의 추모에 접근할 수 없습니다.',
+            );
+        }
 
         res.status(200).json(remembrance);
     } catch (error) {
@@ -65,6 +70,15 @@ remembranceRouter.post('/:remembranceId/comments', async (req, res, next) => {
     try {
         const { remembranceId } = req.params;
         const { writer, title, content, password } = req.body;
+
+        const remembrance = await remembranceService.getRemembranceById(
+            remembranceId,
+        );
+        if (!remembrance.dateOfDeath) {
+            throw new Error(
+                '아직 사망하지 않은 유저의 추모에 접근할 수 없습니다.',
+            );
+        }
 
         const newComment = await commentService.addComment(remembranceId, {
             writer,
