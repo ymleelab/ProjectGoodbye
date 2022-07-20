@@ -120,6 +120,11 @@ const MyPage = () => {
 			})
 			.catch((err) => alert(err.response.data.reason));
 	};
+
+	const changeLifeDeath = () => {
+		console.log('생사변경: 유언장, 추모 링크 발송되고 추모 공개로 전환');
+	};
+
 	return (
 		<AppLayout>
 			<div css={titleImageStyle}>
@@ -251,6 +256,13 @@ const MyPage = () => {
 								등록
 							</Button>
 						</Modal>
+					</div>
+				</section>
+			</div>
+			<div css={mainWrapper}>
+				<section>
+					<div>
+						<h2>내가 생사여부 변경 권한이 있는 사용자 목록</h2>
 					</div>
 				</section>
 			</div>
