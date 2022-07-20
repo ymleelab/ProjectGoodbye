@@ -4,6 +4,8 @@ export const initialState = {
 	fullName: '',
 	userId: '',
 	token: '',
+	dateOfBirth: '',
+	remembranceId: '',
 	logInState: false
 };
 
@@ -12,9 +14,11 @@ const userSlice = createSlice({
 	initialState,
 	reducers: {
 		setUserData(state, action) {
+			console.log(action.payload)
 			state.fullName = action.payload.fullName;
 			state.userId = action.payload.userId;
 			state.token = action.payload.token;
+			state.remembranceId = action.payload.remembranceId;
 			state.logInState = action.payload.logInState;
 		},
 		clearUserData(state) {

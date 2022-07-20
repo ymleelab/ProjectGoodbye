@@ -29,8 +29,10 @@ const Header = () => {
 
     const setLoginValue = async () => {
 		const checkValue = await userLoginCheck();
-		dispatch(USERACTIONS.setLoginState(checkValue));
-		// setIsLogIn(checkValue);
+		dispatch(USERACTIONS.setUserData(checkValue));
+		console.log(checkValue, logInState);
+		// 유저 데이터를 헤더에서 받아서 리듀서에 저장해야됨
+		// dispatch(USERACTIONS.setLoginState(userData));
 	}
 
 
@@ -74,8 +76,8 @@ const Header = () => {
 							</Link>
 						</li>
 						<li>
-							<Link href={'/remembrance_page'}>
-								<a>나의 장례식</a>
+							<Link href={'/make_remembrance'}>
+								<a>나의 추모공간</a>
 							</Link>
 						</li>
 						<li>
