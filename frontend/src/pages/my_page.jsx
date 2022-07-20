@@ -12,6 +12,11 @@ const MyPage = () => {
 	const [password, onChangePassword, setPassword] = useInput('');
 	const [currentPassword, onChangeCurrentPassword, setCurrentPassword] =
 		useInput('');
+	const [email, onChangeEmail, setEmail] = useInput('');
+	const [confirmPassword, onChangeConfirmPassword, setConfirmPassword] =
+		useInput('');
+	const [trustedUser, setTrustedUser] = useState('');
+	const [managedUser, setManagedUser] = useState('');
 
 	const onUpdateUser = useCallback(async () => {
 		const userId = sessionStorage.getItem('userId');
@@ -81,6 +86,40 @@ const MyPage = () => {
 			.catch((err) => alert(err.response.data.reason));
 	};
 
+	//팝업 띄우기 관련
+	const [isModalVisible, setIsModalVisible] = useState(false);
+	const showModal = () => {
+		setIsModalVisible(true);
+	};
+	const handleOk = () => {
+		setIsModalVisible(false);
+	};
+	const handleCancel = () => {
+		setIsModalVisible(false);
+	};
+
+	//자신의 유언장을 전송, 생사여부를 변경 가능 권한을 주고싶은 사람 등록
+	const addTruseUser = async () => {
+		const userId = sessionStorage.getItem('userId');
+		const token = sessionStorage.getItem('token');
+		const currentPassword = confirmPassword;
+		await axios
+			.patch(
+				`/api/auth/${userId}/trustedUser`,
+				{ email, currentPassword },
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				},
+			)
+			.then((res) => {
+				console.log(res);
+				alert('성공적으로 신뢰할 수 있는 사람을 등록했습니다.');
+				setIsModalVisible(false);
+			})
+			.catch((err) => alert(err.response.data.reason));
+	};
 	return (
 		<AppLayout>
 			<div css={titleImageStyle}>
@@ -158,6 +197,61 @@ const MyPage = () => {
 						자신의 추모 공개 여부
 						<Switch defaultChecked onChange={onChange} />
 					</h2>
+				</section>
+			</div>
+			<div css={mainWrapper}>
+				<section>
+					<div>
+						<h2>
+							자신의 유언장을 전송, 생사여부를 변경 가능 권한을
+							주고 싶은 사람
+						</h2>
+
+						<div>
+							<Button
+								onClick={showModal}
+								style={{ left: '40%', marginTop: '2em' }}
+							>
+								등록하기
+							</Button>
+						</div>
+						<Modal
+							title="등록하기"
+							visible={isModalVisible}
+							onOk={handleOk}
+							onCancel={handleCancel}
+						>
+							<Input
+								placeholder="신뢰하는 사람의 이메일"
+								style={{
+									width: '100%',
+									marginBottom: '1em',
+								}}
+								value={email}
+								onChange={onChangeEmail}
+							/>
+							<Input
+								placeholder="나의 현재 비밀번호"
+								style={{
+									width: '100%',
+									marginBottom: '1em',
+								}}
+								type="password"
+								value={confirmPassword}
+								onChange={onChangeConfirmPassword}
+							/>
+							<Button
+								type="button"
+								style={{
+									width: '20%',
+									left: '40%',
+								}}
+								onClick={addTruseUser}
+							>
+								등록
+							</Button>
+						</Modal>
+					</div>
 				</section>
 			</div>
 		</AppLayout>
