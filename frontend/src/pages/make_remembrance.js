@@ -114,7 +114,6 @@ const make_remembrance = () => {
     const ReachableContext = createContext(null);
 
     const { userId, token } = useSelector(state => {
-        console.log(state.user);
         return state.user;
     });
     const [userData, setUserData] = useState(null);
@@ -123,22 +122,9 @@ const make_remembrance = () => {
     const [submitting, setSubmitting] = useState(false);
     const formRef = useRef(null);
     // const [value, valueHandler, setValue] = useInput('');
-
-
-    useEffect(() => {
-        // 추모 데이터 서버에서 받아오기
-        if (userId && token) {
-            getRemembranceData();
-        }
-    }, [userId, token])
-
-
-    console.log(userId, token);
+    // console.log(userId, token);
 
     const getRemembranceData = async () => {
-
-        // const {userId, token} = getUserIdToken();
-        console.log(userId, token);
         try {
             console.log(userId, token);
             const res = await axios.get(`/api/auth/${userId}/remembrances`, {
@@ -147,16 +133,16 @@ const make_remembrance = () => {
                 }
             });
             const {
-                userId,
-                dateOfBirth,
-                dateOfDeath,
-                photo
+                _id,
+                photo,
+                comments
             } = res.data;
+
             setUserData({
-                remembranceId: res.data._id,
+                remembranceId: _id,
                 photo
             })
-            setComments([...res.data.comments])
+            setComments([...comments])
         } catch (error) {
             console.log(error);
         }
@@ -201,6 +187,12 @@ const make_remembrance = () => {
         }, 500);
     }
 
+    useEffect(() => {
+        if (userId && token) {
+            getRemembranceData();
+        }
+    }, [userId, token])
+
 
     return (
         <>
@@ -211,14 +203,15 @@ const make_remembrance = () => {
                             <h1>따뜻한 말을 남겨주세요..</h1>
                             <h2>-추모 공간입니다-</h2>
                         </div>
-                        <div css={imageStyle}>
-                            <Image
+                        {/* <div css={imageStyle}> */}
+                            <img
                                 src="https://images.unsplash.com/photo-1516967124798-10656f7dca28?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8d2FybSUyMGhlYXJ0fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=600&q=60"
                                 alt="소개 사진"
-                                layout="fill"
-                                priority
+                                width={200}
+                                // layout="fill"
+                                // priority
                             />
-                        </div>
+                        {/* </div> */}
                     </div>
                 </Introduction>
                 <CommentTree>
@@ -231,13 +224,14 @@ const make_remembrance = () => {
                                 </ReachableContext.Provider>
                             }
                             <FrameImages>
-                                <Image
+                                {/* <Image
                                     src="https://images.unsplash.com/photo-1516967124798-10656f7dca28?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8d2FybSUyMGhlYXJ0fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=600&q=60"
                                     alt="테스트 사진"
                                     width={150}
                                     height={150}
                                     priority
-                                />
+                                /> */}
+                                <img src="https://images.unsplash.com/photo-1516967124798-10656f7dca28?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8d2FybSUyMGhlYXJ0fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=600&q=60"/>
                                 <TbRectangleVertical className={'frame_svg'} />
                             </FrameImages>
                         </Frame>
@@ -410,7 +404,16 @@ const TextArea = styled.textarea`
 ` 
 
 const FrameImages = styled.div`
-    display: grid;
+    position: relative;
+    display: inline-block;
+
+    & > img {
+        position: absolute;
+        width: 150px;
+        top: 35px;
+        left: 75px;
+    }
+    /* display: grid;
     grid-template-areas: "overlay";
     justify-items: center;
     & > svg {
@@ -418,5 +421,5 @@ const FrameImages = styled.div`
     }
     & > span {
         grid-area: overlay;
-    }
+    } */
 `
