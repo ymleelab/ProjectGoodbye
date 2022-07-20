@@ -203,14 +203,15 @@ const make_remembrance = () => {
                             <h1>따뜻한 말을 남겨주세요..</h1>
                             <h2>-추모 공간입니다-</h2>
                         </div>
-                        <div css={imageStyle}>
-                            <Image
+                        {/* <div css={imageStyle}> */}
+                            <img
                                 src="https://images.unsplash.com/photo-1516967124798-10656f7dca28?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8d2FybSUyMGhlYXJ0fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=600&q=60"
                                 alt="소개 사진"
-                                layout="fill"
-                                priority
+                                width={200}
+                                // layout="fill"
+                                // priority
                             />
-                        </div>
+                        {/* </div> */}
                     </div>
                 </Introduction>
                 <CommentTree>
@@ -223,13 +224,14 @@ const make_remembrance = () => {
                                 </ReachableContext.Provider>
                             }
                             <FrameImages>
-                                <Image
+                                {/* <Image
                                     src="https://images.unsplash.com/photo-1516967124798-10656f7dca28?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8d2FybSUyMGhlYXJ0fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=600&q=60"
                                     alt="테스트 사진"
                                     width={150}
                                     height={150}
                                     priority
-                                />
+                                /> */}
+                                <img src="https://images.unsplash.com/photo-1516967124798-10656f7dca28?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8d2FybSUyMGhlYXJ0fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=600&q=60"/>
                                 <TbRectangleVertical className={'frame_svg'} />
                             </FrameImages>
                         </Frame>
@@ -402,7 +404,16 @@ const TextArea = styled.textarea`
 ` 
 
 const FrameImages = styled.div`
-    display: grid;
+    position: relative;
+    display: inline-block;
+
+    & > img {
+        position: absolute;
+        width: 150px;
+        top: 35px;
+        left: 75px;
+    }
+    /* display: grid;
     grid-template-areas: "overlay";
     justify-items: center;
     & > svg {
@@ -410,5 +421,5 @@ const FrameImages = styled.div`
     }
     & > span {
         grid-area: overlay;
-    }
+    } */
 `
