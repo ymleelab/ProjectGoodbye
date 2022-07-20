@@ -1,8 +1,5 @@
 import { Types } from 'mongoose';
-import {
-    createRemembranceJoiSchema,
-    updateRemembranceJoiSchema,
-} from '../db/schemas/joi-schemas/remembrance-joi-schema';
+import { updateRemembranceJoiSchema } from '../db/schemas/joi-schemas/remembrance-joi-schema';
 import { IUpdateRemembrance, RemembranceModel, remembranceModel } from '../db';
 
 interface ICreateRemembrance {
@@ -23,18 +20,23 @@ class RemembranceService {
         const { userId } = remembranceInfo;
 
         // 해당 유저의 추모 데이터가 존재하는지 확인
-        const remembrances = await this.remembranceModel.findByUserId(userId);
-        if (remembrances.length) {
+        const remembrance = await this.getRemembranceByUser(userId);
+        if (remembrance) {
             throw new Error('해당 유저의 추모 데이터가 이미 존재합니다.');
         }
-
-        await createRemembranceJoiSchema.validateAsync(remembranceInfo);
 
         const createdNewRemembrance = await this.remembranceModel.create(
             remembranceInfo,
         );
 
         return createdNewRemembrance;
+    }
+
+    // 전체 추모 데이터 조회
+    async getRemembrances() {
+        const remembrances = await this.remembranceModel.find();
+
+        return remembrances;
     }
 
     // 최근 업데이트 추모 조회
@@ -44,7 +46,7 @@ class RemembranceService {
         return remembrances;
     }
 
-    // 특정 추모 조회
+    // remembranceId로 특정 추모 조회
     async getRemembranceById(remembranceId: string) {
         const remembrance = await this.remembranceModel.findById(remembranceId);
         if (!remembrance) {
@@ -54,6 +56,13 @@ class RemembranceService {
         }
 
         return remembrance.populate('comments');
+    }
+
+    // userId로 특정 추모 조회
+    async getRemembranceByUser(userId: string) {
+        const remembrance = await this.remembranceModel.findByUserId(userId);
+
+        return remembrance;
     }
 
     // 추모 수정

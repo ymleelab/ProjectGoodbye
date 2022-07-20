@@ -333,6 +333,13 @@ components:
               result:
                 type: string
                 example: "success"
+    remembrancesRes:
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/RemembranceWithCommentId"
     remembranceRes:
       content:
         application/json:
@@ -363,6 +370,16 @@ components:
             $ref: "#/components/schemas/Obituary"
 
 paths:
+  /api/remembrances:
+    get:
+      tags:
+      - Remembrances
+      summary: "전체 추모 데이터 조회"
+      description: "전체 추모 데이터를 최근 업데이트된 순으로 조회"
+      responses:
+        200:
+          description: "여러개의 추모 데이터 조회"
+          $ref: "#/components/responses/remembrancesRes"
   /api/remembrances?count={count}:
     get:
       tags:
@@ -379,12 +396,7 @@ paths:
       responses:
         200:
           description: "여러개의 추모 데이터 조회"
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/RemembranceWithCommentId"
+          $ref: "#/components/responses/remembrancesRes"
   /api/remembrances/{remembranceId}:
     get:
       tags:
