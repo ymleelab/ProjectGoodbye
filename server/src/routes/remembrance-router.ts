@@ -60,30 +60,6 @@ remembranceRouter.get(
     },
 );
 
-// 추모 수정 - fullName, dateOfBirth, photo는 user data -> 언제 어떻게 변경?
-remembranceRouter.patch('/:remembranceId', async (req, res, next) => {
-    try {
-        const { remembranceId } = req.params;
-        const { fullName, dateOfBirth, dateOfDeath, isPublic, photo } =
-            req.body;
-
-        const remembrance = await remembranceService.setRemembrance(
-            remembranceId,
-            {
-                ...(fullName && { fullName }),
-                ...(dateOfBirth && { dateOfBirth }),
-                ...(dateOfDeath && { dateOfDeath }),
-                ...(typeof isPublic === 'boolean' && { isPublic }),
-                ...(photo && { photo }),
-            },
-        );
-
-        res.status(201).json(remembrance);
-    } catch (error) {
-        next(error);
-    }
-});
-
 // 추모 글 추가
 remembranceRouter.post('/:remembranceId/comments', async (req, res, next) => {
     try {

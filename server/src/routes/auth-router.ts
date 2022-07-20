@@ -10,12 +10,11 @@ import {
 import {
     createReceiverJoiSchema,
     updateReceiverJoiSchema,
-} from '../db/schemas/joi-schemas/receiver-joi-schema';
-import {
     createWillJoiSchema,
     updateWillJoiSchema,
-} from '../db/schemas/joi-schemas/will-joi-schema';
-import { userUpdateJoiSchema } from '../db/schemas/joi-schemas/user-joi-schema';
+    userUpdateJoiSchema,
+    updateRemembranceJoiSchema,
+} from '../db/schemas/joi-schemas';
 import { uploadImage } from '../middlewares';
 import { InterfaceUserResult } from '../db/schemas/user-schema';
 import { sendMailTest } from '../services/mail-service';
@@ -149,12 +148,16 @@ authRouter.patch(
                 ...(dateOfBirth && { dateOfBirth }),
                 ...(photo && { photo }),
             };
-
             // 사용자 정보를 업데이트함.
             const updatedUserInfo = await userService.setUser(
                 userInfoRequired,
                 toUpdate,
             );
+
+            // password를 제외한 나머지 수정 정보를 추모 데이터에 반영
+            delete toUpdate.password;
+            await updateRemembranceJoiSchema.validateAsync(toUpdate);
+            await remembranceService.setRemembrance(userId, toUpdate);
 
             // 업데이트 이후의 유저 데이터를 프론트에 보내 줌
             res.status(200).json(updatedUserInfo);

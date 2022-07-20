@@ -70,13 +70,9 @@ class RemembranceService {
         return remembrance;
     }
 
-    // 추모 수정
-    async setRemembrance(remembranceId: string, update: IUpdateRemembrance) {
-        await updateRemembranceJoiSchema.validateAsync(update);
-        const remembrance = await this.remembranceModel.update(
-            remembranceId,
-            update,
-        );
+    // 추모의 유저 정보 수정
+    async setRemembrance(userId: string, update: IUpdateRemembrance) {
+        const remembrance = await this.remembranceModel.update(userId, update);
 
         return remembrance;
     }

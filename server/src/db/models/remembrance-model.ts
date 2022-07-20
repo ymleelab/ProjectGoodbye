@@ -62,9 +62,9 @@ export class RemembranceModel {
         return remembrance;
     }
 
-    // 추모 데이터 수정
-    async update(remembranceId: string, update: IUpdateRemembrance) {
-        const filter = { _id: remembranceId };
+    // 추모의 유저 데이터 수정
+    async update(userId: string, update: IUpdateRemembrance) {
+        const filter = { userId };
         const option = { returnOriginal: false };
 
         const updatedRemembrance = await this.Remembrance.findOneAndUpdate(
