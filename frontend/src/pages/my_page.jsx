@@ -16,7 +16,8 @@ const MyPage = () => {
 	const [confirmPassword, onChangeConfirmPassword, setConfirmPassword] =
 		useInput('');
 	const [trustedUser, setTrustedUser] = useState('');
-	const [managedUser, setManagedUser] = useState('');
+	const [managedUsers, setManagedUsers] = useState([]);
+	const [dateOfDeath, onChangeDateOfDeath, setDateOfDeath] = useInput('');
 
 	useEffect(() => {
 		const userId = sessionStorage.getItem('userId');
@@ -32,10 +33,10 @@ const MyPage = () => {
 				if (res.data.user.trustedUser) {
 					setTrustedUser(res.data.user.trustedUser.email);
 				}
-
-				//console.log(res.data.user.managedUser);
-				if (res.data.user.managedUser) {
-					setManagedUser(res.data.user.managedUser.email);
+				console.log(res.data.user.managedUsers);
+				//console.log(res.data.user.managedUsers[0].email);
+				if (res.data.user.managedUsers) {
+					setManagedUsers(res.data.user.managedUsers);
 				}
 			})
 			.catch((err) => console.log(err.response.data.reason));
@@ -143,8 +144,9 @@ const MyPage = () => {
 			.catch((err) => alert(err.response.data.reason));
 	};
 
-	const changeLifeDeath = () => {
+	const changeLifeDeath = (managedUserId) => {
 		console.log('생사변경: 유언장, 추모 링크 발송되고 추모 공개로 전환');
+		console.log(managedUserId);
 	};
 
 	return (
@@ -289,15 +291,32 @@ const MyPage = () => {
 				<section>
 					<div>
 						<h2>내가 생사여부 변경 권한이 있는 사용자 목록</h2>
-						{managedUser && (
+						{managedUsers && (
 							<div style={{ left: '40%', marginTop: '2em' }}>
-								{managedUser}{' '}
-								<Button onClick={changeLifeDeath}>
-									생사여부 변경
-								</Button>
+								{managedUsers.map((user) => {
+									return (
+										user.confirmed && (
+											<div key={user.userId}>
+												{user.email}
+												<Button
+													onClick={() => {
+														changeLifeDeath(
+															user.userId,
+														);
+													}}
+													style={{
+														left: '30%',
+													}}
+												>
+													생사여부 변경
+												</Button>
+											</div>
+										)
+									);
+								})}
 							</div>
 						)}
-						{!managedUser && (
+						{!managedUsers && (
 							<div style={{ left: '40%', marginTop: '2em' }}>
 								등록되어있지 않습니다..
 							</div>
