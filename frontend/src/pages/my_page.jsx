@@ -1,6 +1,6 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { css } from '@emotion/react';
-import { Form, Switch } from 'antd';
+import { Form, Switch, Modal, Button, Input } from 'antd';
 import 'antd/dist/antd.css';
 import AppLayout from '../components/AppLayout';
 import useInput from '../hooks/useInput';
@@ -55,6 +55,32 @@ const MyPage = () => {
 			.catch((err) => alert(err.response.data.reason));
 	}, [currentPassword]);
 
+	const fileChange = (e) => {
+		const userId = sessionStorage.getItem('userId');
+		const token = sessionStorage.getItem('token');
+		console.log(e.target.files[0]);
+		//const photo = e.target.value;
+		//{"result":"error","reason":"Cannot destructure property 'key' of 'file' as it is undefined."}
+
+		const formData = new FormData();
+		formData.append('photo', e.target.files[0]);
+		axios
+			.patch(
+				`/api/auth/${userId}`,
+				{ formData },
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				},
+			)
+			.then((res) => {
+				console.log(res);
+				alert('성공적으로 등록되었습니다.');
+			})
+			.catch((err) => alert(err.response.data.reason));
+	};
+
 	return (
 		<AppLayout>
 			<div css={titleImageStyle}>
@@ -65,7 +91,12 @@ const MyPage = () => {
 					<h2>나의 영정 사진</h2>
 					<p>밝은 표정이 담긴 사진을 업로드해주세요</p>
 					<p>11x14인치 (28x35cm)</p>
-					<input type="file" name="file" />
+					<input
+						type="file"
+						accept="image/*"
+						name="photo"
+						onChange={fileChange}
+					/>
 				</div>
 				<div css={imageStyle}>
 					<Image
