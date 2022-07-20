@@ -18,6 +18,28 @@ const MyPage = () => {
 	const [trustedUser, setTrustedUser] = useState('');
 	const [managedUser, setManagedUser] = useState('');
 
+	useEffect(() => {
+		const userId = sessionStorage.getItem('userId');
+		const token = sessionStorage.getItem('token');
+		axios
+			.get(`/api/auth/${userId}`, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			})
+			.then((res) => {
+				//console.log(res);
+				if (res.data.user.trustedUser) {
+					setTrustedUser(res.data.user.trustedUser.email);
+				}
+
+				//console.log(res.data.user.managedUser);
+				if (res.data.user.managedUser) {
+					setManagedUser(res.data.user.managedUser.email);
+				}
+			})
+			.catch((err) => console.log(err.response.data.reason));
+	}, []);
 	const onUpdateUser = useCallback(async () => {
 		const userId = sessionStorage.getItem('userId');
 		const token = sessionStorage.getItem('token');
@@ -211,7 +233,11 @@ const MyPage = () => {
 							자신의 유언장을 전송, 생사여부를 변경 가능 권한을
 							주고 싶은 사람
 						</h2>
-
+						{trustedUser && (
+							<div style={{ left: '40%', marginTop: '2em' }}>
+								등록된 이메일: {trustedUser}
+							</div>
+						)}
 						<div>
 							<Button
 								onClick={showModal}
@@ -263,6 +289,19 @@ const MyPage = () => {
 				<section>
 					<div>
 						<h2>내가 생사여부 변경 권한이 있는 사용자 목록</h2>
+						{managedUser && (
+							<div style={{ left: '40%', marginTop: '2em' }}>
+								{managedUser}{' '}
+								<Button onClick={changeLifeDeath}>
+									생사여부 변경
+								</Button>
+							</div>
+						)}
+						{!managedUser && (
+							<div style={{ left: '40%', marginTop: '2em' }}>
+								등록되어있지 않습니다..
+							</div>
+						)}
 					</div>
 				</section>
 			</div>
