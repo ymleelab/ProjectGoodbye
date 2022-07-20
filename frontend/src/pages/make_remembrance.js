@@ -30,8 +30,21 @@ const CommentList = ({ comments, modal }) => {
                     <FlowerIconDiv
                         key={`${i}+${comment.password}`}
                         onClick={() => {
-                            console.log('테스트', modal)
-                            modal.info(comment);
+                            // console.log('테스트', modal)
+                            const modalData = {
+                                title: comment.title,
+                                content: (
+                                    <>
+                                        {/* <ReachableContext.Consumer>{(name) => `Reachable: ${name}!`}</ReachableContext.Consumer>
+                                        <br />
+                                        <UnreachableContext.Consumer>{(name) => `Unreachable: ${name}!`}</UnreachableContext.Consumer> */}
+                                        <p>{`작성자: ${comment.writer}`}</p>
+                                        <p>{`내용: ${comment.content}`}</p>
+                                    </>
+                                )
+                            }
+                            console.log(modalData);       
+                            modal.info(modalData);
                         }}
                     >
                         <Flower />
@@ -102,8 +115,6 @@ const Editor = ({ onSubmit, formRef }) => {
         <Button htmlType="submit" form='submitComment'>
             댓글 등록
         </Button>
-        <Form.Item>
-        </Form.Item>
     </Form>
     )
 };
@@ -124,9 +135,28 @@ const make_remembrance = () => {
     // const [value, valueHandler, setValue] = useInput('');
     // console.log(userId, token);
 
+    const getCommentData = (remembranceId, commentIdList) => {
+        try {
+            commentIdList.forEach(async (commentId) => {
+                const res = await axios.get(`/api/remembrances/${remembranceId}/comments/${commentId}`);
+                console.log(res);
+                const data = {
+                    writer: res.data.writer,
+                    title: res.data.title,
+                    content: res.data.content,
+                    password: res.data.password
+                }
+                setComments((prev) => [...prev, data]);
+            })
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    
+    
+    
     const getRemembranceData = async () => {
         try {
-            console.log(userId, token);
             const res = await axios.get(`/api/auth/${userId}/remembrances`, {
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -138,11 +168,12 @@ const make_remembrance = () => {
                 comments
             } = res.data;
 
+            console.log(res.data);
             setUserData({
                 remembranceId: _id,
                 photo
             })
-            setComments([...comments])
+            getCommentData(_id, comments)
         } catch (error) {
             console.log(error);
         }
@@ -154,15 +185,21 @@ const make_remembrance = () => {
         const { remembranceId } = userData;
         try {
             const response =
-                axios.post(`/api/remembrances/${remembranceId}/comments`,
+                await axios.post(`/api/remembrances/${remembranceId}/comments`,
                     data, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
                 });
+
+            setComments((prev) => [
+                ...prev,
+                data
+            ]);
             console.log(response);
         } catch (error) {
-            console.log(error);
+            alert(error.reason);
+            console.log(error.reason);
         }
     }
 
@@ -177,10 +214,10 @@ const make_remembrance = () => {
 
         setTimeout(() => {
             console.log('확인')
-            setComments((prev) => [
-                ...prev,
-                data
-            ]);
+            // setComments((prev) => [
+            //     ...prev,
+            //     data
+            // ]);
             postComment(data);
             // 폼 양식 리셋하기
             handlerFormClear(formRef);
@@ -204,13 +241,13 @@ const make_remembrance = () => {
                             <h2>-추모 공간입니다-</h2>
                         </div>
                         {/* <div css={imageStyle}> */}
-                            <img
-                                src="https://images.unsplash.com/photo-1516967124798-10656f7dca28?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8d2FybSUyMGhlYXJ0fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=600&q=60"
-                                alt="소개 사진"
-                                width={200}
-                                // layout="fill"
-                                // priority
-                            />
+                        <img
+                            src="https://images.unsplash.com/photo-1516967124798-10656f7dca28?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8d2FybSUyMGhlYXJ0fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=600&q=60"
+                            alt="소개 사진"
+                            width={200}
+                        // layout="fill"
+                        // priority
+                        />
                         {/* </div> */}
                     </div>
                 </Introduction>
@@ -231,8 +268,8 @@ const make_remembrance = () => {
                                     height={150}
                                     priority
                                 /> */}
-                                <img src="https://images.unsplash.com/photo-1516967124798-10656f7dca28?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8d2FybSUyMGhlYXJ0fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=600&q=60"/>
                                 <TbRectangleVertical className={'frame_svg'} />
+                                <img src="https://images.unsplash.com/photo-1516967124798-10656f7dca28?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8d2FybSUyMGhlYXJ0fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=600&q=60" />
                             </FrameImages>
                         </Frame>
                         <Decorator>
@@ -350,9 +387,9 @@ const Decorator = styled.div`
 
 const IconComments = styled.div`
     display: inline-grid;
-    grid-column-gap: 1rem;
+    grid-column-gap: 0.5rem;
     place-content: center;
-    grid-template-columns: repeat(5, minmax(50px,auto));
+    grid-template-columns: repeat(5, minmax(auto, auto));
     position: absolute;
     left: 10px;
 `
@@ -365,8 +402,8 @@ const CommentArea = styled.div`
     }
 
     form button {
-        position: absolute;
-        right: 5rem;
+        position: relative;
+        left: 14rem;
     }
     
     label, textarea {
@@ -401,7 +438,7 @@ const FlowerIconDiv = styled.div`
 
 const TextArea = styled.textarea`
 
-` 
+`
 
 const FrameImages = styled.div`
     position: relative;
