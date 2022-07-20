@@ -275,6 +275,8 @@ components:
         application/json:
           schema:
             type: object
+            required:
+              - password
             properties:
               writer:
                 $ref: "#/components/schemas/Comment/properties/writer"
@@ -425,6 +427,8 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+              - password
               properties:
                 password:
                   $ref: "#/components/schemas/Comment/properties/password"

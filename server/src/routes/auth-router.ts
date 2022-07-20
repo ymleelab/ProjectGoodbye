@@ -157,7 +157,7 @@ authRouter.patch(
             // password를 제외한 나머지 수정 정보를 추모 데이터에 반영
             delete toUpdate.password;
             await updateRemembranceJoiSchema.validateAsync(toUpdate);
-            await remembranceService.setRemembrance(userId, toUpdate);
+            remembranceService.setRemembrance(userId, toUpdate);
 
             // 업데이트 이후의 유저 데이터를 프론트에 보내 줌
             res.status(200).json(updatedUserInfo);
