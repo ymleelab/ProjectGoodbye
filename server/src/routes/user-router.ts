@@ -399,10 +399,12 @@ usersRouter.post(
                 throw new Error('올바르지 않은 이메일 주소입니다.');
             }
 
-            res.status(200).json({ result: 'success' });
+            res.status(200).json({ will });
         } catch (error) {
             next(error);
         }
     },
 );
+
+
 export { usersRouter };
