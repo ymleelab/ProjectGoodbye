@@ -1,9 +1,11 @@
 import { Router, Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
 import {
     userService,
     willService,
     receiverService,
     ImageService,
+    remembranceService,
 } from '../services';
 import {
     createReceiverJoiSchema,
@@ -14,8 +16,8 @@ import {
     updateWillJoiSchema,
 } from '../db/schemas/joi-schemas/will-joi-schema';
 import { userUpdateJoiSchema } from '../db/schemas/joi-schemas/user-joi-schema';
+import { updateRemembranceJoiSchema } from '../db/schemas/joi-schemas';
 import { uploadImage } from '../middlewares';
-import { InterfaceUserResult } from '../db/schemas/user-schema';
 import { sendMailTest } from '../services/mail-service';
 // ts-node에서 typeRoot인지 type인지는 모르겠으나, --file 옵션을 package.json이나 file:true를 tsconfig에 해주지 않으면 적용이 안된다고 함.
 declare global {
@@ -40,7 +42,7 @@ const authRouter = Router();
 
 /**
  * @swagger
- * /api/auth/{userId}/isLoggedIn:
+ * /api/auth/{userId}:
  *   get:
  *     parameters:
  *       - in: path
@@ -51,21 +53,22 @@ const authRouter = Router();
  *     security:
  *       - bearerAuth: []
  *     tags: [AuthUser]
- *     summary: 유저가 로그인이 되어있다면, result-"success"를 반환하는 API
- *     description: 유저가 로그인이 되어있다면, result- "success"를 반환 (jwt token 값이 올바르다면)
+ *     summary: 유저가 로그인이 되어있다면, 유저 정보를 반환하는 API
+ *     description: 유저가 로그인이 되어있다면, 유저 정보를 반환 (jwt token 값이 올바르다면)
  *     responses:
  *       200:
- *         description: result success
+ *         description: user as json
  *
  */
 
 authRouter.get(
-    '/:userId/isLoggedIn',
+    '/:userId',
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { userId } = req.params;
             checkUserValidity(req, userId);
-            res.status(200).json({ result: 'success' });
+            const user = await userService.getUser(userId);
+            res.status(200).json({ user });
         } catch (error) {
             next(error);
         }
@@ -122,13 +125,13 @@ authRouter.patch(
                 req.file as Express.MulterS3.File,
             );
 
-            // const isValid = await userUpdateJoiSchema.validateAsync({
-            //     fullName,
-            //     password,
-            //     dateOfBirth,
-            //     currentPassword,
-            //     photo,
-            // });
+            const isValid = await userUpdateJoiSchema.validateAsync({
+                fullName,
+                password,
+                dateOfBirth,
+                currentPassword,
+                photo,
+            });
             // currentPassword 없을 시, 진행 불가
             if (currentPassword === password) {
                 throw new Error(
@@ -182,77 +185,6 @@ authRouter.patch(
 ///  이메일을 받은 사람이 유언장 발송 권한을 confirm하기전에 query로 받아온 정보로 managedUsers에 추가하는 api
 /**
  * @swagger
- * /api/auth/{userId}/managedUsers:
- *   patch:
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *         required: true
- *       - in: query
- *         name: email
- *         schema:
- *           type: string
- *           required: true
- *       - in: query
- *         name: managedUserId
- *         schema:
- *           type: string
- *           required: true
- *     security:
- *       - bearerAuth: []
- *     tags: [AuthTrustAndManage]
- *     summary: 유저에게서 이메일을 받아서 trusted user가 된 사람이 로그인 혹은 회원 가입 후, url query에서 받은 정보로 managedUsers에 초기 등록하는 API
- *     description: 예를 들어서 유저 A가 B가 아들이어서 trusted user로 아들 이메일을 등록, 관련 이메일을 받은 아들 B가 메일의 링크를 따라서 신규 회원을 등록 그 이후에는 A의 trustedUser가 되겠냐는 confirm을 아직 안한 상황에서 우선 B의 정보에 아버지 A의 이메일과 userId 정보가 들어가게 되는 API
- *     responses:
- *       200:
- *         description: 로그인한 유저가 patch 된 이후의 유저 정보 as JSON
- *
- */
-authRouter.patch(
-    '/:userId/managedUsers',
-    async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const { userId } = req.params;
-            checkUserValidity(req, userId);
-
-            // body data 로부터 업데이트할 사용자 정보를 추출함.
-            const { email, managedUserId } = req.query; // query로 받아온다고 가정
-
-            // const isValid = await userUpdateJoiSchema.validateAsync({
-            //     fullName,
-            //     password,
-            //     dateOfBirth,
-            //     currentPassword,
-            //     photo,
-            // });
-            const managedUser = {
-                email,
-                userId: managedUserId,
-                confirm: false,
-            };
-
-            // 위 데이터가 undefined가 아니라면, 즉, 프론트에서 업데이트를 위해
-            // 보내주었다면, 업데이트용 객체에 삽입함.
-
-            // 사용자 정보를 업데이트함.
-            const updatedUserInfo = await userService.setManagedUsers(
-                userId,
-                managedUser,
-            );
-            console.log(updatedUserInfo);
-
-            // 업데이트 이후의 유저 데이터를 프론트에 보내 줌
-            res.status(200).json(updatedUserInfo);
-        } catch (error) {
-            next(error);
-        }
-    },
-);
-// 유저가 확정을 지어서 trusted user를 확정한 경우 유저 정보를 두명 다 업데이트 하는 api
-/**
- * @swagger
  * /api/auth/{userId}/confirmation:
  *   patch:
  *     parameters:
@@ -262,51 +194,48 @@ authRouter.patch(
  *           type: string
  *         required: true
  *       - in: query
- *         name: managedUserId
+ *         name: token
  *         schema:
  *           type: string
  *           required: true
  *     security:
  *       - bearerAuth: []
  *     tags: [AuthTrustAndManage]
- *     summary: 유저가 자신에게 할당된 managedUser에 대하여 confirm 버튼을 눌러서 생사여부 관한 책임을 지겠다고 선언했을 때, 본인과 해당하는 유저 정보 모두 confirmed를 true로 변환하고, 관련 정보를 업데이트하는 API.
- *     description: 예를 들어서 유저 A가 B가 아들이어서 trusted user로 아들 이메일을 등록, B는 로그인 등의 과정을 모두 마친후 A의 생사여부 권한을 받기로 확정, 이 때의 A의 trustedUser의 userId와 confirmed true로 정보를 업데이트하고, 아들 B의 managedUsers의 A에 해당하는 managedUser object의 confirmed 정보 또한 true로 변경하게 되는 API.
+ *     summary: 유저에게서 이메일을 받아서 trusted user가 된 사람이 로그인 혹은 회원 가입 후, url query에서 받은 토큰정보로 managedUsers와 trustedUser 정보를 업데이트 하는 API
+ *     description: 예를 들어서 유저 A가 B가 아들이어서 trusted user로 아들 이메일을 등록, 관련 이메일을 받은 아들 B가 메일의 링크를 따라서 회원가입 후 로그인을 하면 신뢰받는 유저로 등록. A의 trusted user정보에 B 정보가 들어가고, B managedUsers에 A 정보가 추가됨. 
  *     responses:
  *       200:
- *         description: mainUserInfo-trustedUser를 처음 신청한 A의 정보, trustedUserInfo- trustedUser가 된 B의 정보 as JSON
+ *         description: mainUserInfo (A), trustedUserInfo (B) as JSON
  *
  */
+// homepage/accept?token 부분에 사용하면 될 것 같음.
 authRouter.patch(
     '/:userId/confirmation',
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            // 이메일 받아서 가입한 유저 아이디 확인
             const { userId } = req.params;
             checkUserValidity(req, userId);
-            const { managedUserId }: any = req.query; // or body?
 
-            // const isValid = await userUpdateJoiSchema.validateAsync({
-            //     fullName,
-            //     password,
-            //     dateOfBirth,
-            //     currentPassword,
-            //     photo,
-            // });
-            /// / confirm을 누른 사용자의 정보 변경
-            const userInfo: any = await userService.getUser(userId);
-            const { managedUsers } = userInfo;
-            managedUsers.map((el) => {
-                if (el.userId === managedUserId) {
-                    el.confirmed = true;
-                    return el;
-                }
-            });
-            const toUpdateManagedUsers = { managedUsers };
-            const trustedUserInfo = await userService.confirmManagedUsers(
+            // body data 로부터 업데이트할 사용자 정보를 추출함.
+            const { token }: any = req.query;
+            const secretKey = process.env.JWT_SECRET_KEY || 'secret-key';
+            const decodedInfo = jwt.verify(token, secretKey);
+            const { managedUserEmail, managedUserId }: any = decodedInfo;
+            const managedUser = {
+                email: managedUserEmail,
+                userId: managedUserId,
+                confirmed: true,
+            };
+
+            // 위 데이터가 undefined가 아니라면, 즉, 프론트에서 업데이트를 위해
+            // 보내주었다면, 업데이트용 객체에 삽입함.
+
+            // 사용자 정보를 업데이트함.
+            const trustedUserInfo = await userService.setManagedUsers(
                 userId,
-                toUpdateManagedUsers,
+                managedUser,
             );
-            // 이제 자신의 유언장을 보내줄 사람이 정해진 사람 관련 유저 정보 변경
+            /// 이메일을 발송한 사람에 대한 정보업데이트
             const managedUserInfo: any = await userService.getUser(
                 managedUserId,
             );
@@ -320,13 +249,11 @@ authRouter.patch(
             const toUpdateTrustedUser = {
                 trustedUser: updatedTrustedUser,
             };
-            console.log(toUpdateTrustedUser);
             const updatedManagedUserInfo =
                 await userService.confirmManagedUsers(
                     managedUserId,
                     toUpdateTrustedUser,
                 );
-            console.log(managedUserInfo);
             const result = {
                 mainUserInfo: updatedManagedUserInfo,
                 trustedUserInfo,
@@ -337,7 +264,6 @@ authRouter.patch(
         }
     },
 );
-
 // 자신이 유언장 전송 권한을 주고 싶은 email 주소를 입력하여서 그 이메일 주소를 trusted user 정보에 등록하고,
 // 그 이메일 주소로 서비스 관련 이메일 전송
 /**
@@ -363,7 +289,7 @@ authRouter.patch(
  *     description: 예를 들어서 유저 A가 B가 아들이어서 B에게 권한을 부여하기로 결정, B의 이메일 주소와 A 계정의 비밀번호를 확인 받고 A의 trustedUser 부분의 email부분이 아들 이메일로 등록됨, 아들은 ProjectGoodbye 서비스 관련 정보가 담긴 이메일을 받고, 이메일에는 링크등을 활용하여 신규유저인 경우 회원 가입, 기존 유저인 경우는 로그인을 해달라는 부탁을 받게 됨. 아직 HTML 부분은 API에서 크게 구현을 안했기 때문에 프론트 분들이 html을 이미 작성하신 양식이 있다면 비슷하게 작성해주시거나 같이 상의해보아요.
  *     responses:
  *       200:
- *         description: 수정된 A의 정보 as JSON
+ *         description: 수정된 A의 정보와 token값 as JSON
  *
  */
 authRouter.patch(
@@ -385,14 +311,161 @@ authRouter.patch(
             );
             // mail 전송하는 부분을 여기서 작성하는게 편할까?
             const user = await userService.getUser(userId);
+            if (!user) {
+                throw new Error('해당 유저를 찾을 수 없습니다.');
+            }
             const { fullName }: any = user;
+            // userId와 email 정보를 담을 token값 생성
+            const secretKey = process.env.JWT_SECRET_KEY || 'secret-key'; // login 성공시 key값을 써서 토큰 생성
+            const token = jwt.sign(
+                {
+                    managedUserId: userId,
+                    managedUserEmail: user.email,
+                    trustedUserEmail: email,
+                },
+                secretKey,
+            );
             const receivers = [email];
+            const homepage = 'http://localhost:3000';
             const subject = `Project Goodbye 서비스의 ${fullName}님이 고객님에게 관리자 역할을 요청하였습니다.`;
-            const html = `<h1>아무말 대잔치..</h1>`;
-            sendMailTest(receivers, subject, html);
+            const html = `<!DOCTYPE html>
+            <html lang="en">
+                <head>
+                    <meta charset="UTF-8" />
+                    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                    <title>Invitation Email</title>
+                </head>
+                <body>
+                    <h1>Project Goodbye의 서비스에 가입해주세요!</h1>
+                    <p>
+                        Project Goodbye의 서비스를 이용 중이신 ${fullName}님이 당신을
+                        신뢰하는 사람으로 설정하였습니다.
+                    </p>
+                    <p>
+                        Project Goodbye의 유언장 서비스는 미리 작성한 유언장을 지인들
+                        이메일로 전달하는 서비스입니다. 다만, 각 회원님의 생사여부는 저희
+                        서비스가 판단 할 수 없기에 회원님은 생사여부를 판단해 줄 신뢰하는
+                        사람을 정하게 됩니다. 신뢰하는 사람으로 지정되신 당신에게
+                        회원가입/로그인을 요청드립니다!
+                    </p>
+                    <p>
+                        회원가입, 로그인 이 후에는 ${fullName}님의 신뢰하는 유저가 되는 것을
+                        확정해주시면 됩니다.
+                    </p>
+                    <p>
+                        이미 Project Goodbye의 기존 회원님이시라면 <a href="${homepage}/sign_in?redirectUrl=${homepage}/accept?token=${token}">이 링크</a>를
+                        클릭해주세요.
+                    </p>
 
+                    <p>
+                        Project Goodbye에 처음 가입하신다면 <a href="${homepage}/sign_up?redirectUrl=${homepage}/sign_in?redirectUrl=${homepage}/accept?token=${token}">이 링크</a>를
+                        클릭해주세요.
+                    </p>
+                </body>
+            </html>
+            `;
+            sendMailTest(receivers, subject, html);
             // 업데이트 이후의 유저 데이터를 프론트에 보내 줌
-            res.status(200).json(updatedUserInfo);
+            res.status(200).json({ updatedUserInfo, token });
+        } catch (error) {
+            next(error);
+        }
+    },
+);
+/**
+ * @swagger
+ * /api/auth/{userId}/managedUsers/{managedUserId}:
+ *   patch:
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         required: true
+ *       - in: path
+ *         name: managedUserId
+ *         schema:
+ *           type: string
+ *         required: true
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             $ref: '#/components/schemas/ConfirmDeath' 
+ *     tags: [AuthEmail]
+ *     summary: TrustedUser가 managedUser가 죽었을 경우, 사망일자와 함께 유언장 url과 추모 url이 첨부된 이메일을 보내는 API
+ *     description: 예를 들어서 유저 B가 A가 사망하여서 유언장 전송하기를 누름, 그러면 modal에 사망일자를 입력하게 되고, 사망일자를 입력하면 A가 등록한 모든 유언장에서 이메일 정보를 써서 url(추모, 유언장) 링크가 들은 email을 발송함.
+ *     responses:
+ *       200:
+ *         description: 성공 시 result-success
+ *
+ */
+authRouter.post(
+    '/:userId/managedUsers/:managedUserId',
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            // 신뢰 받는 유저가 로그인 하여서 신뢰받는 userId와 관리하는 managedUserId를 params로 받아옴
+            const { userId, managedUserId } = req.params;
+            checkUserValidity(req, userId);
+            // managedUser 객체 받아옴
+            const managedUser = await userService.getUser(managedUserId);
+            // 이름과 신뢰받는 유저 정보
+            const { trustedUser, fullName }: any = managedUser;
+            const trustedUserId = trustedUser.userId;
+            // 신뢰받는 유저 정보와 유저아이디가 일치하지 않으면 뭔가 잘못된거임.
+            if (trustedUserId !== userId) {
+                throw new Error(
+                    '해당 유저에 대한 유언장 발송 권한이 없습니다.',
+                );
+            }
+            // 사망일자는 body에서 모달 같은 방식으로 받아옴.
+            const { dateOfDeath } = req.body;
+            // 사망했으므로 추모 정보 업데이트
+            const toUpdate = { dateOfDeath, isPublic: true };
+            await updateRemembranceJoiSchema.validateAsync(toUpdate);
+            await remembranceService.setRemembrance(userId, toUpdate);
+            // 유저의 추모 정보를 가져옴
+            const remembrance = await remembranceService.getRemembranceByUser(
+                managedUserId,
+            );
+            // 추모 정보 중 추모 id 값이 필요함.
+            const remebranceId = remembrance._id;
+            // 비슷하게 유저의 유언장들 정보를 가져옴
+            const wills = await willService.findWillsForOneUser(managedUserId);
+            // url link 에 포함될 homepage 변수 세팅
+            const homepage = process.env.HOMEPAGE;
+            // 유언장 마다 같은 양식의 이메일 전송
+            wills.forEach((will) => {
+                const receiversEmails: string[] = [];
+                const { receivers, _id } = will;
+                const willId = _id;
+                receivers.forEach((receiver: any) =>
+                    receiversEmails.push(receiver.email),
+                );
+                const subject = `Project Goodbye: ${fullName}으로부터 유언장이 도착했습니다`;
+                const html = `<!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>유언장</title>
+                </head>
+                <body>
+                    <h1>${fullName}님으로부터 유언장이 도착했습니다</h1>
+                    <p>Project Goodbye의 서비스는 유언장을 링크를 통하여 전달해드립니다.</p>
+                    <p>유언장을 열람하시려면 <a href="${homepage}/wills/${willId}">이 링크</a>를 클릭 후, 이 이메일을 받은 이메일 주소를 입력하시면 됩니다.</p>
+                    <p>${fullName}님의 추모식에 참여를 원하시면 <a href="${homepage}/remebrances/${remebranceId}">이 링크</a>를 클릭하시면 됩니다.</p>
+                </body>
+                </html>`;
+                sendMailTest(receiversEmails, subject, html);
+            });
+            // 성공시 result-success 응답.
+            res.status(200).json({ result: 'success' });
         } catch (error) {
             next(error);
         }
@@ -800,7 +873,7 @@ authRouter.get(
  *       - bearerAuth: []
  *     tags: [AuthReceiver]
  *     summary: 특정 유저의 수신자를 DB에 등록할 때 사용하는 API
- *     description: 유저가 수신자를 post요청시 req.body의 fullName, emailAddress, relation, role 정보를 사용, 새 수신자를 등록
+ *     description: 유저가 수신자를 post요청시 req.body의 fullName, emailAddress, relation 정보를 사용, 새 수신자를 등록
  *     requestBody:
  *       required: true
  *       content:
@@ -820,19 +893,17 @@ authRouter.post(
             const { userId } = req.params;
             checkUserValidity(req, userId);
             // receiver collection에 추가
-            const { fullName, emailAddress, relation, role } = req.body;
+            const { fullName, emailAddress, relation } = req.body;
             const isValid = await createReceiverJoiSchema.validateAsync({
                 fullName,
                 emailAddress,
                 relation,
-                role,
             });
             const newReceiver = await receiverService.addReceiver({
                 fullName,
                 emailAddress,
                 userId,
                 relation,
-                role,
             });
             // 유저의 receiver list에 추가
             const updatedUser = await userService.addReceiver(
@@ -927,7 +998,7 @@ authRouter.delete(
  *       - bearerAuth: []
  *     tags: [AuthReceiver]
  *     summary: 특정 유저의 특정 수신자 정보를 수정할 때 사용하는 API
- *     description: 유저가 수신자 정보를 patch 요청시 req.body의 fullName, emailAddress, relation, role 정보를 사용, 수신자 정보를 수정
+ *     description: 유저가 수신자 정보를 patch 요청시 req.body의 fullName, emailAddress, relation 정보를 사용, 수신자 정보를 수정
  *     requestBody:
  *       required: true
  *       content:
@@ -945,18 +1016,16 @@ authRouter.patch(
         try {
             const { userId, receiverId } = req.params;
             checkUserValidity(req, userId);
-            const { fullName, emailAddress, relation, role } = req.body;
+            const { fullName, emailAddress, relation } = req.body;
             const isValid = await updateReceiverJoiSchema.validateAsync({
                 fullName,
                 emailAddress,
                 relation,
-                role,
             });
             const toUpdate = {
                 ...(fullName && { fullName }),
                 ...(emailAddress && { emailAddress }),
                 ...(relation && { relation }),
-                ...(role && { role }),
             };
             const updatedReceiver = await receiverService.updateReceiver(
                 receiverId,
@@ -968,5 +1037,42 @@ authRouter.patch(
         }
     },
 );
+
+/**
+ * @swagger
+ * /api/auth/{userId}/remembrances:
+ *   get:
+ *     tags:
+ *     - Remembrances
+ *     security:
+ *       - bearerAuth: []
+ *     summary: userId로 추모 데이터 조회
+ *     description: 로그인한 유저의 추모 데이터 조회
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: 하나의 추모 데이터 조회
+ *         $ref: "#/components/responses/remembranceWithCommentsRes"
+ */
+// 유저의 추모 데이터 조회
+authRouter.get('/:userId/remembrances', async (req, res, next) => {
+    try {
+        const { userId } = req.params;
+        checkUserValidity(req, userId);
+
+        const remembrance = await remembranceService.getRemembranceByUser(
+            userId,
+        );
+
+        res.status(200).json(remembrance);
+    } catch (error) {
+        next(error);
+    }
+});
 
 export { authRouter };
