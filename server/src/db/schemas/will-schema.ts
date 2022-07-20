@@ -26,6 +26,7 @@ const WillSchema = new Schema<InterfaceWill>(
                 {
                     receiverId: String,
                     email: String,
+                    _id: false,
                 },
             ],
             required: true,
