@@ -20,7 +20,7 @@ class RemembranceService {
         const { userId } = remembranceInfo;
 
         // 해당 유저의 추모 데이터가 존재하는지 확인
-        const remembrance = await this.getRemembranceByUser(userId);
+        const remembrance = await this.remembranceModel.findByUserId(userId);
         if (remembrance) {
             throw new Error('해당 유저의 추모 데이터가 이미 존재합니다.');
         }
@@ -61,6 +61,11 @@ class RemembranceService {
     // userId로 특정 추모 조회
     async getRemembranceByUser(userId: string) {
         const remembrance = await this.remembranceModel.findByUserId(userId);
+        if (!remembrance) {
+            throw new Error(
+                '해당 유저의 추모 데이터가 존재하지 않습니다. 다시 확인해 주세요.',
+            );
+        }
 
         return remembrance;
     }
