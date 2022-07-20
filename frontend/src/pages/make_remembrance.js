@@ -114,7 +114,6 @@ const make_remembrance = () => {
     const ReachableContext = createContext(null);
 
     const { userId, token } = useSelector(state => {
-        console.log(state.user);
         return state.user;
     });
     const [userData, setUserData] = useState(null);
@@ -123,22 +122,9 @@ const make_remembrance = () => {
     const [submitting, setSubmitting] = useState(false);
     const formRef = useRef(null);
     // const [value, valueHandler, setValue] = useInput('');
-
-
-    useEffect(() => {
-        // 추모 데이터 서버에서 받아오기
-        if (userId && token) {
-            getRemembranceData();
-        }
-    }, [userId, token])
-
-
-    console.log(userId, token);
+    // console.log(userId, token);
 
     const getRemembranceData = async () => {
-
-        // const {userId, token} = getUserIdToken();
-        console.log(userId, token);
         try {
             console.log(userId, token);
             const res = await axios.get(`/api/auth/${userId}/remembrances`, {
@@ -147,16 +133,16 @@ const make_remembrance = () => {
                 }
             });
             const {
-                userId,
-                dateOfBirth,
-                dateOfDeath,
-                photo
+                _id,
+                photo,
+                comments
             } = res.data;
+
             setUserData({
-                remembranceId: res.data._id,
+                remembranceId: _id,
                 photo
             })
-            setComments([...res.data.comments])
+            setComments([...comments])
         } catch (error) {
             console.log(error);
         }
@@ -200,6 +186,12 @@ const make_remembrance = () => {
             handlerFormClear(formRef);
         }, 500);
     }
+
+    useEffect(() => {
+        if (userId && token) {
+            getRemembranceData();
+        }
+    }, [userId, token])
 
 
     return (
