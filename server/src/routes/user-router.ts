@@ -383,28 +383,16 @@ usersRouter.post(
             const will = await willService.findWill(willId);
             // will 안의 receivers는 receiver Id가 등록되어 있고,
             const { receivers }: any = will;
-            const registeredEmails: string[] = [];
-            for (let i = 0; i < receivers.length; i++) {
-                const receiverId = receivers[0];
-                const receiver: any = await receiverService.findReceiver(
-                    receiverId,
-                );
-                const { emailAddress } = receiver;
-                registeredEmails.push(emailAddress);
-            }
-            const matchedEmail = registeredEmails.find(
-                (registeredEmail) => registeredEmail === email,
+            const matchedReceiver = receivers.find(
+                (receiver) => receiver.email === email,
             );
-            if (!matchedEmail) {
+            if (!matchedReceiver) {
                 throw new Error('올바르지 않은 이메일 주소입니다.');
             }
-
             res.status(200).json({ will });
         } catch (error) {
             next(error);
         }
     },
 );
-
-
 export { usersRouter };

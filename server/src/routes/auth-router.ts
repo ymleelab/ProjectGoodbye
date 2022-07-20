@@ -5,6 +5,7 @@ import {
     willService,
     receiverService,
     ImageService,
+    remembranceService,
 } from '../services';
 import {
     createReceiverJoiSchema,
@@ -263,8 +264,6 @@ authRouter.patch(
         }
     },
 );
-
-
 // 자신이 유언장 전송 권한을 주고 싶은 email 주소를 입력하여서 그 이메일 주소를 trusted user 정보에 등록하고,
 // 그 이메일 주소로 서비스 관련 이메일 전송
 /**
@@ -374,75 +373,58 @@ authRouter.patch(
         }
     },
 );
-
-
-// authRouter.get(
-//     '/:userId/managedUsers/:managedUserId',
-//     async (req: Request, res: Response, next: NextFunction) => {
-//         try {
-//             // 우선은 한번 설정하면 수정이 불가능하게 해야하나...?
-//             // 이메일 받아서 가입한 유저 아이디 확인
-//             const { userId, managedUserId } = req.params;
-//             checkUserValidity(req, userId);
-//             // body로 이메일 정보 + 현재 비밀번호 받아오기
-//             const managedUser = await userService.getUser(managedUserId);
-//             const { trustedUser }: any = managedUser;
-//             const trustedUserId = trustedUser.userId;
-//             if(trustedUserId!== userId){
-//                 throw new Error('해당 유저에 대한 유언장 발송 권한이 없습니다.')
-//             }
-//             const wills = await willService.findWillsForOneUser(managedUserId);
-
-
-//             // mail 전송하는 부분을 여기서 작성하는게 편할까?
-//             const receivers = [email];
-//             const homepage = 'http://localhost:3000';
-//             const subject = `Project Goodbye 서비스의 ${fullName}님이 고객님에게 관리자 역할을 요청하였습니다.`;
-//             const html = `<!DOCTYPE html>
-//             <html lang="en">
-//                 <head>
-//                     <meta charset="UTF-8" />
-//                     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-//                     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-//                     <title>Invitation Email</title>
-//                 </head>
-//                 <body>
-//                     <h1>Project Goodbye의 서비스에 가입해주세요!</h1>
-//                     <p>
-//                         Project Goodbye의 서비스를 이용 중이신 ${fullName}님이 당신을
-//                         신뢰하는 사람으로 설정하였습니다.
-//                     </p>
-//                     <p>
-//                         Project Goodbye의 유언장 서비스는 미리 작성한 유언장을 지인들
-//                         이메일로 전달하는 서비스입니다. 다만, 각 회원님의 생사여부는 저희
-//                         서비스가 판단 할 수 없기에 회원님은 생사여부를 판단해 줄 신뢰하는
-//                         사람을 정하게 됩니다. 신뢰하는 사람으로 지정되신 당신에게
-//                         회원가입/로그인을 요청드립니다!
-//                     </p>
-//                     <p>
-//                         회원가입, 로그인 이 후에는 ${fullName}님의 신뢰하는 유저가 되는 것을
-//                         확정해주시면 됩니다.
-//                     </p>
-//                     <p>
-//                         이미 Project Goodbye의 기존 회원님이시라면 <a href="${homepage}/sign_in?redirectUrl=${homepage}/accept?token=${token}">이 링크</a>를
-//                         클릭해주세요.
-//                     </p>
-
-//                     <p>
-//                         Project Goodbye에 처음 가입하신다면 <a href="${homepage}/sign_up?redirectUrl=${homepage}/sign_in?redirectUrl=${homepage}/accept?token=${token}">이 링크</a>를
-//                         클릭해주세요.
-//                     </p>
-//                 </body>
-//             </html>
-//             `;
-//             sendMailTest(receivers, subject, html);
-//             // 업데이트 이후의 유저 데이터를 프론트에 보내 줌
-//             res.status(200).json({ updatedUserInfo, token });
-//         } catch (error) {
-//             next(error);
-//         }
-//     },
-// );
+authRouter.get(
+    '/:userId/managedUsers/:managedUserId',
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            // 우선은 한번 설정하면 수정이 불가능하게 해야하나...?
+            // 이메일 받아서 가입한 유저 아이디 확인
+            const { userId, managedUserId } = req.params;
+            checkUserValidity(req, userId);
+            // body로 이메일 정보 + 현재 비밀번호 받아오기
+            const managedUser = await userService.getUser(managedUserId);
+            const { trustedUser, fullName }: any = managedUser;
+            const trustedUserId = trustedUser.userId;
+            if (trustedUserId !== userId) {
+                throw new Error(
+                    '해당 유저에 대한 유언장 발송 권한이 없습니다.',
+                );
+            }
+            // const remembrance = await remembranceService.findByUserId(managedUserId);
+            // const remebranceId = remembrance._id;
+            const wills = await willService.findWillsForOneUser(managedUserId);
+            const homepage = process.env.HOMEPAGE;
+            wills.forEach((will) => {
+                const receiversEmails: string[] = [];
+                const { receivers, _id } = will;
+                receivers.forEach((receiver:any) =>
+                    receiversEmails.push(receiver.email),
+                );
+                const subject = `Project Goodbye: ${fullName}으로부터 유언장이 도착했습니다`;
+                const html = `<!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>유언장</title>
+                </head>
+                <body>
+                    <h1>${fullName}으로부터 유언장이 도착했습니다</h1>
+                    <p>Project Goodbye의 서비스는 유언장을 링크를 통하여 전달해드립니다.</p>
+                    <p>유언장을 열람하시려면 <a href="${homepage}/wills/${_id}">이 링크</a>를 클릭 후, 이 이메일을 받은 이메일 주소를 입력하시면 됩니다.</p>
+                    <p>${fullName}님의 추모식에 참여를 원하시면 <a href="${homepage}/remebrances/${remebranceId}">이 링크</a>를 클릭하시면 됩니다.</p>
+                </body>
+                </html>`;
+                sendMailTest(receiversEmails, subject, html);
+            });
+            // 업데이트 이후의 유저 데이터를 프론트에 보내 줌
+            res.status(200).json({result:'success'});
+        } catch (error) {
+            next(error);
+        }
+    },
+);
 // 회원 탈퇴 api
 
 /**
