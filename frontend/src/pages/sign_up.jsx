@@ -5,11 +5,13 @@ import { css } from '@emotion/react';
 import useInput from '../hooks/useInput';
 import AppLayout from '../components/AppLayout';
 import axios from 'axios';
-import Router from 'next/router';
+import Router, { useRouter } from 'next/router';
 
 import userLoginCheck from '../util/userLoginCheck';
 
 const SignUp = () => {
+	const router = useRouter();
+	const [redirectUrl, setRedirectUrl] = useState('/sign_in');
 	// const [isLogIn, setIsLogIn] = useState(null);
 
 	const [email, onChangeEmail] = useInput('');
@@ -18,11 +20,6 @@ const SignUp = () => {
 	const [password, onChangePassword] = useInput('');
 	const [repeatPassword, onChangeRepeatPassword] = useInput('');
 	const [term, onChangeTerm] = useState(false);
-
-	useEffect(() => {
-		// 로그인한 유저가 접속하지 못하게 하는 부분
-		preventUserAccess();
-	}, []);
 
 	const preventUserAccess = async () => {
 		const isLogIn = await userLoginCheck();
@@ -41,7 +38,7 @@ const SignUp = () => {
 					alert(
 						`${res.data.fullName}님 회원가입을 축하합니다. 로그인을 먼저 해주세요.`,
 					);
-					Router.replace('/sign_in');
+					Router.replace(redirectUrl);
 				}
 			})
 			.catch((error) => {
@@ -50,6 +47,17 @@ const SignUp = () => {
 				//}
 			});
 	}, [email, fullName, dateOfBirth, password, repeatPassword, term]);
+
+	useEffect(() => {
+		// 로그인한 유저가 접속하지 못하게 하는 부분
+		preventUserAccess();
+
+		if (!router.isReady) return;
+		if (router.query.redirectUrl) {
+			setRedirectUrl(router.query.redirectUrl);
+		}
+		//console.log('query : ' + redirectUrl);
+	}, [router.isReady]);
 
 	return (
 		<AppLayout>

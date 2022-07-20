@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { Form } from 'antd';
 import { css } from '@emotion/react';
 import useInput from '../hooks/useInput';
@@ -12,13 +12,14 @@ import userLoginCheck from '../util/userLoginCheck';
 
 const SignIn = () => {
 	const router = useRouter();
+	const [redirectUrl, setRedirectUrl] = useState('/');
 	const dispatch = useDispatch();
 	const [email, onChangeEmail] = useInput('');
 	const [password, onChangePassword] = useInput('');
 
 	const preventUserAccess = async () => {
 		const isLogIn = await userLoginCheck();
-		console.log(isLogIn);
+		//console.log(isLogIn);
 		if (isLogIn) {
 			alert('이미 로그인 되어있습니다..');
 			Router.replace('/');
@@ -42,8 +43,7 @@ const SignIn = () => {
 							userId,
 						}),
 					);
-					console.log('확인');
-					Router.replace('/');
+					Router.replace(redirectUrl);
 				}
 			})
 			.catch((error) => alert(error.response.data.reason));
@@ -54,7 +54,9 @@ const SignIn = () => {
 		preventUserAccess();
 
 		if (!router.isReady) return;
-		const { redirectUrl } = router.query;
+		if (router.query.redirectUrl) {
+			setRedirectUrl(router.query.redirectUrl);
+		}
 		//console.log('query : ' + redirectUrl);
 	}, [router.isReady]);
 
