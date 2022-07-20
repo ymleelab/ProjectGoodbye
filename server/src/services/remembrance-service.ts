@@ -31,7 +31,7 @@ class RemembranceService {
         return createdNewRemembrance;
     }
 
-    // 전체 추모 데이터 조회
+    // 전체 사망한 유저의 추모 데이터 조회
     async getRemembrances() {
         const remembrances = await this.remembranceModel.find();
 

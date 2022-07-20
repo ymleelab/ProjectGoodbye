@@ -28,9 +28,11 @@ export class RemembranceModel {
         return createdNewRemembrance;
     }
 
-    // 전체 추모 데이터 조회
+    // 전체 사망한 유저의 추모 데이터를 업데이트순으로 조회
     async find() {
-        const remembrances = await this.Remembrance.find().sort({
+        const remembrances = await this.Remembrance.find({
+            dateOfDeath: { $exists: true },
+        }).sort({
             updatedAt: -1,
         });
 

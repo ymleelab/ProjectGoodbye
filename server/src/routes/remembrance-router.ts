@@ -3,7 +3,7 @@ import { remembranceService, commentService } from '../services';
 
 const remembranceRouter = Router();
 
-// 전체 추모 데이터 조회
+// 전체 사망한 유저의 추모 데이터 조회
 remembranceRouter.get('/', async (req, res, next) => {
     try {
         const remembrances = await remembranceService.getRemembrances();
