@@ -1,4 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
 import {
     userService,
     willService,
@@ -40,7 +41,7 @@ const authRouter = Router();
 
 /**
  * @swagger
- * /api/auth/{userId}/isLoggedIn:
+ * /api/auth/{userId}:
  *   get:
  *     parameters:
  *       - in: path
@@ -51,21 +52,22 @@ const authRouter = Router();
  *     security:
  *       - bearerAuth: []
  *     tags: [AuthUser]
- *     summary: 유저가 로그인이 되어있다면, result-"success"를 반환하는 API
- *     description: 유저가 로그인이 되어있다면, result- "success"를 반환 (jwt token 값이 올바르다면)
+ *     summary: 유저가 로그인이 되어있다면, 유저 정보를 반환하는 API
+ *     description: 유저가 로그인이 되어있다면, 유저 정보를 반환 (jwt token 값이 올바르다면)
  *     responses:
  *       200:
- *         description: result success
+ *         description: user as json
  *
  */
 
 authRouter.get(
-    '/:userId/isLoggedIn',
+    '/:userId',
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { userId } = req.params;
             checkUserValidity(req, userId);
-            res.status(200).json({ result: 'success' });
+            const user = await userService.getUser(userId);
+            res.status(200).json({ user });
         } catch (error) {
             next(error);
         }
@@ -191,12 +193,7 @@ authRouter.patch(
  *           type: string
  *         required: true
  *       - in: query
- *         name: email
- *         schema:
- *           type: string
- *           required: true
- *       - in: query
- *         name: managedUserId
+ *         name: token
  *         schema:
  *           type: string
  *           required: true
@@ -210,6 +207,7 @@ authRouter.patch(
  *         description: 로그인한 유저가 patch 된 이후의 유저 정보 as JSON
  *
  */
+// homepage/accept?token 부분에 사용하면 될 것 같음.
 authRouter.patch(
     '/:userId/managedUsers',
     async (req: Request, res: Response, next: NextFunction) => {
@@ -218,7 +216,10 @@ authRouter.patch(
             checkUserValidity(req, userId);
 
             // body data 로부터 업데이트할 사용자 정보를 추출함.
-            const { email, managedUserId } = req.query; // query로 받아온다고 가정
+            const { token }: any = req.query;
+            const secretKey = process.env.JWT_SECRET_KEY || 'secret-key'; 
+            const decodedInfo = jwt.verify(token, secretKey);
+            const { managedUserEmail ,managedUserId }: any = decodedInfo;
 
             // const isValid = await userUpdateJoiSchema.validateAsync({
             //     fullName,
@@ -228,7 +229,7 @@ authRouter.patch(
             //     photo,
             // });
             const managedUser = {
-                email,
+                email: managedUserEmail,
                 userId: managedUserId,
                 confirm: false,
             };
@@ -253,7 +254,7 @@ authRouter.patch(
 // 유저가 확정을 지어서 trusted user를 확정한 경우 유저 정보를 두명 다 업데이트 하는 api
 /**
  * @swagger
- * /api/auth/{userId}/confirmation:
+ * /api/auth/{userId}/managedUsers/{managedUserId}/confirmation:
  *   patch:
  *     parameters:
  *       - in: path
@@ -261,11 +262,11 @@ authRouter.patch(
  *         schema:
  *           type: string
  *         required: true
- *       - in: query
+ *       - in: path
  *         name: managedUserId
  *         schema:
  *           type: string
- *           required: true
+ *         required: true
  *     security:
  *       - bearerAuth: []
  *     tags: [AuthTrustAndManage]
@@ -276,14 +277,20 @@ authRouter.patch(
  *         description: mainUserInfo-trustedUser를 처음 신청한 A의 정보, trustedUserInfo- trustedUser가 된 B의 정보 as JSON
  *
  */
+
+//여러개 중에 골라 할 수 있다면, managedUsers 중에 하나의 managedUserId를 param에서 받아오는 것이 맞나?
+
 authRouter.patch(
-    '/:userId/confirmation',
+    '/:userId/managedUsers/:managedUserId/confirmation',
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             // 이메일 받아서 가입한 유저 아이디 확인
-            const { userId } = req.params;
+            const { userId, managedUserId } = req.params;
             checkUserValidity(req, userId);
-            const { managedUserId }: any = req.query; // or body?
+            // const { token }: any = req.query;
+            // const secretKey = process.env.JWT_SECRET_KEY || 'secret-key'; 
+            // const decodedInfo = jwt.verify(token, secretKey);
+            // const { managedUserId }: any = decodedInfo;
 
             // const isValid = await userUpdateJoiSchema.validateAsync({
             //     fullName,
@@ -385,12 +392,61 @@ authRouter.patch(
             );
             // mail 전송하는 부분을 여기서 작성하는게 편할까?
             const user = await userService.getUser(userId);
+            if (!user) {
+                throw new Error('해당 유저를 찾을 수 없습니다.');
+            }
             const { fullName }: any = user;
+            // userId와 email 정보를 담을 token값 생성
+            const secretKey = process.env.JWT_SECRET_KEY || 'secret-key'; // login 성공시 key값을 써서 토큰 생성
+            const token = jwt.sign(
+                {
+                    managedUserId: userId,
+                    managedUserEmail: user.email,
+                    trustedUserEmail: email,
+                },
+                secretKey,
+            );
             const receivers = [email];
+            const homepage = 'http://localhost:3000';
             const subject = `Project Goodbye 서비스의 ${fullName}님이 고객님에게 관리자 역할을 요청하였습니다.`;
-            const html = `<h1>아무말 대잔치..</h1>`;
-            sendMailTest(receivers, subject, html);
+            const html = `<!DOCTYPE html>
+            <html lang="en">
+                <head>
+                    <meta charset="UTF-8" />
+                    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                    <title>Invitation Email</title>
+                </head>
+                <body>
+                    <h1>Project Goodbye의 서비스에 가입해주세요!</h1>
+                    <p>
+                        Project Goodbye의 서비스를 이용 중이신 ${fullName}님이 당신을
+                        신뢰하는 사람으로 설정하였습니다.
+                    </p>
+                    <p>
+                        Project Goodbye의 유언장 서비스는 미리 작성한 유언장을 지인들
+                        이메일로 전달하는 서비스입니다. 다만, 각 회원님의 생사여부는 저희
+                        서비스가 판단 할 수 없기에 회원님은 생사여부를 판단해 줄 신뢰하는
+                        사람을 정하게 됩니다. 신뢰하는 사람으로 지정되신 당신에게
+                        회원가입/로그인을 요청드립니다!
+                    </p>
+                    <p>
+                        회원가입, 로그인 이 후에는 ${fullName}님의 신뢰하는 유저가 되는 것을
+                        확정해주시면 됩니다.
+                    </p>
+                    <p>
+                        이미 Project Goodbye의 기존 회원님이시라면 <a href="${homepage}/login?redirectUrl=${homepage}/accept?token=${token}">이 링크</a>를
+                        클릭해주세요.
+                    </p>
 
+                    <p>
+                        Project Goodbye에 처음 가입하신다면 <a href="${homepage}/register?redirectUrl=${homepage}/login?redirectUrl=${homepage}/accept?token=${token}">이 링크</a>를
+                        클릭해주세요.
+                    </p>
+                </body>
+            </html>
+            `;
+            sendMailTest(receivers, subject, html);
             // 업데이트 이후의 유저 데이터를 프론트에 보내 줌
             res.status(200).json(updatedUserInfo);
         } catch (error) {
@@ -800,7 +856,7 @@ authRouter.get(
  *       - bearerAuth: []
  *     tags: [AuthReceiver]
  *     summary: 특정 유저의 수신자를 DB에 등록할 때 사용하는 API
- *     description: 유저가 수신자를 post요청시 req.body의 fullName, emailAddress, relation, role 정보를 사용, 새 수신자를 등록
+ *     description: 유저가 수신자를 post요청시 req.body의 fullName, emailAddress, relation 정보를 사용, 새 수신자를 등록
  *     requestBody:
  *       required: true
  *       content:
@@ -820,19 +876,17 @@ authRouter.post(
             const { userId } = req.params;
             checkUserValidity(req, userId);
             // receiver collection에 추가
-            const { fullName, emailAddress, relation, role } = req.body;
+            const { fullName, emailAddress, relation } = req.body;
             const isValid = await createReceiverJoiSchema.validateAsync({
                 fullName,
                 emailAddress,
                 relation,
-                role,
             });
             const newReceiver = await receiverService.addReceiver({
                 fullName,
                 emailAddress,
                 userId,
                 relation,
-                role,
             });
             // 유저의 receiver list에 추가
             const updatedUser = await userService.addReceiver(
@@ -927,7 +981,7 @@ authRouter.delete(
  *       - bearerAuth: []
  *     tags: [AuthReceiver]
  *     summary: 특정 유저의 특정 수신자 정보를 수정할 때 사용하는 API
- *     description: 유저가 수신자 정보를 patch 요청시 req.body의 fullName, emailAddress, relation, role 정보를 사용, 수신자 정보를 수정
+ *     description: 유저가 수신자 정보를 patch 요청시 req.body의 fullName, emailAddress, relation 정보를 사용, 수신자 정보를 수정
  *     requestBody:
  *       required: true
  *       content:
@@ -945,18 +999,16 @@ authRouter.patch(
         try {
             const { userId, receiverId } = req.params;
             checkUserValidity(req, userId);
-            const { fullName, emailAddress, relation, role } = req.body;
+            const { fullName, emailAddress, relation } = req.body;
             const isValid = await updateReceiverJoiSchema.validateAsync({
                 fullName,
                 emailAddress,
                 relation,
-                role,
             });
             const toUpdate = {
                 ...(fullName && { fullName }),
                 ...(emailAddress && { emailAddress }),
                 ...(relation && { relation }),
-                ...(role && { role }),
             };
             const updatedReceiver = await receiverService.updateReceiver(
                 receiverId,
