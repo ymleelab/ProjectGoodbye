@@ -160,6 +160,28 @@ const MyPage = () => {
 			.catch((err) => alert(err.response.data.reason));
 	};
 
+	const onChangeDeathDate = (date, dateString) => {
+		//console.log(date, dateString);
+		//console.log(typeof dateString);
+		setDateOfDeath(dateString);
+		//console.log(dateOfDeath);
+	};
+	const setDeathDate = (managedUserId) => {
+		confirm({
+			title: `사망일자를 입력해주세요.`, //${managedUserId}님의
+			icon: <ExclamationCircleOutlined />,
+			content: <DatePicker onChange={onChangeDeathDate} />,
+
+			onOk() {
+				changeLifeDeath(managedUserId);
+			},
+
+			onCancel() {
+				//console.log('Cancel');
+			},
+		});
+	};
+
 	const changeLifeDeath = (managedUserId) => {
 		console.log('생사변경: 유언장, 추모 링크 발송되고 추모 공개로 전환');
 		console.log(managedUserId);
@@ -305,14 +327,14 @@ const MyPage = () => {
 						<h2>내가 생사여부 변경 권한이 있는 사용자 목록</h2>
 						{managedUsers && (
 							<div style={{ left: '40%', marginTop: '2em' }}>
-								{managedUsers.map((user) => {
+								{managedUsers.map((user, index) => {
 									return (
 										user.confirmed && (
-											<div key={user.userId}>
+											<div key={index}>
 												{user.email}
 												<Button
 													onClick={() => {
-														changeLifeDeath(
+														setDeathDate(
 															user.userId,
 														);
 													}}
