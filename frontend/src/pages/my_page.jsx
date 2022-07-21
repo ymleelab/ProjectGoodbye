@@ -183,8 +183,28 @@ const MyPage = () => {
 	};
 
 	const changeLifeDeath = (managedUserId) => {
-		console.log('생사변경: 유언장, 추모 링크 발송되고 추모 공개로 전환');
-		console.log(managedUserId);
+		//console.log('생사변경: 유언장, 추모 링크 발송되고 추모 공개로 전환');
+		//console.log(managedUserId);
+		//console.log(dateOfDeath);
+
+		const userId = sessionStorage.getItem('userId');
+		const token = sessionStorage.getItem('token');
+		axios
+			.post(
+				`/api/auth/${userId}/managedUsers/${managedUserId}`,
+				{ dateOfDeath },
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				},
+			)
+			.then((res) => {
+				console.log(res);
+				alert('성공적으로 유언장을 발송했습니다.');
+				//setIsModalVisible(false);
+			})
+			.catch((err) => alert(err.response.data.reason));
 	};
 
 	return (
