@@ -310,11 +310,11 @@ usersRouter.post(
                                 expiresIn: '7d',
                             },
                         );
+                        // console.log(user);
 
                         res.status(200).json({
                             token,
                             userId: user._id,
-                            remembranceId: user.remembranceId,
                         });
                     });
                 },
