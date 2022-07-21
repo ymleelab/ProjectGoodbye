@@ -1,16 +1,20 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import Link from 'next/link';
+
 import { Form } from 'antd';
 import { css } from '@emotion/react';
 import useInput from '../hooks/useInput';
 import AppLayout from '../components/AppLayout';
 import axios from 'axios';
-import Router from 'next/router';
+import Router, { useRouter } from 'next/router';
 
 import userLoginCheck from '../util/userLoginCheck';
 
 const SignUp = () => {
+	const router = useRouter();
+	const [redirectUrl, setRedirectUrl] = useState('/sign_in');
 	// const [isLogIn, setIsLogIn] = useState(null);
+    // const userData = useSelector((state) => state.user);
 
 	const [email, onChangeEmail] = useInput('');
 	const [fullName, onChangeFullName] = useInput('');
@@ -19,11 +23,6 @@ const SignUp = () => {
 	const [repeatPassword, onChangeRepeatPassword] = useInput('');
 	const [term, onChangeTerm] = useState(false);
 
-	useEffect(() => {
-		// 로그인한 유저가 접속하지 못하게 하는 부분
-		preventUserAccess();
-	}, []);
-
 	const preventUserAccess = async () => {
 		const isLogIn = await userLoginCheck();
 		if (isLogIn) {
@@ -31,6 +30,28 @@ const SignUp = () => {
 			Router.replace('/');
 		}
 	};
+
+
+    //  추모 데이터 생성
+    // const createRemembranceData = async (userData) => {
+    //     // 유저 리듀서에서 정보를 가져와서 씀
+    //     const postData = {
+	// 		userId: userData.userId,
+	// 		fullName: userData.fullName,
+	// 		dateOfBirth: userData.dateOfBirth,
+	// 		isPublic: false
+	// 	}
+	// 	try {
+	// 		const res = await axios.post('/api/remembrances', 
+    //             postData
+    //         );
+	// 		console.log(res);
+	// 	} catch (error) {
+	// 		console.error(error);
+	// 	}
+	// }	
+
+	
 
 	const onSubmitForm = useCallback(() => {
 		const data = { email, fullName, dateOfBirth, password, repeatPassword };
@@ -41,7 +62,7 @@ const SignUp = () => {
 					alert(
 						`${res.data.fullName}님 회원가입을 축하합니다. 로그인을 먼저 해주세요.`,
 					);
-					Router.replace('/sign_in');
+					Router.replace(redirectUrl);
 				}
 			})
 			.catch((error) => {
@@ -50,6 +71,17 @@ const SignUp = () => {
 				//}
 			});
 	}, [email, fullName, dateOfBirth, password, repeatPassword, term]);
+
+	useEffect(() => {
+		// 로그인한 유저가 접속하지 못하게 하는 부분
+		preventUserAccess();
+
+		if (!router.isReady) return;
+		if (router.query.redirectUrl) {
+			setRedirectUrl(router.query.redirectUrl);
+		}
+		//console.log('query : ' + redirectUrl);
+	}, [router.isReady]);
 
 	return (
 		<AppLayout>

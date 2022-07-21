@@ -1,18 +1,66 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { css } from '@emotion/react';
-import { Form, Switch } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { Form, Switch, Modal, Button, Input, DatePicker } from 'antd';
 import 'antd/dist/antd.css';
 import AppLayout from '../components/AppLayout';
 import useInput from '../hooks/useInput';
 import Image from 'next/image';
 import axios from 'axios';
 import Router from 'next/router';
+const { confirm } = Modal;
 
 const MyPage = () => {
 	const [password, onChangePassword, setPassword] = useInput('');
 	const [currentPassword, onChangeCurrentPassword, setCurrentPassword] =
 		useInput('');
+	const [email, onChangeEmail, setEmail] = useInput('');
+	const [confirmPassword, onChangeConfirmPassword, setConfirmPassword] =
+		useInput('');
+	const [trustedUser, setTrustedUser] = useState('');
+	const [managedUsers, setManagedUsers] = useState([]);
+	const [dateOfDeath, setDateOfDeath] = useState('2000-01-01');
+	const [imageSrc, setImageSrc] = useState(
+		'https://images.unsplash.com/photo-1528752477378-485b46bedcde?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8dGVzdGFtZW50fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=600&q=60',
+	);
 
+	useEffect(() => {
+		const userId = sessionStorage.getItem('userId');
+		const token = sessionStorage.getItem('token');
+		axios
+			.get(`/api/auth/${userId}`, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			})
+			.then((res) => {
+				//console.log(res);
+				if (res.data.user.trustedUser) {
+					setTrustedUser(res.data.user.trustedUser.email);
+				}
+				//console.log(res.data.user.managedUsers);
+				//console.log(res.data.user.managedUsers[0].email);
+				if (res.data.user.managedUsers) {
+					setManagedUsers(res.data.user.managedUsers);
+				}
+			})
+			.catch((err) => console.log(err.response.data.reason));
+
+		axios
+			.get(`/api/auth/${userId}/remembrances`, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			})
+			.then((res) => {
+				//console.log(res);
+				const photo = res.data.photo;
+				if (!(typeof photo === 'undefined' || photo === '')) {
+					setImageSrc(res.data.photo);
+				}
+			})
+			.catch((err) => console.log(err.response.data.reason));
+	}, []);
 	const onUpdateUser = useCallback(async () => {
 		const userId = sessionStorage.getItem('userId');
 		const token = sessionStorage.getItem('token');
@@ -55,6 +103,110 @@ const MyPage = () => {
 			.catch((err) => alert(err.response.data.reason));
 	}, [currentPassword]);
 
+	//이미지 등록
+	const fileChange = (e) => {
+		const userId = sessionStorage.getItem('userId');
+		const token = sessionStorage.getItem('token');
+		console.log(e.target.files[0]);
+
+		const formData = new FormData();
+		formData.append('photo', e.target.files[0]);
+		axios
+			.post(`/api/auth/${userId}/image`, formData, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			})
+			.then((res) => {
+				console.log(res.data.photo);
+				alert('성공적으로 등록되었습니다.');
+				setImageSrc(res.data.photo);
+			})
+			.catch((err) => console.log(err));
+	};
+
+	//팝업 띄우기 관련
+	const [isModalVisible, setIsModalVisible] = useState(false);
+	const showModal = () => {
+		setIsModalVisible(true);
+	};
+	const handleOk = () => {
+		setIsModalVisible(false);
+	};
+	const handleCancel = () => {
+		setIsModalVisible(false);
+	};
+
+	//자신의 유언장을 전송, 생사여부를 변경 가능 권한을 주고싶은 사람 등록
+	const addTruseUser = async () => {
+		const userId = sessionStorage.getItem('userId');
+		const token = sessionStorage.getItem('token');
+		const currentPassword = confirmPassword;
+		await axios
+			.patch(
+				`/api/auth/${userId}/trustedUser`,
+				{ email, currentPassword },
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				},
+			)
+			.then((res) => {
+				console.log(res);
+				alert('성공적으로 신뢰할 수 있는 사람을 등록했습니다.');
+				setIsModalVisible(false);
+			})
+			.catch((err) => alert(err.response.data.reason));
+	};
+
+	const onChangeDeathDate = (date, dateString) => {
+		//console.log(date, dateString);
+		//console.log(typeof dateString);
+		setDateOfDeath(dateString);
+		//console.log(dateOfDeath);
+	};
+	const setDeathDate = (managedUserId) => {
+		confirm({
+			title: `사망일자를 입력해주세요.`, //${managedUserId}님의
+			icon: <ExclamationCircleOutlined />,
+			content: <DatePicker onChange={onChangeDeathDate} />,
+
+			onOk() {
+				changeLifeDeath(managedUserId);
+			},
+
+			onCancel() {
+				//console.log('Cancel');
+			},
+		});
+	};
+
+	const changeLifeDeath = (managedUserId) => {
+		//console.log('생사변경: 유언장, 추모 링크 발송되고 추모 공개로 전환');
+		//console.log(managedUserId);
+		//console.log(dateOfDeath);
+
+		const userId = sessionStorage.getItem('userId');
+		const token = sessionStorage.getItem('token');
+		axios
+			.post(
+				`/api/auth/${userId}/managedUsers/${managedUserId}`,
+				{ dateOfDeath },
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				},
+			)
+			.then((res) => {
+				console.log(res);
+				alert('성공적으로 유언장을 발송했습니다.');
+				//setIsModalVisible(false);
+			})
+			.catch((err) => alert(err.response.data.reason));
+	};
+
 	return (
 		<AppLayout>
 			<div css={titleImageStyle}>
@@ -65,14 +217,15 @@ const MyPage = () => {
 					<h2>나의 영정 사진</h2>
 					<p>밝은 표정이 담긴 사진을 업로드해주세요</p>
 					<p>11x14인치 (28x35cm)</p>
-					<input type="file" name="file" />
+					<input
+						type="file"
+						accept="image/*"
+						name="photo"
+						onChange={fileChange}
+					/>
 				</div>
 				<div css={imageStyle}>
-					<Image
-						src="https://images.unsplash.com/photo-1528752477378-485b46bedcde?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8dGVzdGFtZW50fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=600&q=60"
-						alt="나의 영정 사진"
-						layout="fill"
-					/>
+					<Image src={imageSrc} alt="나의 영정 사진" layout="fill" />
 				</div>
 			</div>
 			{/* <div css={adBoxStyle}>
@@ -122,20 +275,116 @@ const MyPage = () => {
 						</div>
 					</Form>
 				</section>
-				<section css={sectionWrapper}>
+				{/* <section css={sectionWrapper}>
 					<h2>
 						자신의 추모 공개 여부
 						<Switch defaultChecked onChange={onChange} />
 					</h2>
+				</section> */}
+			</div>
+			<div css={mainWrapper}>
+				<section>
+					<div>
+						<h2>
+							자신의 유언장을 전송, 생사여부를 변경 가능 권한을
+							주고 싶은 사람
+						</h2>
+						{trustedUser && (
+							<div style={{ left: '40%', marginTop: '2em' }}>
+								등록된 이메일: {trustedUser}
+							</div>
+						)}
+						<div>
+							<Button
+								onClick={showModal}
+								style={{ left: '40%', marginTop: '2em' }}
+							>
+								등록하기
+							</Button>
+						</div>
+						<Modal
+							title="등록하기"
+							visible={isModalVisible}
+							onOk={handleOk}
+							onCancel={handleCancel}
+						>
+							<Input
+								placeholder="신뢰하는 사람의 이메일"
+								style={{
+									width: '100%',
+									marginBottom: '1em',
+								}}
+								value={email}
+								onChange={onChangeEmail}
+							/>
+							<Input
+								placeholder="나의 현재 비밀번호"
+								style={{
+									width: '100%',
+									marginBottom: '1em',
+								}}
+								type="password"
+								value={confirmPassword}
+								onChange={onChangeConfirmPassword}
+							/>
+							<Button
+								type="button"
+								style={{
+									width: '20%',
+									left: '40%',
+								}}
+								onClick={addTruseUser}
+							>
+								등록
+							</Button>
+						</Modal>
+					</div>
+				</section>
+			</div>
+			<div css={mainWrapper}>
+				<section>
+					<div>
+						<h2>내가 생사여부 변경 권한이 있는 사용자 목록</h2>
+						{managedUsers && (
+							<div style={{ left: '40%', marginTop: '2em' }}>
+								{managedUsers.map((user, index) => {
+									return (
+										user.confirmed && (
+											<div key={index}>
+												{user.email}
+												<Button
+													onClick={() => {
+														setDeathDate(
+															user.userId,
+														);
+													}}
+													style={{
+														left: '30%',
+													}}
+												>
+													생사여부 변경
+												</Button>
+											</div>
+										)
+									);
+								})}
+							</div>
+						)}
+						{!managedUsers && (
+							<div style={{ left: '40%', marginTop: '2em' }}>
+								등록되어있지 않습니다..
+							</div>
+						)}
+					</div>
 				</section>
 			</div>
 		</AppLayout>
 	);
 };
 
-const onChange = (checked) => {
-	console.log(`switch to ${checked}`);
-};
+// const onChange = (checked) => {
+// 	console.log(`switch to ${checked}`);
+// };
 
 const titleImageStyle = css`
 	position: relative;

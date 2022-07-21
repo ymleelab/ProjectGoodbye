@@ -4,21 +4,19 @@ import {
     userService,
     willService,
     receiverService,
-    ImageService,
     remembranceService,
+    ImageService,
 } from '../services';
 import {
     createReceiverJoiSchema,
     updateReceiverJoiSchema,
-} from '../db/schemas/joi-schemas/receiver-joi-schema';
-import {
     createWillJoiSchema,
     updateWillJoiSchema,
-} from '../db/schemas/joi-schemas/will-joi-schema';
-import { userUpdateJoiSchema } from '../db/schemas/joi-schemas/user-joi-schema';
-import { updateRemembranceJoiSchema } from '../db/schemas/joi-schemas';
-import { uploadImage } from '../middlewares';
+    userUpdateJoiSchema,
+    updateDeathDayJoiSchema,
+} from '../db/schemas/joi-schemas';
 import { sendMailTest } from '../services/mail-service';
+import { uploadImage } from '../middlewares';
 // ts-node에서 typeRoot인지 type인지는 모르겠으나, --file 옵션을 package.json이나 file:true를 tsconfig에 해주지 않으면 적용이 안된다고 함.
 declare global {
     namespace Express {
@@ -108,7 +106,6 @@ authRouter.get(
 
 authRouter.patch(
     '/:userId',
-    uploadImage.single('photo'),
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             // is로 req.body 확인 필요?
@@ -120,17 +117,12 @@ authRouter.patch(
             // body data 로부터 업데이트할 사용자 정보를 추출함.
             const { fullName, password, dateOfBirth, currentPassword } =
                 req.body;
-            // s3에 이미지 업로드 후 url 반환
-            const photo = ImageService.addImage(
-                req.file as Express.MulterS3.File,
-            );
 
             const isValid = await userUpdateJoiSchema.validateAsync({
                 fullName,
                 password,
                 dateOfBirth,
                 currentPassword,
-                photo,
             });
             // currentPassword 없을 시, 진행 불가
             if (currentPassword === password) {
@@ -147,9 +139,7 @@ authRouter.patch(
                 ...(fullName && { fullName }),
                 ...(password && { password }),
                 ...(dateOfBirth && { dateOfBirth }),
-                ...(photo && { photo }),
             };
-
             // 사용자 정보를 업데이트함.
             const updatedUserInfo = await userService.setUser(
                 userInfoRequired,
@@ -163,6 +153,114 @@ authRouter.patch(
         }
     },
 );
+
+/**
+ * @swagger
+ * /api/auth/{userId}/image:
+ *   post:
+ *     tags:
+ *     - Images
+ *     security:
+ *       - bearerAuth: []
+ *     summary: 유저 사진 등록 - 신규 등록 및 변경
+ *     description: 사진을 AWS S3에 저장하고 유저 및 추모 데이터에 반영. 기존 사진이 있는 경우 자동 삭제 후 진행
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         required: true
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               photo:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       201:
+ *         description: 등록된 이미지 url
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 photo:
+ *                   type: string
+ *                   example: imageUrl
+ */
+// 이미지 등록
+authRouter.post(
+    '/:userId/image',
+    uploadImage.single('photo'),
+    async (req, res, next) => {
+        try {
+            const { userId } = req.params;
+            checkUserValidity(req, userId);
+
+            const { key } = req.file as Express.MulterS3.File;
+
+            const photo = await ImageService.addImage(userId, key);
+
+            res.status(201).json(photo);
+        } catch (error) {
+            next(error);
+        }
+    },
+);
+
+/**
+ * @swagger
+ * /api/auth/{userId}/image/{imageUrl}:
+ *   delete:
+ *     tags:
+ *     - Images
+ *     security:
+ *       - bearerAuth: []
+ *     summary: 유저 사진 삭제
+ *     description: 사진을 AWS S3에서 삭제 후 유저 및 추모 데이터에 반영. 유저가 사진 정보를 지우고 싶을 때 사용.
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         schema:
+ *           type: string
+ *           example: userId
+ *         required: true
+ *       - in: path
+ *         name: imageUrl
+ *         schema:
+ *           type: string
+ *           example: imageUrl
+ *         required: true
+ *     responses:
+ *       201:
+ *         description: 사진 삭제 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 result:
+ *                   type: string
+ *                   example: 'success'
+ */
+// 이미지 삭제
+authRouter.delete('/:userId/image/:imageUrl', async (req, res, next) => {
+    try {
+        const { userId, imageUrl } = req.params;
+        checkUserValidity(req, userId);
+
+        const result = await ImageService.deleteImage(userId, imageUrl);
+
+        res.status(201).json(result);
+    } catch (error) {
+        next(error);
+    }
+});
+
 // AuthRouter의 user Patch 시 비슷한 느낌?
 // 회원이 자신의 유언장 전송 권한을 줄 api -post 요청과 조금 다른 느낌인데 다른 api를 사용해야 할려나?
 // 로직이 나의 trusted-user가 될 사람에게 서비스 관련 이메일과 회원가입 내용이 담긴 이메일을 보냄
@@ -202,7 +300,7 @@ authRouter.patch(
  *       - bearerAuth: []
  *     tags: [AuthTrustAndManage]
  *     summary: 유저에게서 이메일을 받아서 trusted user가 된 사람이 로그인 혹은 회원 가입 후, url query에서 받은 토큰정보로 managedUsers와 trustedUser 정보를 업데이트 하는 API
- *     description: 예를 들어서 유저 A가 B가 아들이어서 trusted user로 아들 이메일을 등록, 관련 이메일을 받은 아들 B가 메일의 링크를 따라서 회원가입 후 로그인을 하면 신뢰받는 유저로 등록. A의 trusted user정보에 B 정보가 들어가고, B managedUsers에 A 정보가 추가됨. 
+ *     description: 예를 들어서 유저 A가 B가 아들이어서 trusted user로 아들 이메일을 등록, 관련 이메일을 받은 아들 B가 메일의 링크를 따라서 회원가입 후 로그인을 하면 신뢰받는 유저로 등록. A의 trusted user정보에 B 정보가 들어가고, B managedUsers에 A 정보가 추가됨.
  *     responses:
  *       200:
  *         description: mainUserInfo (A), trustedUserInfo (B) as JSON
@@ -289,7 +387,7 @@ authRouter.patch(
  *     description: 예를 들어서 유저 A가 B가 아들이어서 B에게 권한을 부여하기로 결정, B의 이메일 주소와 A 계정의 비밀번호를 확인 받고 A의 trustedUser 부분의 email부분이 아들 이메일로 등록됨, 아들은 ProjectGoodbye 서비스 관련 정보가 담긴 이메일을 받고, 이메일에는 링크등을 활용하여 신규유저인 경우 회원 가입, 기존 유저인 경우는 로그인을 해달라는 부탁을 받게 됨. 아직 HTML 부분은 API에서 크게 구현을 안했기 때문에 프론트 분들이 html을 이미 작성하신 양식이 있다면 비슷하게 작성해주시거나 같이 상의해보아요.
  *     responses:
  *       200:
- *         description: 수정된 A의 정보와 token값 as JSON
+ *         description: 수정된 A의 정보와 token값과 isUpdated값 as JSON
  *
  */
 authRouter.patch(
@@ -302,6 +400,21 @@ authRouter.patch(
             checkUserValidity(req, userId);
             // body로 이메일 정보 + 현재 비밀번호 받아오기
             const { email, currentPassword } = req.body;
+            const user = await userService.getUser(userId);
+            if (!user) {
+                throw new Error('해당 유저를 찾을 수 없습니다.');
+            }
+            const possibleTrustedUser = user.trustedUser;
+            const possibleTrustedUserEmail = possibleTrustedUser?.email;
+            const possibleTrustedUserId = possibleTrustedUser?.userId;
+            console.log(possibleTrustedUser);
+            console.log(possibleTrustedUserEmail);
+            if (email === possibleTrustedUserEmail) {
+                throw new Error(
+                    '이미 등록되어 있는 신뢰하는 유저 이메일입니다.',
+                );
+            }
+            // possible trusted user가 있든 없든 우선 새 신뢰유저로 정보 업데이트 + 이메일 전송
             const userInfoRequired = { userId, currentPassword };
             const newTrustedUser = { email, confirmed: false };
             const toUpdate = { trustedUser: newTrustedUser };
@@ -310,10 +423,6 @@ authRouter.patch(
                 toUpdate,
             );
             // mail 전송하는 부분을 여기서 작성하는게 편할까?
-            const user = await userService.getUser(userId);
-            if (!user) {
-                throw new Error('해당 유저를 찾을 수 없습니다.');
-            }
             const { fullName }: any = user;
             // userId와 email 정보를 담을 token값 생성
             const secretKey = process.env.JWT_SECRET_KEY || 'secret-key'; // login 성공시 key값을 써서 토큰 생성
@@ -367,7 +476,18 @@ authRouter.patch(
             `;
             sendMailTest(receivers, subject, html);
             // 업데이트 이후의 유저 데이터를 프론트에 보내 줌
-            res.status(200).json({ updatedUserInfo, token });
+            // 기존 등록유저가 있었다면 기존 등록 유저에서 정보 삭제
+            let isUpdated: boolean = false;
+            if (possibleTrustedUserId) {
+                isUpdated = true;
+                // data 삭제;
+                await userService.removeManagedUsers(
+                    possibleTrustedUserId,
+                    userId,
+                );
+            }
+
+            res.status(200).json({ updatedUserInfo, token, isUpdated });
         } catch (error) {
             next(error);
         }
@@ -395,7 +515,7 @@ authRouter.patch(
  *       content:
  *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/ConfirmDeath' 
+ *             $ref: '#/components/schemas/ConfirmDeath'
  *     tags: [AuthEmail]
  *     summary: TrustedUser가 managedUser가 죽었을 경우, 사망일자와 함께 유언장 url과 추모 url이 첨부된 이메일을 보내는 API
  *     description: 예를 들어서 유저 B가 A가 사망하여서 유언장 전송하기를 누름, 그러면 modal에 사망일자를 입력하게 되고, 사망일자를 입력하면 A가 등록한 모든 유언장에서 이메일 정보를 써서 url(추모, 유언장) 링크가 들은 email을 발송함.
@@ -424,13 +544,13 @@ authRouter.post(
             }
             // 사망일자는 body에서 모달 같은 방식으로 받아옴.
             const { dateOfDeath } = req.body;
+            const toUpdate = { dateOfDeath };
             // 사망했으므로 추모 정보 업데이트
-            const toUpdate = { dateOfDeath, isPublic: true };
-            await updateRemembranceJoiSchema.validateAsync(toUpdate);
-            await remembranceService.setRemembrance(userId, toUpdate);
-            // 유저의 추모 정보를 가져옴
-            const remembrance = await remembranceService.getRemembranceByUser(
+            await updateDeathDayJoiSchema.validateAsync(toUpdate);
+            // 유저의 사망일을 등록하고 추모 정보를 가져옴
+            const remembrance = await remembranceService.setRemembrance(
                 managedUserId,
+                toUpdate,
             );
             // 추모 정보 중 추모 id 값이 필요함.
             const remebranceId = remembrance._id;
