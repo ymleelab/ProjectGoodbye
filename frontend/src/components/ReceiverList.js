@@ -25,12 +25,15 @@ function showCoverList(people) {
 const ReceiverList = ({ will }) => {
     const dispatch = useDispatch();
     const [showList, setShowList] = useState(false);
-    const { allReceiverList } = useSelector(state => state.receivers);
+    const { allReceiverList } = useSelector(state => {
+        // console.log(state.receivers)
+        return state.receivers});
     const [receiverData, setReceiverData] = useState([]);
-    const receiverIdList = will.receivers;
+    const receiverList = will.receivers;
 
     const ContainerHeight = 400;
     
+    console.log(receiverList, receiverData);
 
     // receiverIdList에서 수신자 정보를 받아온다.
     useEffect(() => {
@@ -44,8 +47,9 @@ const ReceiverList = ({ will }) => {
 
         // my_will에서 전달받은 id값에 해당되는 수신자를
         // 모든 수신목록에서 찾아서 receiverData에 저장한다. 
-        receiverIdList.forEach(Id =>{ 
-            const value = allReceiverList.find(data => data._id === Id);
+        receiverList.forEach(info =>{ 
+            const value = allReceiverList.find(data => data._id === info.receiverId);
+            // console.log(value, allReceiverList, info);
             if (value) {
                 newData.push(value);
             }
@@ -59,8 +63,8 @@ const ReceiverList = ({ will }) => {
     const deleteReciver = (receiverId) => {
         const token = sessionStorage.getItem('token');
         const userId = sessionStorage.getItem('userId');
-        console.log(receiverId);
-        const receivers = will.receivers.filter( id => id !== receiverId );
+        // console.log(receiverId);
+        const receivers = will.receivers.filter( info => info.receiverId !== receiverId );
         axios.patch(`/api/auth/${userId}/wills/${will._id}`,{
             receivers: [...receivers]
         }, {
@@ -123,7 +127,7 @@ const ReceiverList = ({ will }) => {
                             onScroll={onScroll}
                         >
                             {(item) => {
-                                console.log(item._id);
+                                // console.log(item._id);
                                 return (
                                 <List.Item key={item._id}>
                                     <List.Item.Meta

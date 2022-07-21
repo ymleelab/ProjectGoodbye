@@ -23,6 +23,8 @@ const nextConfig = {
 		});
 		return config
 	},
+	exportTrailingSlash: true,
+	trailingSlash: true
 };
 
 module.exports = nextConfig;

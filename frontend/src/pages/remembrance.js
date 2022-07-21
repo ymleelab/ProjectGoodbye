@@ -1,4 +1,5 @@
 import React, { useState, useEffect, createContext, useRef } from "react";
+import Router, { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 
@@ -120,17 +121,18 @@ const Editor = ({ onSubmit, formRef }) => {
 };
 
 
-const make_remembrance = () => {
+const remembrance = () => {
     const [modal, contextHolder] = Modal.useModal();
     const ReachableContext = createContext(null);
+    const router = useRouter();
+    const { remembranceId } = router.query;
 
-    const { userId, token } = useSelector(state => {
-        return state.user;
-    });
+    // const { userId, token } = useSelector(state => {
+    //     return state.user;
+    // });
     const [userData, setUserData] = useState(null);
     const [comments, setComments] = useState([]);
     const [visibleCommentArea, setCommentArea] = useState(false);
-    const [submitting, setSubmitting] = useState(false);
     const formRef = useRef(null);
     // const [value, valueHandler, setValue] = useInput('');
     // console.log(userId, token);
@@ -153,15 +155,12 @@ const make_remembrance = () => {
         }
     }
     
+    // remembranceId예시 62d7b9e42f66fc6992fe82e1
     
     
     const getRemembranceData = async () => {
         try {
-            const res = await axios.get(`/api/auth/${userId}/remembrances`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
+            const res = await axios.get(`/api/remembrances/${remembranceId}`);
             const {
                 _id,
                 photo,
@@ -185,12 +184,7 @@ const make_remembrance = () => {
         const { remembranceId } = userData;
         try {
             const response =
-                await axios.post(`/api/remembrances/${remembranceId}/comments`,
-                    data, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
+                await axios.post(`/api/remembrances/${remembranceId}/comments`, data);
 
             setComments((prev) => [
                 ...prev,
@@ -198,8 +192,8 @@ const make_remembrance = () => {
             ]);
             console.log(response);
         } catch (error) {
-            alert(error.reason);
-            console.log(error.reason);
+            alert(error.response.reason);
+            console.log(error.response.reason);
         }
     }
 
@@ -225,10 +219,8 @@ const make_remembrance = () => {
     }
 
     useEffect(() => {
-        if (userId && token) {
-            getRemembranceData();
-        }
-    }, [userId, token])
+        getRemembranceData();
+    }, [])
 
 
     return (
@@ -293,12 +285,10 @@ const make_remembrance = () => {
                         <CommentArea>
                             <Editor
                                 onSubmit={handleCommentSubmit}
-                                submitting={submitting}
                                 formRef={formRef}
                             />
                         </CommentArea>}
                 </CommentTree>
-                {/* <Button onClick={createRemembranceData}>추모글 등록하기</Button> */}
             </AppLayout>
         </>
     )
@@ -311,15 +301,13 @@ const make_remembrance = () => {
 <GiFlowerPot />
 <GiGraveFlowers /> */}
 
-export default make_remembrance;
+export default remembrance;
 
 
 const adBoxStyle = css`
 	display: flex;
 	width: 100%;
 	height: 30rem;
-	//margin: 10rem 0;
-	padding: 2rem;
 	align-item: center;
     box-sizing: border-box;
 

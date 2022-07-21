@@ -47,7 +47,7 @@ const MyWill = () => {
 
 	const loadValues = () => {
 		// const checkValue = await userLoginCheck();
-		console.log(logInState);
+		// console.log(logInState);
 		// 로그인 했을 경우 정보 불러오기
 		if (logInState) {
 			getWillsList();
@@ -65,11 +65,11 @@ const MyWill = () => {
 		// 	title: 'test1....유언장-21',
 		// 	content: '유언장-21 내용~',
 		// 	userId: userId,
-		// 	receivers: ['62d3baea2a0a7050008fbf7b',
-		// 				'62d3baf42a0a7050008fbf81',
-		// 				'62d3baff2a0a7050008fbf87',
-		// 				'62d3bb0a2a0a7050008fbf8d',
-		// 				'62d3bb292a0a7050008fbf93'			
+		// 	receivers: [	
+		// 				{
+		// 					"receiverId": '62d3baea2a0a7050008fbf7b',
+		// 					"email": 'test13@email.com'
+		// 				}
 		// 			]
 		// }, {
 		// 	headers: {
@@ -120,6 +120,7 @@ const MyWill = () => {
 			},
 		})
 			.then((res) => {
+				// console.log(res.data);
 				dispatch(WillACTIONS.getWills({ lists: res.data }));
 				pageListUpdate();
 			})
@@ -127,7 +128,7 @@ const MyWill = () => {
 	};
 
 	const onClickDelete = (will) => {
-		console.log(will);
+		// console.log(will);
 		const token = sessionStorage.getItem('token');
 		const userId = sessionStorage.getItem('userId');
 

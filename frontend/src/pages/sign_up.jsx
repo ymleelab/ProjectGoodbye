@@ -38,23 +38,23 @@ const SignUp = () => {
 
 
     //  추모 데이터 생성
-    const createRemembranceData = async (userData) => {
-        // 유저 리듀서에서 정보를 가져와서 씀
-        const postData = {
-			userId: userData.userId,
-			fullName: userData.fullName,
-			dateOfBirth: userData.dateOfBirth,
-			isPublic: false
-		}
-		try {
-			const res = await axios.post('/api/remembrances', 
-                postData
-            );
-			console.log(res);
-		} catch (error) {
-			console.error(error);
-		}
-	}	
+    // const createRemembranceData = async (userData) => {
+    //     // 유저 리듀서에서 정보를 가져와서 씀
+    //     const postData = {
+	// 		userId: userData.userId,
+	// 		fullName: userData.fullName,
+	// 		dateOfBirth: userData.dateOfBirth,
+	// 		isPublic: false
+	// 	}
+	// 	try {
+	// 		const res = await axios.post('/api/remembrances', 
+    //             postData
+    //         );
+	// 		console.log(res);
+	// 	} catch (error) {
+	// 		console.error(error);
+	// 	}
+	// }	
 
 	
 
@@ -72,7 +72,7 @@ const SignUp = () => {
 						fullName: res.data.fullName,
 						dateOfBirth: res.data.dateOfBirth
 					}
-					createRemembranceData(userData);
+					// createRemembranceData(userData);
 					Router.replace('/sign_in');
 				}
 			})

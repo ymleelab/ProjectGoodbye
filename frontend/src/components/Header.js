@@ -76,11 +76,6 @@ const Header = () => {
 							</Link>
 						</li>
 						<li>
-							<Link href={'/make_remembrance'}>
-								<a>나의 추모공간</a>
-							</Link>
-						</li>
-						<li>
 							<Link href={'#'}>
 								<a>부고 작성</a>
 							</Link>
@@ -128,6 +123,10 @@ const NavBar = styled.section`
 
 	ul {
 		margin: 0;
+	}
+
+	ul a {
+		text-decoration: none;
 	}
 
 	ul li {
