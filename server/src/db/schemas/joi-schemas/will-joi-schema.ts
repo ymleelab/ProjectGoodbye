@@ -13,8 +13,13 @@ const createWillJoiSchema = joi.object({
     }), // 10자 이상
     receivers: joi.array().items(
         joi.object({
-            receiverId: joi.string(),
-            email: joi.string().email(),
+            receiverId: joi.string().messages({
+                'string.empty': '수신자 아이디는 비어있을 수 없습니다.',
+            }),
+            email: joi.string().email().messages({
+                'string.empty': '수신자 이메일은 비어있을 수 없습니다.',
+                'string.email': '올바르지 않은 이메일 형식입니다.',
+            }),
         }),
     ),
 });
