@@ -1,12 +1,14 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import { css } from '@emotion/react';
-import { Form, Switch, Modal, Button, Input } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { Form, Switch, Modal, Button, Input, DatePicker } from 'antd';
 import 'antd/dist/antd.css';
 import AppLayout from '../components/AppLayout';
 import useInput from '../hooks/useInput';
 import Image from 'next/image';
 import axios from 'axios';
 import Router from 'next/router';
+const { confirm } = Modal;
 
 const MyPage = () => {
 	const [password, onChangePassword, setPassword] = useInput('');
@@ -17,7 +19,10 @@ const MyPage = () => {
 		useInput('');
 	const [trustedUser, setTrustedUser] = useState('');
 	const [managedUsers, setManagedUsers] = useState([]);
-	const [dateOfDeath, onChangeDateOfDeath, setDateOfDeath] = useInput('');
+	const [dateOfDeath, setDateOfDeath] = useState('2000-01-01');
+	const [imageSrc, setImageSrc] = useState(
+		'https://images.unsplash.com/photo-1528752477378-485b46bedcde?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8dGVzdGFtZW50fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=600&q=60',
+	);
 
 	useEffect(() => {
 		const userId = sessionStorage.getItem('userId');
@@ -33,10 +38,25 @@ const MyPage = () => {
 				if (res.data.user.trustedUser) {
 					setTrustedUser(res.data.user.trustedUser.email);
 				}
-				console.log(res.data.user.managedUsers);
+				//console.log(res.data.user.managedUsers);
 				//console.log(res.data.user.managedUsers[0].email);
 				if (res.data.user.managedUsers) {
 					setManagedUsers(res.data.user.managedUsers);
+				}
+			})
+			.catch((err) => console.log(err.response.data.reason));
+
+		axios
+			.get(`/api/auth/${userId}/remembrances`, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			})
+			.then((res) => {
+				//console.log(res);
+				const photo = res.data.photo;
+				if (!(typeof photo === 'undefined' || photo === '')) {
+					setImageSrc(res.data.photo);
 				}
 			})
 			.catch((err) => console.log(err.response.data.reason));
@@ -83,30 +103,26 @@ const MyPage = () => {
 			.catch((err) => alert(err.response.data.reason));
 	}, [currentPassword]);
 
+	//이미지 등록
 	const fileChange = (e) => {
 		const userId = sessionStorage.getItem('userId');
 		const token = sessionStorage.getItem('token');
 		console.log(e.target.files[0]);
-		//const photo = e.target.value;
-		//{"result":"error","reason":"Cannot destructure property 'key' of 'file' as it is undefined."}
 
 		const formData = new FormData();
 		formData.append('photo', e.target.files[0]);
 		axios
-			.patch(
-				`/api/auth/${userId}`,
-				{ formData },
-				{
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
+			.post(`/api/auth/${userId}/image`, formData, {
+				headers: {
+					Authorization: `Bearer ${token}`,
 				},
-			)
-			.then((res) => {
-				console.log(res);
-				alert('성공적으로 등록되었습니다.');
 			})
-			.catch((err) => alert(err.response.data.reason));
+			.then((res) => {
+				console.log(res.data.photo);
+				alert('성공적으로 등록되었습니다.');
+				setImageSrc(res.data.photo);
+			})
+			.catch((err) => console.log(err));
 	};
 
 	//팝업 띄우기 관련
@@ -167,11 +183,7 @@ const MyPage = () => {
 					/>
 				</div>
 				<div css={imageStyle}>
-					<Image
-						src="https://images.unsplash.com/photo-1528752477378-485b46bedcde?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8dGVzdGFtZW50fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=600&q=60"
-						alt="나의 영정 사진"
-						layout="fill"
-					/>
+					<Image src={imageSrc} alt="나의 영정 사진" layout="fill" />
 				</div>
 			</div>
 			{/* <div css={adBoxStyle}>
