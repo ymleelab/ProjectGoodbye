@@ -19,14 +19,17 @@ export class ImageService {
 
         // 유저 및 추모 데이터에 저장
         const update = { photo: `${domain}/${key}` };
-        userModel.updateById(userId, update);
-        remembranceService.setRemembrance(userId, update);
+        await userModel.updateById(userId, update);
+        await remembranceService.setRemembrance(userId, update);
 
         return update;
     }
 
     // 이미지 삭제
-    static deleteImage(userId: string, imagePath: string): { result: string } {
+    static async deleteImage(
+        userId: string,
+        imagePath: string,
+    ): Promise<{ result: string }> {
         const key = imagePath.replace(`${domain}/`, '');
         s3.deleteObject(
             {
@@ -44,8 +47,8 @@ export class ImageService {
 
         // 유저 및 추모 데이터에도 반영
         const update = { photo: '' };
-        userModel.updateById(userId, update);
-        remembranceService.setRemembrance(userId, update);
+        await userModel.updateById(userId, update);
+        await remembranceService.setRemembrance(userId, update);
 
         return { result: 'success' };
     }

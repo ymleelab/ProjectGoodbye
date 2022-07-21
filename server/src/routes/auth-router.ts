@@ -253,7 +253,7 @@ authRouter.delete('/:userId/image/:imageUrl', async (req, res, next) => {
         const { userId, imageUrl } = req.params;
         checkUserValidity(req, userId);
 
-        const result = ImageService.deleteImage(userId, imageUrl);
+        const result = await ImageService.deleteImage(userId, imageUrl);
 
         res.status(201).json(result);
     } catch (error) {
