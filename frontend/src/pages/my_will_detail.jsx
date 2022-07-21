@@ -24,6 +24,7 @@ const MyWillDetail = () => {
 
 	const [receivers, setReceivers] = useState([]); //receiver Id 목록
 	const [receiverList, setReceiverList] = useState([]); //To 목록
+	const checkedRef = useRef();
 
 	const [willId, setWillId] = useState('');
 	const [idParam, setIdParam] = useState('');
@@ -169,33 +170,69 @@ const MyWillDetail = () => {
 	// }, [])
 
 	// 수신인 선택완료 클릭
-	const onOkReceiverList = (e) => {
-		console.log(e.target);
-		// console.log(checkBoxRef.current);
-		setIsModalVisible(false);
-	};
+	const onOkReceiverList = useCallback(
+		(e) => {
+			//console.log(e.target);
+			console.log(checkedRef.current);
+			// console.log(checkBoxRef.current);
+			setIsModalVisible(false);
+		},
+		[checkedRef],
+	);
 
-	const onChangeCheckBox = useCallback((checkValue) => {
-		console.log(checkValue);
+	// const onChangeCheckBox = useCallback((checkValue) => {
+	// 	console.log(checkValue);
+	// 	//const receiver = `${checkValue.fullName}(${checkValue.relation}) <${checkValue.email}>, `;
+	// 	//console.log(receiver);
+	// 	// updateReceiverList([receiver]);
+	// 	// setReceiverList()
+
+	// 	checkValue.forEach((item) => {
+	// 		// setReceivers({
+	// 		// 	fullName: item.fullName,
+	// 		// 	email: item.email,
+	// 		// 	receiverId: item.receiverId,
+	// 		// 	relation: item.relation,
+	// 		// });
+	// 		const receiverTo = `${item.fullName}(${item.relation}) <${item.email}>, `;
+	// 		console.log(receiverTo);
+	// 		setReceivers(...receivers, receiverTo);
+	// 		console.log(receivers);
+	// 		//setReceiverList([receiver]);
+	// 	});
+	// });
+
+	const onChangeCheckBox = useCallback((e) => {
+		const checkedItem = e.target.value;
+		console.log(checkedItem);
+		const receiverTo = `${checkedItem.fullName}(${checkedItem.relation}) <${checkedItem.email}>, `;
+		console.log(receiverTo);
+		//setReceivers(receiverTo);
+		console.log(e);
+		//setChecked(true);
+		//console.log(receivers);
+		//const tmp = { receiverTo, receivers };
+		//setReceivers(tmp);
+
 		//const receiver = `${checkValue.fullName}(${checkValue.relation}) <${checkValue.email}>, `;
 		//console.log(receiver);
 		// updateReceiverList([receiver]);
 		// setReceiverList()
 
-		checkValue.forEach((item) => {
-			// setReceivers({
-			// 	fullName: item.fullName,
-			// 	email: item.email,
-			// 	receiverId: item.receiverId,
-			// 	relation: item.relation,
-			// });
-			const receiverTo = `${item.fullName}(${item.relation}) <${item.email}>, `;
-			console.log(receiverTo);
-			setReceivers(...receivers, receiverTo);
-			console.log(receivers);
-			//setReceiverList([receiver]);
-		});
-	});
+		//checkValue.forEach((item) => {
+		// setReceivers({
+		// 	fullName: item.fullName,
+		// 	email: item.email,
+		// 	receiverId: item.receiverId,
+		// 	relation: item.relation,
+		// });
+		// const receiverTo = `${item.fullName}(${item.relation}) <${item.email}>, `;
+		// console.log(receiverTo);
+		// setReceivers(...receivers, receiverTo);
+		// console.log(receivers);
+		//setReceiverList([receiver]);
+		//});
+	}, []);
 
 	//유언장 수정
 	const ChangeForm = useCallback(() => {
@@ -301,7 +338,7 @@ const MyWillDetail = () => {
 							onCancel={handleCancel}
 						>
 							<List>
-								<Checkbox.Group onChange={onChangeCheckBox}>
+								<Checkbox.Group>
 									<VirtualList
 										data={receiverData}
 										height={ContainerHeight}
@@ -310,23 +347,35 @@ const MyWillDetail = () => {
 									>
 										{(item) => {
 											//console.log(item);
-											const receiverInfo = {
-												fullName: item.fullName,
-												relation: item.relation,
-												email: item.emailAddress,
-											};
+											// const receiverInfo = {
+											// 	fullName: item.fullName,
+											// 	relation: item.relation,
+											// 	email: item.emailAddress,
+											// 	receiverId: item._id,
+											// };
 											return (
-												<Checkbox value={receiverInfo}>
+												<div>
+													<input
+														type="checkbox"
+														ref={checkedRef}
+													/>
 													<p>{`이름: ${item.fullName}`}</p>
 													<p>{`이메일: ${item.emailAddress}`}</p>
-													{/* <List.Item key={item._id}>
-																<List.Item.Meta
-																	title={<a href="#">{item.fullName}</a>}
-																	description={item.emailAddress}
-																/>					
-													</List.Item> */}
-													{/* <Button type='button' onClick={selectReceiver}>선택</Button> */}
-												</Checkbox>
+												</div>
+												// <Checkbox
+												// 	value={receiverInfo}
+												// 	onChange={onChangeCheckBox}
+												// >
+												// 	<p>{`이름: ${item.fullName}`}</p>
+												// 	<p>{`이메일: ${item.emailAddress}`}</p>
+												// 	{/* <List.Item key={item._id}>
+												// 				<List.Item.Meta
+												// 					title={<a href="#">{item.fullName}</a>}
+												// 					description={item.emailAddress}
+												// 				/>
+												// 	</List.Item> */}
+												// 	{/* <Button type='button' onClick={selectReceiver}>선택</Button> */}
+												// </Checkbox>
 											);
 										}}
 									</VirtualList>
