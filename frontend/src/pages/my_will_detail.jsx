@@ -24,7 +24,6 @@ const MyWillDetail = () => {
 
 	const [receivers, setReceivers] = useState([]); //receiver Id 목록
 	const [receiverList, setReceiverList] = useState([]); //To 목록
-	const checkedRef = useRef();
 
 	const [willId, setWillId] = useState('');
 	const [idParam, setIdParam] = useState('');
@@ -43,7 +42,8 @@ const MyWillDetail = () => {
 
 	const ContainerHeight = 400;
 	const [receiverData, setReceiverData] = useState([]);
-	const checkBoxRef = useRef(null);
+	const checkBoxRef = useRef();
+	const [bchecked, setBchecked] = useState([])
 
 	const getReceiverList = () => {
 		const token = sessionStorage.getItem('token');
@@ -151,7 +151,7 @@ const MyWillDetail = () => {
 	const RegisterForm = useCallback(() => {
 		const { userId, headerAuth } = getData();
 		const url = `/api/auth/${userId}/will`;
-		const data = { title, content, receivers };
+		const data = { title, content, receiverList };
 
 		axios
 			.post(url, data, headerAuth)
@@ -169,17 +169,61 @@ const MyWillDetail = () => {
 	// 	// setReceiverList()
 	// }, [])
 
-	// 수신인 선택완료 클릭
-	const onOkReceiverList = useCallback(
-		(e) => {
-			//console.log(e.target);
-			console.log(checkedRef.current);
-			// console.log(checkBoxRef.current);
-			setIsModalVisible(false);
-		},
-		[checkedRef],
-	);
 
+	
+	//const [listA, setListA] = useState(new Set())
+	//const [checkedIndex, setCheckedIndex] = useState([]);
+	let checkedIndex = [];
+	const onChangeCheckBox = useCallback((e) => {
+		const checkedItem = e.target.value;
+		console.log(checkedItem);
+		const receiverTo = `${checkedItem.fullName}(${checkedItem.relation}) <${checkedItem.email}>, `;
+		//setReceivers(receiverTo)
+		console.log(e.target.index)
+
+		
+		const index = e.target.index;
+		if(checkedIndex.indexOf(index) > -1) {
+			console.log('in : ' + index)
+			checkedIndex = checkedIndex.filter(item => item != index)
+		} else {
+			checkedIndex.push(index)
+		}
+		console.log(checkedIndex)
+
+		// listA.add(receiverTo)
+		// setListA(listA)
+		// console.log(listA)
+		//console.log(receiverTo);
+
+	},[])
+
+
+
+	// 수신인 선택완료 클릭
+	const onOkReceiverList = useCallback((e) => {
+		//console.log(e.target);
+		//console.log(checkBoxRef);
+		//console.log(checkedIndex)
+		console.log(receiverData[0]);
+		let receivers_forShow = "";
+		let receivers_forSend = [];
+		receiverData.map((item, i) => {
+			if(checkedIndex.indexOf(i) > -1) {
+				receivers_forShow += `${receiverData[i].fullName}(${receiverData[i].relation}) <${receiverData[i].emailAddress}>, `;
+				receivers_forSend.push({email: receiverData[i].emailAddress, receiverId: receiverData[i]._id})
+			}
+			//onsole.log(item)
+			
+			
+		})
+		console.log(receivers_forSend)
+		//console.log(receivers_forShow.slice(0, -2))
+		setReceivers(receivers_forShow.slice(0, -2))
+		setReceiverList(receivers_forSend)
+		checkedIndex = []
+		setIsModalVisible(false);
+	},[])
 	// const onChangeCheckBox = useCallback((checkValue) => {
 	// 	console.log(checkValue);
 	// 	//const receiver = `${checkValue.fullName}(${checkValue.relation}) <${checkValue.email}>, `;
@@ -201,38 +245,6 @@ const MyWillDetail = () => {
 	// 		//setReceiverList([receiver]);
 	// 	});
 	// });
-
-	const onChangeCheckBox = useCallback((e) => {
-		const checkedItem = e.target.value;
-		console.log(checkedItem);
-		const receiverTo = `${checkedItem.fullName}(${checkedItem.relation}) <${checkedItem.email}>, `;
-		console.log(receiverTo);
-		//setReceivers(receiverTo);
-		console.log(e);
-		//setChecked(true);
-		//console.log(receivers);
-		//const tmp = { receiverTo, receivers };
-		//setReceivers(tmp);
-
-		//const receiver = `${checkValue.fullName}(${checkValue.relation}) <${checkValue.email}>, `;
-		//console.log(receiver);
-		// updateReceiverList([receiver]);
-		// setReceiverList()
-
-		//checkValue.forEach((item) => {
-		// setReceivers({
-		// 	fullName: item.fullName,
-		// 	email: item.email,
-		// 	receiverId: item.receiverId,
-		// 	relation: item.relation,
-		// });
-		// const receiverTo = `${item.fullName}(${item.relation}) <${item.email}>, `;
-		// console.log(receiverTo);
-		// setReceivers(...receivers, receiverTo);
-		// console.log(receivers);
-		//setReceiverList([receiver]);
-		//});
-	}, []);
 
 	//유언장 수정
 	const ChangeForm = useCallback(() => {
@@ -345,37 +357,26 @@ const MyWillDetail = () => {
 										itemHeight={47}
 										itemKey="receiver_list"
 									>
-										{(item) => {
+										{(item, i) => {
 											//console.log(item);
-											// const receiverInfo = {
-											// 	fullName: item.fullName,
-											// 	relation: item.relation,
-											// 	email: item.emailAddress,
-											// 	receiverId: item._id,
-											// };
+											const receiverInfo = {
+												fullName: item.fullName,
+												relation: item.relation,
+												email: item.emailAddress,
+												receiverId: item.receiverId,
+											};
 											return (
-												<div>
-													<input
-														type="checkbox"
-														ref={checkedRef}
-													/>
+												<Checkbox value={receiverInfo} onChange={onChangeCheckBox} checked={bchecked} ref={checkBoxRef} index={i}>
 													<p>{`이름: ${item.fullName}`}</p>
 													<p>{`이메일: ${item.emailAddress}`}</p>
-												</div>
-												// <Checkbox
-												// 	value={receiverInfo}
-												// 	onChange={onChangeCheckBox}
-												// >
-												// 	<p>{`이름: ${item.fullName}`}</p>
-												// 	<p>{`이메일: ${item.emailAddress}`}</p>
-												// 	{/* <List.Item key={item._id}>
-												// 				<List.Item.Meta
-												// 					title={<a href="#">{item.fullName}</a>}
-												// 					description={item.emailAddress}
-												// 				/>
-												// 	</List.Item> */}
-												// 	{/* <Button type='button' onClick={selectReceiver}>선택</Button> */}
-												// </Checkbox>
+													{/* <List.Item key={item._id}>
+																<List.Item.Meta
+																	title={<a href="#">{item.fullName}</a>}
+																	description={item.emailAddress}
+																/>					
+													</List.Item> */}
+													{/* <Button type='button' onClick={selectReceiver}>선택</Button> */}
+												</Checkbox>
 											);
 										}}
 									</VirtualList>
