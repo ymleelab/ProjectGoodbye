@@ -275,12 +275,12 @@ const MyPage = () => {
 						</div>
 					</Form>
 				</section>
-				<section css={sectionWrapper}>
+				{/* <section css={sectionWrapper}>
 					<h2>
 						자신의 추모 공개 여부
 						<Switch defaultChecked onChange={onChange} />
 					</h2>
-				</section>
+				</section> */}
 			</div>
 			<div css={mainWrapper}>
 				<section>
@@ -382,9 +382,9 @@ const MyPage = () => {
 	);
 };
 
-const onChange = (checked) => {
-	console.log(`switch to ${checked}`);
-};
+// const onChange = (checked) => {
+// 	console.log(`switch to ${checked}`);
+// };
 
 const titleImageStyle = css`
 	position: relative;
