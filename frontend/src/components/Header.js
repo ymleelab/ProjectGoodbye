@@ -6,12 +6,10 @@ import { useDispatch } from 'react-redux';
 import { USERACTIONS } from '../reducers/user';
 import { useSelector } from 'react-redux';
 
-
 import styled from '@emotion/styled';
 
 import { Button } from '../util/common_styles';
 import userLoginCheck from '../util/userLoginCheck';
-
 
 const Header = () => {
 	// const isLogIn = useMemo(userLoginCheck, []);
@@ -19,12 +17,11 @@ const Header = () => {
 	const dispatch = useDispatch();
 	const {logInState} = useSelector((state) => state.user);
 
-
 	// 로그인 확인 부분
 	useEffect(() => {
 		// console.log(logInState);
 		setLoginValue();
-	}, [])
+	}, []);
 
 
     const setLoginValue = async () => {
@@ -42,7 +39,7 @@ const Header = () => {
 		dispatch(USERACTIONS.clearUserData());
 		Router.replace('/');
 	}, []);
-	
+
 	return (
 		<>
 			<Wrapper>
@@ -61,7 +58,9 @@ const Header = () => {
 							<Link href={'/my_page'}>
 								<Button type="button">마이페이지</Button>
 							</Link>
-							<Button type="button" onClick={handleLogOut}>로그아웃</Button>
+							<Button type="button" onClick={handleLogOut}>
+								로그아웃
+							</Button>
 						</ButtonGroup>
 					)}
 				</LoginHeader>
@@ -76,11 +75,6 @@ const Header = () => {
 							</Link>
 						</li>
 						<li>
-							<Link href={'#'}>
-								<a>부고 작성</a>
-							</Link>
-						</li>
-						<li>
 							<Link href={'/receiver_management_page'}>
 								<a>수신인 관리</a>
 							</Link>
@@ -92,7 +86,6 @@ const Header = () => {
 	);
 };
 
-
 export default Header;
 
 const Wrapper = styled.header`
@@ -101,6 +94,8 @@ const Wrapper = styled.header`
 		margin: 0;
 		line-height: 30px;
 		text-align: center;
+		font-size: 1.5em;
+		font-weight: bold;
 	}
 	h1:hover {
 		cursor: pointer;

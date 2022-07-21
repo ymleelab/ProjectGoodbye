@@ -7,10 +7,7 @@ import {
     willService,
     sendMailTest,
 } from '../services';
-import {
-    registerJoiSchema,
-    createRemembranceJoiSchema,
-} from '../db/schemas/joi-schemas';
+import { registerJoiSchema } from '../db/schemas/joi-schemas';
 
 const usersRouter = Router();
 
@@ -60,9 +57,6 @@ const usersRouter = Router();
  *           type: string
  *         password:
  *           type: string
- *         photo:
- *           type: string
- *           format: binary
  *         dateOfBirth:
  *           type: string
  *         currentPassword:
@@ -70,7 +64,6 @@ const usersRouter = Router();
  *       example:
  *         fullName: Steve Baek
  *         password: "12345"
- *         photo: imageURL
  *         currentPassword: "12345"
  *         dateOfBirth: "970623"
  *     Register:
@@ -251,7 +244,6 @@ usersRouter.post(
                 fullName,
                 dateOfBirth,
             };
-            await createRemembranceJoiSchema.validateAsync(remembranceInfo);
             remembranceService.addRemembrance(remembranceInfo);
 
             res.status(201).json(newUser);

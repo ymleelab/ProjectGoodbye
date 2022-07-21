@@ -13,9 +13,8 @@ import Router, { useRouter } from 'next/router';
 
 const MyWillDetail = () => {
 	const router = useRouter();
+
 	const { willList } = useSelector((state) => state.will);
-	//const params = new URLSearchParams(window.location.search);
-	//const id = params.get('id');
 
 	const [title, onChangeTitle, setTitle] = useInput('');
 	const [content, onChangeContent, setContent] = useInput('');
@@ -25,6 +24,9 @@ const MyWillDetail = () => {
 
 	const [receivers, setReceivers] = useState([]); //receiver Id 목록
 	const [receiverList, setReceiverList] = useState([]); //To 목록
+
+	const [willId, setWillId] = useState('');
+	const [idParam, setIdParam] = useState('');
 
 	//팝업 띄우기 관련
 	const [isModalVisible, setIsModalVisible] = useState(false);
@@ -38,7 +40,7 @@ const MyWillDetail = () => {
 		setIsModalVisible(false);
 	};
 
-    const ContainerHeight = 400;
+	const ContainerHeight = 400;
 	const [receiverData, setReceiverData] = useState([]);
 	const checkBoxRef = useRef(null);
 
@@ -62,11 +64,13 @@ const MyWillDetail = () => {
 	useEffect(() => {
 		getReceiverList();
 		const { id } = router.query;
-		console.log(willList);
-		if (willList.length > 0) {
+		//console.log(id);
+		if (id) {
+			setIdParam(id);
 			setTitle(willList[0][id].title);
 			setContent(willList[0][id].content);
 			setReceivers(willList[0][id].receivers);
+			setWillId(willList[0][id]._id);
 		}
 	}, []);
 
@@ -96,37 +100,61 @@ const MyWillDetail = () => {
 	// 			//To 항목에 보여줄 수신자 목록
 	// 			const receiver = `${res.data.fullName}(${res.data.relation}) <${res.data.emailAddress}>, `;
 	// 			setReceiverList([receiver, ...receiverList]);
-
-	// 			//수신자 id 목록
-	// 			const receiverId = res.data._id;
-	// 			setReceivers([receiverId, ...receivers]);
-
-	// 			//input 값 초기화
-	// 			setName('');
-	// 			setRelation('');
-	// 			setEmail('');
-	// 			alert('성공적으로 추가되었습니다.');
-	// 		})
-	// 		.catch((err) => alert(err.response.data.reason));
-	// });
-
-	//유언장 등록
-	const onSubmitForm = useCallback(() => {
-		const userId = sessionStorage.getItem('userId');
-		const token = sessionStorage.getItem('token');
-
+	const addReceiver = useCallback(() => {
+		const { userId, headerAuth } = getData();
+		const fullName = name;
+		const emailAddress = email;
+		const role = 'receiver';
 		axios
 			.post(
-				`/api/auth/${userId}/will`,
-				{ title, content, receivers },
+				`/api/auth/${userId}/receiver`,
 				{
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
+					fullName,
+					emailAddress,
+					relation,
+					role,
 				},
+				headerAuth,
 			)
 			.then((res) => {
-				console.log(res);
+				//To 항목에 보여줄 수신자 목록
+				const receiver = `${res.data.fullName}(${res.data.relation}) <${res.data.emailAddress}>, `;
+				setReceiverList([receiver, ...receiverList]);
+
+				// 			//수신자 id 목록
+				// 			const receiverId = res.data._id;
+				// 			setReceivers([receiverId, ...receivers]);
+
+				// 			//input 값 초기화
+				// 			setName('');
+				// 			setRelation('');
+				// 			setEmail('');
+				// 			alert('성공적으로 추가되었습니다.');
+			})
+			.catch((err) => alert(err.response.data.reason));
+	});
+
+	//API 사용을 위한 공통 데이터
+	const getData = () => {
+		const userId = sessionStorage.getItem('userId');
+		const token = sessionStorage.getItem('token');
+		const headerAuth = {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		};
+		return { userId, headerAuth };
+	};
+
+	//유언장 등록
+	const RegisterForm = useCallback(() => {
+		const { userId, headerAuth } = getData();
+		const url = `/api/auth/${userId}/will`;
+		const data = { title, content, receivers };
+
+		axios
+			.post(url, data, headerAuth)
+			.then(() => {
 				alert('성공적으로 유언장이 등록되었습니다.');
 				Router.replace('/my_will');
 			})
@@ -134,36 +162,60 @@ const MyWillDetail = () => {
 	});
 
 
-    const updateReceiverList = useCallback(setReceiverList, []);	
-    const onChangeCheckBox = useCallback((checkValue) => {
-		console.log(checkValue);
-		const receiver = `${checkValue.fullName}(${checkValue.relation}) <${checkValue.email}>, `;
+	// const updateReceiverList = useCallback(setReceiverList, []);	
+	// 	const receiver = `${checkValue.fullName}(${checkValue.relation}) <${checkValue.email}>, `;
 
-		// updateReceiverList([receiver]);
-		// setReceiverList()
-	}, [])
+	// 	// updateReceiverList([receiver]);
+	// 	// setReceiverList()
+	// }, [])
+
 
 	// 수신인 선택완료 클릭
 	const onOkReceiverList = (e) => {
-        console.log(e.target);
+		console.log(e.target);
 		// console.log(checkBoxRef.current);	
 	}
 
+	//유언장 수정
+	const ChangeForm = useCallback(() => {
+		const url = `/api/auth/${userId}/wills/${willId}`;
 
+		axios
+			.patch(url, data, headerAuth)
+			.then(() => {
+				alert('성공적으로 유언장이 수정되었습니다.');
+				Router.replace('/my_will');
+			})
+			.catch((err) => alert(err.response.data.reason));
+	});
+
+	//유언장 삭제
+	const DeleteForm = useCallback(() => {
+		const { userId, headerAuth } = getData();
+		const url = `/api/auth/${userId}/wills/${willId}`;
+
+		axios
+			.delete(url, headerAuth)
+			.then(() => {
+				alert('성공적으로 유언장이 삭제되었습니다.');
+				Router.replace('/my_will');
+			})
+			.catch((err) => alert(err.response.data.reason));
+	});
+
+	// {/* <div css={adBoxStyle}>
+	// 		<div css={adContentStyle}>
+	// 		</div>
+	// 		<div css={imageStyle}>
+	// 			<Image
+	// 				src="https://images.unsplash.com/photo-1528752477378-485b46bedcde?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8dGVzdGFtZW50fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=600&q=60"
+	// 				alt="나의 유언장"
+	// 				layout="fill"
+	// 			/>
+	// 		</div>
+	// 	</div> */}
 	return (
-		<AppLayout>
-			{/* <div css={adBoxStyle}>
-				<div css={adContentStyle}>
-					<h2>나의 유언장</h2>
-				</div>
-				<div css={imageStyle}>
-					<Image
-						src="https://images.unsplash.com/photo-1528752477378-485b46bedcde?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8dGVzdGFtZW50fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=600&q=60"
-						alt="나의 유언장"
-						layout="fill"
-					/>
-				</div>
-			</div> */}
+		<AppLayout AppLayout >
 			<main css={mainWrapper}>
 				<section css={willsectionWrapper}>
 					{/* <div css={headerWrapper}>
@@ -225,7 +277,7 @@ const MyWillDetail = () => {
 							<List>
 								<Checkbox.Group
 									onChange={onChangeCheckBox}
-									>
+								>
 									<VirtualList
 										data={receiverData}
 										height={ContainerHeight}
@@ -251,13 +303,14 @@ const MyWillDetail = () => {
 													</List.Item> */}
 													{/* <Button type='button' onClick={selectReceiver}>선택</Button> */}
 												</Checkbox>
-										)}}
+											)
+										}}
 									</VirtualList>
 								</Checkbox.Group>
 							</List>
 						</Modal>
 					</div>
-					<Form onFinish={onSubmitForm}>
+					<Form>
 						<div css={letterWrapper}>
 							<div css={headerWrapper}>
 								<input
@@ -276,7 +329,7 @@ const MyWillDetail = () => {
 							/>
 						</div>
 						<div css={buttonWrapper}>
-							{willList.length <= 0 && (
+							{!idParam && (
 								<div>
 									<input
 										type="button"
@@ -290,20 +343,29 @@ const MyWillDetail = () => {
 										type="submit"
 										value="생성"
 										style={{ cursor: 'pointer' }}
+										onClick={RegisterForm}
 									/>
 								</div>
 							)}
-							{willList.length > 0 && (
+							{idParam && (
 								<div>
-									<input type="button" value="삭제" />
-									<input type="submit" value="수정" />
+									<input
+										type="button"
+										value="삭제"
+										onClick={DeleteForm}
+									/>
+									<input
+										type="submit"
+										value="수정"
+										onClick={ChangeForm}
+									/>
 								</div>
 							)}
 						</div>
 					</Form>
 				</section>
 			</main>
-		</AppLayout>
+		</AppLayout >
 	);
 };
 
@@ -364,7 +426,7 @@ const buttonWrapper = css`
 	width: 100%;
 	margin-top: 3rem;
 	& > div > input[type='submit'] {
-		margin-right: 2%;
+		margin-right: 0.5em;
 		background-color: #3e606f;
 	}
 
@@ -375,34 +437,8 @@ const buttonWrapper = css`
 		border: none;
 		width: 5rem;
 		padding: 10px;
-		border-radius: 1rem;
+		border-radius: 0.2rem;
 	}
 `;
 
-const adBoxStyle = css`
-	display: flex;
-	width: 100%;
-	height: 30rem;
-	margin: 10rem 0;
-	padding: 2rem;
-	align-item: center;
-	&:nth-of-type(even) {
-		flex-direction: row-reverse;
-	}
-`;
-
-const adContentStyle = css`
-	width: 50%;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-`;
-
-const imageStyle = css`
-	position: relative;
-	width: 50%;
-	line-height: 10rem;
-	background-color: silver;
-`;
 export default MyWillDetail;

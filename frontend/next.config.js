@@ -6,6 +6,7 @@ const nextConfig = {
 			'images.unsplash.com',
 			'basicincomekorea.org',
 			'media.istockphoto.com',
+			'd3vx2tv8yhh0mv.cloudfront.net',
 		],
 	},
 	async rewrites() {
@@ -23,8 +24,6 @@ const nextConfig = {
 		});
 		return config
 	},
-	exportTrailingSlash: true,
-	trailingSlash: true
 };
 
 module.exports = nextConfig;
