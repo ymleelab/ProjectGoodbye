@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { css, jsx } from '@emotion/react';
+import axios from 'axios';
+
+import { css } from '@emotion/react';
+import styled from '@emotion/styled';
+import { Card } from 'antd';
+import 'antd/dist/antd.css';
 
 import Image from 'next/image';
 import AppLayout from '../components/AppLayout';
@@ -7,6 +12,20 @@ import AppLayout from '../components/AppLayout';
 
 
 const Home = () => {
+
+  const getRecentRBData = async () => {
+    try {
+      const res = await axios.get(`/api/remembrances/recent?count=6`);
+      console.log(res);
+    } catch (error) {
+      console.log(error);
+    }
+    
+  } 
+  
+  useEffect(() => {
+      getRecentRBData();
+  }, [])
 
   return (
     <AppLayout>
@@ -49,17 +68,25 @@ const Home = () => {
           />
         </div>
       </div>
-      <div css={adBoxStyle}>
+      <BoxStyle>
         <div css={currentProgress}>
           <h2>현재 진행중인 추모식</h2>
           <p>진행중인 추모</p>
           <div css={CardGroup}>
             {Array(8).fill('').map((x, i) => {
-              return <div key={`progress-${i}`} css={progessCard} />
+              return (
+                  <>
+                    <div key={`progress-${i}`} css={progessCard}>
+                      <Card title="Card title" bordered={true} >
+                        <p>Card content</p>
+                      </Card>   
+                    </div>
+                  </>
+                )
             })}
           </div>
         </div>
-      </div>
+      </BoxStyle>
     </AppLayout>
   )
 }
@@ -78,6 +105,11 @@ const adBoxStyle = css`
   &:nth-of-type(even) {
     flex-direction: row-reverse;
   }
+`
+const BoxStyle = styled.div`
+  width: 100%;
+  margin: 10rem 0;
+  padding: 2rem;
 `
 
 const adContentStyle = css`
@@ -103,15 +135,15 @@ const currentProgress = css`
 `
 
 const progessCard = css`
-  width: 5rem;
-  height: 5rem;
+  width: 10rem;
+  height: auto;
   background-color: silver;
 `
 
 const CardGroup = css`
   display: grid;
-  grid-template-columns: repeat(4, 5rem);
-  grid-column-gap: 5rem;
+  grid-template-columns: repeat(4, 10rem);
+  grid-column-gap: 3rem;
   grid-row-gap: 3rem;
   place-content: center;
 `

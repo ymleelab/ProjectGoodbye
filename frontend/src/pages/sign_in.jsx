@@ -37,17 +37,10 @@ const SignIn = () => {
 					sessionStorage.setItem('remembranceId', res.data.remembranceId);
 					// const { token, userId } = res.data;
 					// console.log(res, res.data, fullName);
-					dispatch(
-						USERACTIONS.setUserData({
-							fullName,
-							token,
-							userId,
-						}),
-					);
 					Router.replace(redirectUrl);
 				}
 			})
-			.catch((error) => alert(error.response.data.reason));
+			.catch((error) => console.log(error));
 	}, [email, password]);
 
 	useEffect(() => {
