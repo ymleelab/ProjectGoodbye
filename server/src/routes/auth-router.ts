@@ -108,41 +108,7 @@ authRouter.patch(
 
 /**
  * @swagger
- * /api/auth/{userId}/image:
- *   post:
- *     tags:
- *     - Images
- *     security:
- *       - bearerAuth: []
- *     summary: 유저 사진 등록 - 신규 등록 및 변경
- *     description: 사진을 AWS S3에 저장하고 유저 및 추모 데이터에 반영. 기존 사진이 있는 경우 자동 삭제 후 진행
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *         required: true
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             properties:
- *               photo:
- *                 type: string
- *                 format: binary
- *     responses:
- *       201:
- *         description: 등록된 이미지 url
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 photo:
- *                   type: string
- *                   example: imageUrl
+
  */
 // 이미지 등록
 authRouter.post(
