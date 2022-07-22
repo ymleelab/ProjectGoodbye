@@ -123,22 +123,6 @@ components:
           description: '유저와의 관계'
           example: '가족'
 
-    ReceiverPost:
-      type: object
-      required:
-      - fullName
-      - emailAddress
-      - relation
-      properties:
-        fullName:
-          type: string
-          example: "홍길동"
-        emailAddress:
-          type: string
-          example: "hong@email.com"
-        relation:
-          type: string
-          example: "brother"
     Remembrance:
       type: object
       required:
@@ -966,6 +950,36 @@ paths:
         200:
           description: 여러개의 수신자 데이터
           $ref: "#/components/responses/receiversRes"
+    post:
+      tags:
+      - Receivers
+      security:
+      - bearerAuth: []
+      summary: 수신자 등록
+      description: 새 수신자 정보를 DB에 저장
+      parameters:
+      - $ref: "#/components/parameters/userIdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - fullName
+              - emailAddress
+              - relation
+              properties:
+                fullName:
+                  $ref: "#/components/schemas/Receiver/properties/fullName"
+                emailAddress:
+                  $ref: "#/components/schemas/Receiver/properties/emailAddress"
+                relation:
+                  $ref: "#/components/schemas/Receiver/properties/relation"
+      responses:
+        200:
+          description: 수신자 정보 수정 성공
+          $ref: "#/components/responses/receiverRes"
   /api/auth/{userId}/receivers/{receiverId}:
     get:
       tags:

@@ -580,35 +580,9 @@ authRouter.get(
         }
     },
 );
-/**
- * @swagger
- * /api/auth/{userId}/receiver:
- *   post:
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *         required: true
- *     security:
- *       - bearerAuth: []
- *     tags: [AuthReceiver]
- *     summary: 특정 유저의 수신자를 DB에 등록할 때 사용하는 API
- *     description: 유저가 수신자를 post요청시 req.body의 fullName, emailAddress, relation 정보를 사용, 새 수신자를 등록
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/ReceiverPost'
- *     responses:
- *       200:
- *         description: Created Receiver as JSON
- *
- */
 
 authRouter.post(
-    '/:userId/receiver',
+    '/:userId/receivers',
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { userId } = req.params;
