@@ -649,37 +649,7 @@ authRouter.delete(
         }
     },
 );
-/**
- * @swagger
- * /api/auth/{userId}/receivers/{receiverId}:
- *   patch:
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *           required: true
- *       - in: path
- *         name: receiverId
- *         schema:
- *           type: string
- *           required: true
- *     security:
- *       - bearerAuth: []
- *     tags: [AuthReceiver]
- *     summary: 특정 유저의 특정 수신자 정보를 수정할 때 사용하는 API
- *     description: 유저가 수신자 정보를 patch 요청시 req.body의 fullName, emailAddress, relation 정보를 사용, 수신자 정보를 수정
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/ReceiverPost'
- *     responses:
- *       200:
- *         description: Updated Receiver as JSON
- *
- */
+
 authRouter.patch(
     '/:userId/receivers/:receiverId',
     async (req: Request, res: Response, next: NextFunction) => {
