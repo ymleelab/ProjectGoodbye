@@ -1,4 +1,3 @@
-
 # :pen_ballpoint: Project GoodBye
 ## 01 서비스 소개
 
@@ -77,6 +76,7 @@ npm run start
 <p align="center"><a href="https://nextjs.org/"><img src="https://upload.wikimedia.org/wikipedia/commons/8/8e/Nextjs-logo.svg" height="70"/></a>　　　　　　<a href="https://react-redux.js.org/"><img src="https://upload.wikimedia.org/wikipedia/commons/4/49/Redux.png" height="80"/></a></p>
 <p align="center"><a href="https://nodejs.org"><img src="https://upload.wikimedia.org/wikipedia/commons/d/d9/Node.js_logo.svg" height="70"/></a>　　　　　　<a href="https://expressjs.com"><img src="https://upload.wikimedia.org/wikipedia/commons/6/64/Expressjs.png" height="50"/></a>　　　　　　<a href="https://www.typescriptlang.org"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Typescript_logo_2020.svg" height="60"/></a></p>
 <p align="center"><a href="https://www.mongodb.com"><img src="https://upload.wikimedia.org/wikipedia/commons/9/93/MongoDB_Logo.svg" height="60"/></a></p>
+<img src="https://kdt-gitlab.elice.io/sw_track/class_02_seoul/web_project_2/team11/project-goodbye/-/wikis/uploads/67cea2a78ba61f0df459658e99e2dc12/image.png" width="500" />
 <br>
 <details><summary><strong>Frontend</strong></summary>
 <ul>
