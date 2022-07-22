@@ -3,7 +3,9 @@ import { useSelector } from 'react-redux';
 
 import { css } from '@emotion/react';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { TbRectangleVertical } from 'react-icons/tb';
 import { Form, Switch, Modal, Button, Input, DatePicker } from 'antd';
+import styled from '@emotion/styled';
 import 'antd/dist/antd.css';
 const { confirm } = Modal;
 
@@ -26,9 +28,7 @@ const MyPage = () => {
 	const [trustedUser, setTrustedUser] = useState('');
 	const [managedUsers, setManagedUsers] = useState([]);
 	const [dateOfDeath, setDateOfDeath] = useState('2022-01-01');
-	const [imageSrc, setImageSrc] = useState(
-		'https://images.unsplash.com/photo-1528752477378-485b46bedcde?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8dGVzdGFtZW50fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=600&q=60',
-	);
+	const [imageSrc, setImageSrc] = useState('');
 
 	useEffect(() => {
 		if (logInState === null) return;
@@ -220,9 +220,8 @@ const MyPage = () => {
 			</div>
 			<div css={adBoxStyle}>
 				<div css={adContentStyle}>
-					<h2>나의 영정 사진</h2>
+					<h1>나의 영정 사진</h1>
 					<p>밝은 표정이 담긴 사진을 업로드해주세요</p>
-					<p>11x14인치 (28x35cm)</p>
 					<input
 						type="file"
 						accept="image/*"
@@ -230,9 +229,15 @@ const MyPage = () => {
 						onChange={fileChange}
 					/>
 				</div>
-				<div css={imageStyle}>
+				{/* <div css={imageStyle}>
 					<Image src={imageSrc} alt="나의 영정 사진" layout="fill" />
-				</div>
+				</div> */}
+				<Frame>
+					<FrameImages>
+						<TbRectangleVertical className={'frame_svg'} />
+						<img src={imageSrc} />
+					</FrameImages>
+				</Frame>
 			</div>
 			{/* <div css={adBoxStyle}>
 				<div css={adContentStyle}>
@@ -251,7 +256,7 @@ const MyPage = () => {
 
 			<div css={mainWrapper}>
 				<section css={sectionWrapper}>
-					<h2>개인정보 수정</h2>
+					<h1>비밀번호 수정</h1>
 					<Form onFinish={onUpdateUser}>
 						<div css={inputWrapper}>
 							<input
@@ -291,10 +296,10 @@ const MyPage = () => {
 			<div css={mainWrapper}>
 				<section>
 					<div>
-						<h2>
+						<h1>
 							자신의 유언장을 전송, 생사여부를 변경 가능 권한을
 							주고 싶은 사람
-						</h2>
+						</h1>
 						{trustedUser && (
 							<div style={{ left: '40%', marginTop: '2em' }}>
 								등록된 이메일: {trustedUser}
@@ -350,7 +355,7 @@ const MyPage = () => {
 			<div css={mainWrapper}>
 				<section>
 					<div>
-						<h2>내가 생사여부 변경 권한이 있는 사용자 목록</h2>
+						<h1>내가 생사여부 변경 권한이 있는 사용자 목록</h1>
 						{managedUsers && (
 							<div style={{ left: '40%', marginTop: '2em' }}>
 								{managedUsers.map((user, index) => {
@@ -479,6 +484,32 @@ const buttonWrapper = css`
 		width: 49%;
 		padding: 10px;
 		cursor: pointer;
+	}
+`;
+
+const Frame = styled.div`
+	position: relative;
+	color: dimgray;
+	z-index: 1;
+	svg.frame_svg {
+		width: 300px;
+		height: auto;
+		color: darkgrey;
+	}
+	left: 10%;
+`;
+
+const FrameImages = styled.div`
+	position: relative;
+	display: inline-block;
+
+	& > img {
+		position: absolute;
+		width: 150px;
+		height: 215px;
+		top: 35px;
+		left: 75px;
+		z-index: -1;
 	}
 `;
 export default MyPage;

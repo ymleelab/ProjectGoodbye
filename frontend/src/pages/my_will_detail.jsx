@@ -9,13 +9,14 @@ import useInput from '../hooks/useInput';
 import userLoginCheck from '../util/userLoginCheck';
 
 import { css } from '@emotion/react';
+import styled from '@emotion/styled';
 import { Form, Modal, Button, List, Checkbox } from 'antd';
 import 'antd/dist/antd.css';
 
 let checkedIndex = [];
 const MyWillDetail = () => {
 	const router = useRouter();
-	const { willList } = useSelector((state) => state.will);
+	//const { willList } = useSelector((state) => state.will);
 	const { logInState } = useSelector((state) => state.user);
 
 	const [title, onChangeTitle, setTitle] = useInput('');
@@ -49,51 +50,16 @@ const MyWillDetail = () => {
 				},
 			})
 			.then((res) => {
+				// dispatch(RECEIVERACTIONS.getReceivers({ lists: res.data }));
+				console.log(res.data.length);
 				setReceiverData([...res.data]);
+				if (res.data.length === 0) {
+					alert('수신자 목록을 먼저 등록해주세요!');
+					Router.replace('/receiver_management_page');
+				}
 			})
 			.catch((err) => console.log(err));
 	};
-
-	useEffect(() => {
-		if (!router.isReady) return;
-		if (logInState === null) return;
-		if (!logInState) {
-			alert('서비스를 이용하려면 로그인을 먼저 해주세요!');
-			Router.replace('/sign_in');
-		}
-
-		getReceiverList();
-		const { id } = router.query;
-		if (id) {
-			setIdParam(id);
-			setTitle(willList[0][id].title);
-			setContent(willList[0][id].content);
-			setReceiverList(willList[0][id].receivers);
-			setWillId(willList[0][id]._id);
-
-			const token = sessionStorage.getItem('token');
-			const userId = sessionStorage.getItem('userId');
-			let receivers_forShow = '';
-
-			willList[0][id].receivers.map((item) => {
-				const receiverId = item.receiverId;
-
-				axios
-					.get(`/api/auth/${userId}/receivers/${receiverId}`, {
-						headers: {
-							Authorization: `Bearer ${token}`,
-						},
-					})
-					.then((res) => {
-						receivers_forShow += `${res.data.fullName}(${res.data.relation}) <${res.data.emailAddress}>, `;
-					})
-					.catch((err) => console.log(err))
-					.finally(() =>
-						setReceivers(receivers_forShow.slice(0, -2)),
-					);
-			});
-		}
-	}, [logInState, router.isReady]);
 
 	//API 사용을 위한 공통 데이터
 	const getData = () => {
@@ -106,6 +72,58 @@ const MyWillDetail = () => {
 		};
 		return { userId, headerAuth };
 	};
+
+	const getWillData = () => {
+		const { willId } = router.query;
+		if (willId) {
+			setIdParam(willId);
+
+			const { userId, headerAuth } = getData();
+			const url = `/api/auth/${userId}/wills/${willId}`;
+
+			axios
+				.get(url, headerAuth)
+				.then((res) => {
+					//console.log(res.data);
+					const { title, content, receivers, _id } = res.data;
+					setTitle(title);
+					setContent(content);
+					setReceiverList(receivers);
+					setWillId(_id);
+
+					let receivers_forShow = '';
+					receivers.map((item) => {
+						const receiverId = item.receiverId;
+						axios
+							.get(
+								`/api/auth/${userId}/receivers/${receiverId}`,
+								headerAuth,
+							)
+							.then((res) => {
+								receivers_forShow += `${res.data.fullName}(${res.data.relation}) <${res.data.emailAddress}>, `;
+							})
+							.catch((err) => console.log(err))
+							.finally(() =>
+								setReceivers(receivers_forShow.slice(0, -2)),
+							);
+					});
+				})
+				.catch((err) => alert(err.response.data.reason));
+		}
+	};
+
+	useEffect(() => {
+		if (!router.isReady) return;
+		//console.log(logInState);
+		if (logInState === null) return;
+		if (!logInState) {
+			alert('서비스를 이용하려면 로그인을 먼저 해주세요!');
+			Router.replace('/sign_in');
+		}
+
+		getReceiverList();
+		getWillData();
+	}, [logInState, router.isReady]);
 
 	//유언장 등록
 	const RegisterForm = useCallback(() => {
@@ -186,11 +204,15 @@ const MyWillDetail = () => {
 
 	return (
 		<AppLayout>
-			<main css={mainWrapper}>
-				<section css={willsectionWrapper}>
+			<Wrapper>
+				<Content>
+					{/* <main css={mainWrapper}>
+						<section css={willsectionWrapper}> */}
 					<div>
+						<div>
+							<Button onClick={showModal}>받는 사람 선택</Button>
+						</div>
 						To <span>{receivers}</span>
-						<Button onClick={showModal}>받는 사람 선택</Button>
 						<Modal
 							title="ReceiverList Modal"
 							visible={isModalVisible}
@@ -282,8 +304,10 @@ const MyWillDetail = () => {
 							)}
 						</div>
 					</Form>
-				</section>
-			</main>
+					{/* </section>
+					</main> */}
+				</Content>
+			</Wrapper>
 		</AppLayout>
 	);
 };
@@ -325,10 +349,10 @@ const letterWrapper = css`
 	box-sizing: border-box;
 	width: 100%;
 	height: 100vh;
-	border: 1px solid #d1dbb1;
-	margin: 1rem auto;
-	padding: 5rem;
-	background-color: #d1dbbd;
+	//border: 1px solid #d1dbb1;
+	margin: 1rem;
+	padding: 1rem;
+	//background-color: #d1dbbd;
 
 	& > textarea {
 		width: 100%;
@@ -344,6 +368,7 @@ const letterWrapper = css`
 const buttonWrapper = css`
 	width: 100%;
 	margin-top: 3rem;
+	padding: 3rem;
 	& > div > input[type='submit'] {
 		margin-right: 0.5em;
 		background-color: #3e606f;
@@ -359,6 +384,39 @@ const buttonWrapper = css`
 		border-radius: 0.2rem;
 		cursor: pointer;
 	}
+`;
+
+const Wrapper = styled.div`
+	max-width: 650px;
+	min-height: inherit;
+	margin: 5em auto;
+	font-family: helvetica, arial;
+	background: url(https://images.unsplash.com/photo-1618635245221-a1974f59cb02?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTAwfHxsZXR0ZXJ8ZW58MHx8MHx8&auto=format&fit=crop&w=600&q=60);
+	padding: 40px 50px 15px 50px;
+	border-radius: 50px;
+`;
+
+const Content = styled.div`
+	.title {
+		font-size: 2em;
+	}
+
+	p {
+		position: relative;
+		top: 2rem;
+		font-family: 'Cinzel', serif;
+		font-size: 18px;
+	}
+
+	width: 80%;
+	min-height: inherit;
+	padding: 5%;
+	margin: auto;
+	background: rgb(254, 254, 254, 0.65);
+	border-radius: 50px;
+	border: none;
+	font-size: 1.15em;
+	font-family: book antiqua;
 `;
 
 export default MyWillDetail;

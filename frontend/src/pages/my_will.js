@@ -25,8 +25,6 @@ import { WillACTIONS } from '../reducers/will';
 import { RECEIVERACTIONS } from '../reducers/receivers';
 import getUserIdToken from '../util/getUserIdToken';
 
-
-
 /* 
 	로그인 한 상태에서만 유언장 페이지에 접근가능
 	로그인 하지 않은 상태에서는 로그인, 회원가입 유도 화면 보여줌
@@ -41,22 +39,18 @@ const MyWill = () => {
 	const [currentPage, setCurrentPage] = useState(1);
 	const clickPagination = useCallback(setCurrentPage, []);
 
-
 	const loadValues = () => {
 		// 로그인 했을 경우 정보 불러오기
 		if (logInState) {
 			getWillsList();
 			getReceiverList();
 		}
-	}
-
-
+	};
 
 	useEffect(() => {
 		// 로그인 확인 부분
 		loadValues();
 	}, [logInState]);
-
 
 
 	const pageListUpdate = () => {
@@ -74,23 +68,27 @@ const MyWill = () => {
 	const getReceiverList = () => {
 		const token = sessionStorage.getItem('token');
 		const userId = sessionStorage.getItem('userId');
-		axios.get(`/api/auth/${userId}/receivers`, {
-			headers: {
-				Authorization: `Bearer ${token}`,
-			},
-		}).then(res => {
-			dispatch(RECEIVERACTIONS.getReceivers({ lists: res.data }));
-		}).catch(err => console.log(err));
-	}
+		axios
+			.get(`/api/auth/${userId}/receivers`, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			})
+			.then((res) => {
+				dispatch(RECEIVERACTIONS.getReceivers({ lists: res.data }));
+			})
+			.catch((err) => console.log(err));
+	};
 
 	const getWillsList = () => {
 		const token = sessionStorage.getItem('token');
 		const userId = sessionStorage.getItem('userId');
-		axios.get(`/api/auth/${userId}/wills`, {
-			headers: {
-				Authorization: `Bearer ${token}`,
-			},
-		})
+		axios
+			.get(`/api/auth/${userId}/wills`, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			})
 			.then((res) => {
 				dispatch(WillACTIONS.getWills({ lists: res.data }));
 				pageListUpdate();
@@ -146,9 +144,7 @@ const MyWill = () => {
 						</p>
 						<NoticeBtnGroup>
 							<Link href="/sign_in">
-								<Button>
-									로그인하기
-								</Button>
+								<Button>로그인하기</Button>
 							</Link>
 							<Link href="/sign_up">
 								<Button>회원가입하기</Button>
@@ -160,39 +156,39 @@ const MyWill = () => {
 						<CardGroup>
 							{willList.length > 0
 								? willList[currentPage - 1].map((will, i) => (
-									<Card
-										title={will.title}
-										extra={
-											<CardBtnGroup>
-												<Link
-													href={{
-														pathname:
-															'/my_will_detail',
-														query: `id=${i}`,
-													}}
-												>
-													<a css={aTagStyle}>
-														유언장 상세보기
-													</a>
-												</Link>
-												<Button
-													type="button"
-													onClick={() =>
-														onClickDelete(will)
-													}
-												>
-													유언장 제거하기
-												</Button>
-											</CardBtnGroup>
-										}
-										style={{
-											width: '20rem',
-										}}
-										key={`card-${i}`}
-									>
-										<ReceiverList will={will} />
-									</Card>
-								))
+										<Card
+											title={will.title}
+											extra={
+												<CardBtnGroup>
+													<Link
+														href={{
+															pathname:
+																'/my_will_detail',
+															query: `willId=${will._id}`,
+														}}
+													>
+														<a css={aTagStyle}>
+															유언장 상세보기
+														</a>
+													</Link>
+													<Button
+														type="button"
+														onClick={() =>
+															onClickDelete(will)
+														}
+													>
+														유언장 제거하기
+													</Button>
+												</CardBtnGroup>
+											}
+											style={{
+												width: '20rem',
+											}}
+											key={`card-${i}`}
+										>
+											<ReceiverList will={will} />
+										</Card>
+								  ))
 								: '유언장 정보가 없습니다..'}
 						</CardGroup>
 						<Pagination
