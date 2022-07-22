@@ -427,20 +427,20 @@ components:
                 $ref: "#/components/schemas/Will/properties/receivers"
     receiverReq:
       required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-              - fullName
-              - emailAddress
-              - relation
-              properties:
-                fullName:
-                  $ref: "#/components/schemas/Receiver/properties/fullName"
-                emailAddress:
-                  $ref: "#/components/schemas/Receiver/properties/emailAddress"
-                relation:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - fullName
+            - emailAddress
+            - relation
+            properties:
+              fullName:
+                $ref: "#/components/schemas/Receiver/properties/fullName"
+              emailAddress:
+                $ref: "#/components/schemas/Receiver/properties/emailAddress"
+              relation:
                       $ref: "#/components/schemas/Receiver/properties/relation"
     commentReq:
       required: true
