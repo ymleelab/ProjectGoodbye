@@ -549,26 +549,6 @@ authRouter.patch(
 
 // 유저와 유언장, 수신자의 관계는 쉬운편인거 같은데 - 유언장/수신자의 관계에서 삭제, 추가, 수정이 미치는 영향을 더 생각
 
-/**
- * @swagger
- * /api/auth/{userId}/receivers:
- *   get:
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *         required: true
- *     security:
- *       - bearerAuth: []
- *     tags: [AuthReceiver]
- *     summary: 유저의 수신자 리스트를 불러오는 API
- *     description: 유저의 uri의 유저 아이디를 통하여 해당 유저의 수신자 리스트를 불러오는 API
- *     responses:
- *       200:
- *         description: Receiver list as JSON
- *
- */
 authRouter.get(
     '/:userId/receivers',
     async (req: Request, res: Response, next: NextFunction) => {

@@ -16,6 +16,8 @@ tags:
     description: '인증된 유저 관련 API'
   - name: Wills
     description: '유언장 관련 API'
+  - name: Receivers
+    description: '유언장 수신자 관련 API'
   - name: Remembrances
     description: '추모 관련 API'
   - name: Comments
@@ -97,7 +99,30 @@ components:
               email:
                 type: string
                 description: '수신자 이메일'
-    
+    Receiver:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: '수신자의 objectId'
+          example: '62d91857136d85aefdee0e5f'
+        fullName:
+          type: string
+          description: '수신자 이름'
+          example: '홍길동'
+        emailAddress:
+          type: string
+          description:  '수신자 이메일'
+          example: 'abc@email.com'
+        userId:
+          type: string
+          description: '유언장을 작성한 유저의 objectId'
+          example: '62d7b9e42f66fc6992fe82de'
+        relation:
+          type: string
+          description: '유저와의 관계'
+          example: '가족'
+
     ReceiverPost:
       type: object
       required:
@@ -455,6 +480,13 @@ components:
             type: array
             items:
               $ref: "#/components/schemas/Will"
+    receiversRes:
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/Receiver"
     remembranceRes:
       content:
         application/json:
@@ -908,6 +940,22 @@ paths:
         200:
           description: 유언장 삭제 성공
           $ref: "#/components/responses/resultRes"
+  
+  /api/auth/{userId}/receivers:
+    get:
+      tags:
+      - Receivers
+      security:
+      - bearerAuth: []
+      summary: 전체 유언장 수신자 리스트
+      description: 유저가 작성한 전체 유언장의 수신자 리스트 출력
+      parameters:
+      - $ref: "#/components/parameters/userIdParam"
+      responses:
+        200:
+          description: 여러개의 수신자 데이터
+          $ref: "#/components/responses/receiversRes"
+          
   /api/remembrances:
     get:
       tags:
