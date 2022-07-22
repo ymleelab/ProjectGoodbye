@@ -11,6 +11,7 @@ import axios from 'axios';
 import useInput from '../hooks/useInput';
 import Router, { useRouter } from 'next/router';
 
+let checkedIndex = [];
 const MyWillDetail = () => {
 	const router = useRouter();
 
@@ -43,7 +44,7 @@ const MyWillDetail = () => {
 	const ContainerHeight = 400;
 	const [receiverData, setReceiverData] = useState([]);
 	const checkBoxRef = useRef();
-	const [bchecked, setBchecked] = useState([])
+	const [bchecked, setBchecked] = useState([]);
 
 	const getReceiverList = () => {
 		const token = sessionStorage.getItem('token');
@@ -169,61 +170,61 @@ const MyWillDetail = () => {
 	// 	// setReceiverList()
 	// }, [])
 
-
-	
 	//const [listA, setListA] = useState(new Set())
 	//const [checkedIndex, setCheckedIndex] = useState([]);
-	let checkedIndex = [];
+	//let checkedIndex = [];
 	const onChangeCheckBox = useCallback((e) => {
-		const checkedItem = e.target.value;
-		console.log(checkedItem);
-		const receiverTo = `${checkedItem.fullName}(${checkedItem.relation}) <${checkedItem.email}>, `;
+		//const checkedItem = e.target.value;
+		//console.log(checkedItem);
+		//const receiverTo = `${checkedItem.fullName}(${checkedItem.relation}) <${checkedItem.email}>, `;
 		//setReceivers(receiverTo)
-		console.log(e.target.index)
+		//console.log(e.target.index);
 
-		
 		const index = e.target.index;
-		if(checkedIndex.indexOf(index) > -1) {
-			console.log('in : ' + index)
-			checkedIndex = checkedIndex.filter(item => item != index)
+		if (checkedIndex.indexOf(index) > -1) {
+			//console.log('in : ' + index);
+			checkedIndex = checkedIndex.filter((item) => item != index);
 		} else {
-			checkedIndex.push(index)
+			checkedIndex.push(index);
 		}
-		console.log(checkedIndex)
+		console.log(checkedIndex);
 
 		// listA.add(receiverTo)
 		// setListA(listA)
 		// console.log(listA)
 		//console.log(receiverTo);
-
-	},[])
-
-
+	}, []);
 
 	// 수신인 선택완료 클릭
-	const onOkReceiverList = useCallback((e) => {
-		//console.log(e.target);
-		//console.log(checkBoxRef);
-		//console.log(checkedIndex)
-		console.log(receiverData[0]);
-		let receivers_forShow = "";
-		let receivers_forSend = [];
-		receiverData.map((item, i) => {
-			if(checkedIndex.indexOf(i) > -1) {
-				receivers_forShow += `${receiverData[i].fullName}(${receiverData[i].relation}) <${receiverData[i].emailAddress}>, `;
-				receivers_forSend.push({email: receiverData[i].emailAddress, receiverId: receiverData[i]._id})
-			}
-			//onsole.log(item)
-			
-			
-		})
-		console.log(receivers_forSend)
-		//console.log(receivers_forShow.slice(0, -2))
-		setReceivers(receivers_forShow.slice(0, -2))
-		setReceiverList(receivers_forSend)
-		checkedIndex = []
-		setIsModalVisible(false);
-	},[])
+	const onOkReceiverList = useCallback(
+		(e) => {
+			//console.log(e.target);
+			//console.log(checkBoxRef);
+			console.log(checkedIndex);
+			console.log('is here ? ' + receiverData[0].emailAddress);
+			//console.log(checkedIndex);
+			let receivers_forShow = '';
+			let receivers_forSend = [];
+			receiverData.map((item, i) => {
+				if (checkedIndex.indexOf(i) > -1) {
+					console.log('here');
+					receivers_forShow += `${receiverData[i].fullName}(${receiverData[i].relation}) <${receiverData[i].emailAddress}>, `;
+					receivers_forSend.push({
+						email: receiverData[i].emailAddress,
+						receiverId: receiverData[i]._id,
+					});
+				}
+				//onsole.log(item)
+			});
+			//console.log(receivers_forSend);
+			//console.log(receivers_forShow.slice(0, -2))
+			setReceivers(receivers_forShow.slice(0, -2));
+			setReceiverList(receivers_forSend);
+			checkedIndex = [];
+			setIsModalVisible(false);
+		},
+		[receiverData],
+	);
 	// const onChangeCheckBox = useCallback((checkValue) => {
 	// 	console.log(checkValue);
 	// 	//const receiver = `${checkValue.fullName}(${checkValue.relation}) <${checkValue.email}>, `;
@@ -366,7 +367,13 @@ const MyWillDetail = () => {
 												receiverId: item.receiverId,
 											};
 											return (
-												<Checkbox value={receiverInfo} onChange={onChangeCheckBox} checked={bchecked} ref={checkBoxRef} index={i}>
+												<Checkbox
+													value={receiverInfo}
+													onChange={onChangeCheckBox}
+													checked={bchecked}
+													ref={checkBoxRef}
+													index={i}
+												>
 													<p>{`이름: ${item.fullName}`}</p>
 													<p>{`이메일: ${item.emailAddress}`}</p>
 													{/* <List.Item key={item._id}>
