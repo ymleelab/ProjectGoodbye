@@ -96,14 +96,6 @@ components:
                 type: string
                 description: '수신자 이메일'
     
-    UserDelete:
-      type: object
-      required:
-      - currentPassword
-      properties:
-        currentPassword:
-          type: string
-          example: "12345"
     WillPost:
       type: object
       required:
@@ -412,6 +404,17 @@ components:
       schema:
         $ref: "#/components/schemas/Obituary/properties/_id"
   requestBodies:
+    passwordReq:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - password
+            properties:
+              password:
+                $ref: "#/components/schemas/User/properties/password"
     commentReq:
       required: true
       content:
@@ -659,6 +662,21 @@ paths:
         200:
           description: 유저 정보 수정 성공
           $ref: "#/components/responses/userRes"
+    delete:
+      tags:
+      - Auth
+      security:
+      - bearerAuth: []
+      summary: 회원 탈퇴
+      description: 탈퇴하는 유저의 정보를 DB에서 삭제
+      parameters:
+      - $ref: "#/components/parameters/userIdParam"
+      requestBody:
+        $ref: "#/components/requestBodies/passwordReq"
+      responses:
+        200:
+          description: 회원 정보 삭제 성공
+          $ref: "#/components/responses/resultRes"
   /api/auth/{userId}/image:
     post:
       tags:

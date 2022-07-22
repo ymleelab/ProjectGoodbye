@@ -390,35 +390,8 @@ authRouter.post(
         }
     },
 );
+
 // 회원 탈퇴 api
-
-/**
- * @swagger
- * /api/auth/{userId}:
- *   delete:
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *         required: true
- *     security:
- *       - bearerAuth: []
- *     tags: [AuthUser]
- *     summary: 유저의 회원 탈퇴 시 사용하는 API
- *     description: 유저가 회원탈퇴 delete 요청 시, DB에 저장되어 있는 해당 유저 정보를 삭제하는 API
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/UserDelete'
- *     responses:
- *       200:
- *         description: result success as json
- *
- */
-
 authRouter.delete(
     '/:userId',
     async (req: Request, res: Response, next: NextFunction) => {
