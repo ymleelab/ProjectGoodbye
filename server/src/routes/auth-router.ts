@@ -494,31 +494,7 @@ authRouter.post(
         }
     },
 );
-/**
- * @swagger
- * /api/auth/{userId}/wills/{willId}:
- *   delete:
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *           required: true
- *       - in: path
- *         name: willId
- *         schema:
- *           type: string
- *           required: true
- *     security:
- *       - bearerAuth: []
- *     tags: [AuthWill]
- *     summary: 특정 유저의 특정 유언장을 삭제할 때 사용하는 API
- *     description: 유저가 유언장을 delete 요청시 유언장 정보를 삭제
- *     responses:
- *       200:
- *         description: result success as JSON
- *
- */
+
 authRouter.delete(
     '/:userId/wills/:willId',
     async (req: Request, res: Response, next: NextFunction) => {

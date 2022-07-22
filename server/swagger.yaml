@@ -878,6 +878,20 @@ paths:
         200:
           description: 하나의 유언장 데이터
           $ref: "#/components/responses/willRes"
+    delete:
+      tags:
+      - Wills
+      security:
+      - bearerAuth: []
+      summary: 유언장 삭제
+      description: 유언장 정보 DB에서 삭제
+      parameters:
+      - $ref: "#/components/parameters/userIdParam"
+      - $ref: "#/components/parameters/willIdParam"
+      responses:
+        200:
+          description: 유언장 삭제 성공
+          $ref: "#/components/responses/resultRes"
   /api/remembrances:
     get:
       tags:
