@@ -435,7 +435,8 @@ authRouter.patch(
                 secretKey,
             );
             const receivers = [email];
-            const homepage = 'http://localhost:3000';
+            // url link 에 포함될 homepage 변수 세팅
+            const homepage = process.env.HOMEPAGE;
             const subject = `Project Goodbye 서비스의 ${fullName}님이 고객님에게 관리자 역할을 요청하였습니다.`;
             const html = `<!DOCTYPE html>
             <html lang="en">
