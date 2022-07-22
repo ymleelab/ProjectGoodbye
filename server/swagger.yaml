@@ -31,22 +31,39 @@ components:
       properties:
         _id:
           type: string
+          description: "유저의 objectId"
+          example: "62ce0b33ae074e2a043f1d09"
         fullName:
           type: string
+          description: '유저 이름'
+          example: '김철수'
         email:
           type: string
+          description: "유저 이메일"
+          example: "email@email.com"
         dateOfBirth:
           type: string
+          description: "유저 생년월일"
+          example: "1997-06-23"
         password:
           type: string
+          description: "유저 비밀번호"
+          example: "abcde123"
         wills:
           type: array
+          items:
+            type: string
+            description: "유언장의 objectId"
+            example: "62cfdc9235dc3ae2670e05bd"
+          description: "유저가 작성한 유언장 리스트"
         receivers:
           type: array
-        createdAt:
-          type: string
-        updatedAt:
-          type: string
+          items:
+            type: string
+            description: "수신자의 objectId"
+            example: "62d0e380a665e5eb53d0a80f"
+          description: "유저가 작성한 유언장의 수신자 리스트"
+
     InputEmail:
       type: object
       required:
@@ -440,20 +457,15 @@ components:
               - dateOfBirth
             properties:
               fullName:
-                type: string
-                example: "Steve Baek"
+                $ref: "#/components/schemas/User/properties/fullName"
               email:
-                type: string
-                example: "email@email.com"
+                $ref: "#/components/schemas/User/properties/email"
               dateOfBirth:
-                type: string
-                example: "1997-06-23"
+                $ref: "#/components/schemas/User/properties/dateOfBirth"
               password:
-                type: string
-                example: "abcde123"
+                $ref: "#/components/schemas/User/properties/password"
               repeatPassword:
-                type: string
-                example: "abcde123"
+                $ref: "#/components/schemas/User/properties/password"
     commentReq:
       required: true
       content:
