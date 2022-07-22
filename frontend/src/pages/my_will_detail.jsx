@@ -71,8 +71,40 @@ const MyWillDetail = () => {
 			setIdParam(id);
 			setTitle(willList[0][id].title);
 			setContent(willList[0][id].content);
-			setReceivers(willList[0][id].receivers);
+			setReceiverList(willList[0][id].receivers);
 			setWillId(willList[0][id]._id);
+			console.log('1');
+			console.log(willList[0][id]);
+			console.log('2' + willList[0][id].receivers);
+
+			const token = sessionStorage.getItem('token');
+			const userId = sessionStorage.getItem('userId');
+			let receivers_forShow = '';
+
+			willList[0][id].receivers.map((item) => {
+				console.log(item.receiverId);
+				const receiverId = item.receiverId;
+
+				axios
+					.get(`/api/auth/${userId}/receivers/${receiverId}`, {
+						headers: {
+							Authorization: `Bearer ${token}`,
+						},
+					})
+					.then((res) => {
+						// dispatch(RECEIVERACTIONS.getReceivers({ lists: res.data }));
+						console.log(res.data);
+						//setReceiverData([...res.data]);
+						receivers_forShow += `${res.data.fullName}(${res.data.relation}) <${res.data.emailAddress}>, `;
+					})
+					.catch((err) => console.log(err))
+					.finally(() =>
+						setReceivers(receivers_forShow.slice(0, -2)),
+					);
+
+				//console.log('test' + receivers_forShow);
+				//setReceivers(receivers_forShow.slice(0, -2));
+			});
 		}
 	}, []);
 
@@ -152,7 +184,8 @@ const MyWillDetail = () => {
 	const RegisterForm = useCallback(() => {
 		const { userId, headerAuth } = getData();
 		const url = `/api/auth/${userId}/will`;
-		const data = { title, content, receiverList };
+		console.log({ receivers: receiverList });
+		const data = { title, content, receivers: receiverList };
 
 		axios
 			.post(url, data, headerAuth)
@@ -216,9 +249,10 @@ const MyWillDetail = () => {
 				}
 				//onsole.log(item)
 			});
-			//console.log(receivers_forSend);
+			console.log(receivers_forSend);
 			//console.log(receivers_forShow.slice(0, -2))
 			setReceivers(receivers_forShow.slice(0, -2));
+
 			setReceiverList(receivers_forSend);
 			checkedIndex = [];
 			setIsModalVisible(false);
@@ -249,6 +283,8 @@ const MyWillDetail = () => {
 
 	//유언장 수정
 	const ChangeForm = useCallback(() => {
+		const { userId, headerAuth } = getData();
+		const data = { title, content, receivers: receiverList };
 		const url = `/api/auth/${userId}/wills/${willId}`;
 
 		axios
@@ -519,6 +555,7 @@ const buttonWrapper = css`
 		width: 5rem;
 		padding: 10px;
 		border-radius: 0.2rem;
+		cursor: pointer;
 	}
 `;
 
