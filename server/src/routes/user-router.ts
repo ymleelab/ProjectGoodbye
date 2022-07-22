@@ -115,35 +115,6 @@ usersRouter.post(
 
 // email로 온 유언장을 열람했을 경우, 해당 유저의 유언장 안의 수신자 목록의 이메일과 일치하는지 확인 후, 열람이 되게 하는 API
 // 유언장 링크를 타고 열람을 하면, 모달 창 같은 방식으로 열람한 사람의 이메일 주소를 입력받게 함.
-
-/**
- * @swagger
- * /api/users/:willId:
- *   post:
- *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: willId
- *         schema:
- *           type: string
- *         required: true
- *     summary: 기본적인 willId 정보와 유언장을 열람하고자 하는 사람의 email주소를 받아서 willId의 receiver 등록 정보와 일치하는지 확인 후 그 유언장 정보를 반환하는 API
- *     description: willId로 유언장을 조회하여 유언장 정보에 있는 receivers 배열을 통하여 receivers의 이메일 주소들을 확인, 그 중에 body로 입력받은 이메일과 일치한다면 권한이 있는 것이므로 유언장 정보를 JSON으로 반환
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/InputEmail'
- *     responses:
- *       200:
- *         description: willId로 찾은 will을 JSON 형태로 반환
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *
- */
 usersRouter.post(
     '/:willId',
     async (req: Request, res: Response, next: NextFunction) => {

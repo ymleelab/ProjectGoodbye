@@ -38,27 +38,6 @@ const checkUserValidity = (req: Request, userId: string) => {
 };
 const authRouter = Router();
 
-/**
- * @swagger
- * /api/auth/{userId}:
- *   get:
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *         required: true
- *     security:
- *       - bearerAuth: []
- *     tags: [AuthUser]
- *     summary: 유저가 로그인이 되어있다면, 유저 정보를 반환하는 API
- *     description: 유저가 로그인이 되어있다면, 유저 정보를 반환 (jwt token 값이 올바르다면)
- *     responses:
- *       200:
- *         description: user as json
- *
- */
-
 authRouter.get(
     '/:userId',
     async (req: Request, res: Response, next: NextFunction) => {

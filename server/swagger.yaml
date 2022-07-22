@@ -416,6 +416,12 @@ components:
           description: '상주 이름'
           example: '홍철수'
   parameters:
+    userIdParam:
+      name: userId
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/User/properties/_id"
     willIdParam:
       name: willId
       in: path
@@ -642,6 +648,20 @@ paths:
         200:
           description: 수신자 확인 성공
           $ref: "#/components/responses/willRes"
+  /api/auth/{userId}:
+    get:
+      tags:
+      - Auth
+      security:
+      - bearerAuth: []
+      summary: 로그인한 유저의 정보 조회
+      description: 로그인한 유저의 JWT token을 이용해 인증 진행 후 유저 데이터 반환
+      parameters:
+      - $ref: "#/components/parameters/userIdParam"
+      responses:
+        200:
+          description: '로그인 유저 인증 성공'
+          $ref: "#/components/schemas/User"
   /api/remembrances:
     get:
       tags:
