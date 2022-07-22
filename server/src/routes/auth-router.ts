@@ -612,31 +612,6 @@ authRouter.post(
     },
 );
 
-/**
- * @swagger
- * /api/auth/{userId}/receivers/{receiverId}:
- *   delete:
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *           required: true
- *       - in: path
- *         name: receiverId
- *         schema:
- *           type: string
- *           required: true
- *     security:
- *       - bearerAuth: []
- *     tags: [AuthReceiver]
- *     summary: 특정 유저의 특정 수신자를 삭제할 때 사용하는 API
- *     description: 유저가 수신자를 delete 요청시 해당 수신자 정보를 삭제
- *     responses:
- *       200:
- *         description: result success as JSON
- *
- */
 authRouter.delete(
     '/:userId/receivers/:receiverId',
     async (req: Request, res: Response, next: NextFunction) => {
