@@ -106,10 +106,6 @@ authRouter.patch(
     },
 );
 
-/**
- * @swagger
-
- */
 // 이미지 등록
 authRouter.post(
     '/:userId/image',
@@ -130,41 +126,6 @@ authRouter.post(
     },
 );
 
-/**
- * @swagger
- * /api/auth/{userId}/image/{imageUrl}:
- *   delete:
- *     tags:
- *     - Images
- *     security:
- *       - bearerAuth: []
- *     summary: 유저 사진 삭제
- *     description: 사진을 AWS S3에서 삭제 후 유저 및 추모 데이터에 반영. 유저가 사진 정보를 지우고 싶을 때 사용.
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *           example: userId
- *         required: true
- *       - in: path
- *         name: imageUrl
- *         schema:
- *           type: string
- *           example: imageUrl
- *         required: true
- *     responses:
- *       201:
- *         description: 사진 삭제 성공
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 result:
- *                   type: string
- *                   example: 'success'
- */
 // 이미지 삭제
 authRouter.delete('/:userId/image/:imageUrl', async (req, res, next) => {
     try {

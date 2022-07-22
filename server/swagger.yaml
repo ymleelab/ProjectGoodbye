@@ -12,6 +12,8 @@ servers:
 tags:
   - name: Users
     description: '유저 관련 API'
+  - name: Auth
+    description: '인증된 유저 관련 API'
   - name: Remembrances
     description: '추모 관련 API'
   - name: Comments
@@ -679,7 +681,7 @@ paths:
   /api/auth/{userId}/image:
     post:
       tags:
-      - Images
+      - Auth
       security:
       - bearerAuth: []
       summary: 유저 사진 등록 - 신규 등록 및 변경
@@ -707,6 +709,26 @@ paths:
                   photo:
                     type: string
                     example: "https://d3vx2tv8yhh0mv.cloudfront.net/photo/1658392297366.jpg"
+  /api/auth/{userId}/image/{imageUrl}:
+    delete:
+      tags:
+      - Auth
+      security:
+      - bearerAuth: []
+      summary: 유저 사진 삭제
+      description: 사진을 AWS S3에서 삭제 후 유저 및 추모 데이터에 반영. 유저가 사진 정보를 지우고 싶을 때 사용.
+      parameters:
+      - $ref: "#/components/parameters/userIdParam"
+      - in: path
+        name: imageUrl
+        schema:
+          type: string
+          example: "https://d3vx2tv8yhh0mv.cloudfront.net/photo/1658392297366.jpg"
+          required: true
+      responses:
+        201:
+          description: 사진 삭제 성공
+          $ref: "#/components/responses/resultRes"
   /api/remembrances:
     get:
       tags:
