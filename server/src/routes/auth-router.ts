@@ -216,34 +216,9 @@ authRouter.patch(
         }
     },
 );
+
 // 자신이 유언장 전송 권한을 주고 싶은 email 주소를 입력하여서 그 이메일 주소를 trusted user 정보에 등록하고,
 // 그 이메일 주소로 서비스 관련 이메일 전송
-/**
- * @swagger
- * /api/auth/{userId}/trustedUser:
- *   patch:
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *         required: true
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             $ref: '#/components/schemas/TrustedUserInfo'
- *     tags: [AuthTrustAndManage]
- *     summary: 유저가 자신의 유언장 전송, 생사여부를 변경 가능 권한을 주고 싶은 사람의 이메일과 현재 자신 계정의 비밀번호를 입력하면, 해당 이메일 주소로 관련 내용의 이메일을 보내면서, 자신의 trustedUser 정보를 업데이트 하는 API
- *     description: 예를 들어서 유저 A가 B가 아들이어서 B에게 권한을 부여하기로 결정, B의 이메일 주소와 A 계정의 비밀번호를 확인 받고 A의 trustedUser 부분의 email부분이 아들 이메일로 등록됨, 아들은 ProjectGoodbye 서비스 관련 정보가 담긴 이메일을 받고, 이메일에는 링크등을 활용하여 신규유저인 경우 회원 가입, 기존 유저인 경우는 로그인을 해달라는 부탁을 받게 됨. 아직 HTML 부분은 API에서 크게 구현을 안했기 때문에 프론트 분들이 html을 이미 작성하신 양식이 있다면 비슷하게 작성해주시거나 같이 상의해보아요.
- *     responses:
- *       200:
- *         description: 수정된 A의 정보와 token값과 isUpdated값 as JSON
- *
- */
 authRouter.patch(
     '/:userId/trustedUser',
     async (req: Request, res: Response, next: NextFunction) => {
