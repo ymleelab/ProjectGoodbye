@@ -225,6 +225,7 @@ const MyWillDetail = () => {
 											};
 											return (
 												<Checkbox
+													key={`${item._id}+${i}`}
 													value={receiverInfo}
 													onChange={onChangeCheckBox}
 													index={i}
