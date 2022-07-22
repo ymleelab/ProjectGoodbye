@@ -50,28 +50,7 @@ usersRouter.post(
         }
     },
 );
-/**
- * @swagger
- * /api/users/login:
- *   post:
- *     tags: [Users]
- *     summary: 유저의 이메일 주소와 비밀번호로 유저를 로그인시키는 API
- *     description: 유저의 이메일 주소와 비밀번호를 Request Body로 받아서 유저를 로그인 - user의 JWT token을 생성 후 유저아이디, remembranceId와 함께 반환
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/UserLogin'
- *     responses:
- *       200:
- *         description: user token과 userId를 JSON 형태로 반환
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *
- */
+
 usersRouter.post(
     '/login',
     async (req: Request, res: Response, next: NextFunction) => {
