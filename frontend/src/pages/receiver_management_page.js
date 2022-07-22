@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useSelector, useDispatch } from 'react-redux';
 import { RECEIVERACTIONS } from '../reducers/receivers';
+import Router, { useRouter } from 'next/router';
 
 import 'antd/dist/antd.css';
 import { Divider, List, Modal } from 'antd';
@@ -13,6 +14,8 @@ import { Button } from '../util/common_styles';
 
 const receiver_page = () => {
 	const dispatch = useDispatch();
+	const router = useRouter();
+	const { logInState } = useSelector((state) => state.user);
 
 	/*
         리스트 등록하기와 각 리스트 별 정보수정 버튼을 눌렀을 때
@@ -35,6 +38,10 @@ const receiver_page = () => {
 	const inputEl = useRef(null);
 
 	useEffect(() => {
+		if (!logInState) {
+			alert('서비스를 이용하려면 로그인을 먼저 해주세요!');
+			Router.replace('/sign_in');
+		}
 		getReceiverList();
 	}, []);
 
