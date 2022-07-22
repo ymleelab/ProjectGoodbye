@@ -891,7 +891,6 @@ paths:
         200:
           description: 여러개의 유언장 정보
           $ref: "#/components/responses/willsRes"
-  /api/auth/{userId}/will:
     post:
       tags:
       - Wills
@@ -967,7 +966,6 @@ paths:
         200:
           description: 여러개의 수신자 데이터
           $ref: "#/components/responses/receiversRes"
-  /api/auth/{userId}/receiver:
     post:
       tags:
       - Receivers
