@@ -465,34 +465,9 @@ authRouter.get(
         }
     },
 );
-/**
- * @swagger
- * /api/auth/{userId}/will:
- *   post:
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *         required: true
- *     security:
- *       - bearerAuth: []
- *     tags: [AuthWill]
- *     summary: 특정 유저의 유언장을 DB에 등록할 때 사용하는 API
- *     description: 유저가 유언장을 post요청시 req.body의 title, content, receivers 정보를 사용, 새 유언장을 등록
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/WillPost'
- *     responses:
- *       200:
- *         description: Created Will as JSON
- *
- */
+
 authRouter.post(
-    '/:userId/will',
+    '/:userId/wills',
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { userId } = req.params;

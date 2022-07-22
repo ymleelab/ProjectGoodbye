@@ -86,7 +86,7 @@ components:
           type: string
           description: '유언장을 작성한 유저의 objectId'
           example: "62ce0b33ae074e2a043f1d09"
-        recevers:
+        receivers:
           type: array
           items:
             type: object
@@ -98,29 +98,6 @@ components:
                 type: string
                 description: '수신자 이메일'
     
-    WillPost:
-      type: object
-      required:
-      - title
-      - content
-      - receivers
-      properties:
-        title:
-          type: string
-          example: "어머니에게"
-        content:
-          type: string
-          example: "사랑하는 어머니에게..."
-        receivers:
-          type: array
-          items:
-            type: object
-            properties:
-              receiverId:
-                type: string
-              email:
-                type: string
-          example: [{receiverId, email}]
     ReceiverPost:
       type: object
       required:
@@ -417,6 +394,23 @@ components:
             properties:
               password:
                 $ref: "#/components/schemas/User/properties/password"
+    willReq:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - title
+              - content
+              - receivers
+            properties:
+              title:
+                $ref: "#/components/schemas/Will/properties/title"
+              content:
+                $ref: "#/components/schemas/Will/properties/content"
+              receivers:
+                $ref: "#/components/schemas/Will/properties/receivers"
     commentReq:
       required: true
       content:
@@ -854,6 +848,21 @@ paths:
         200:
           description: 여러개의 유언장 정보
           $ref: "#/components/responses/willsRes"
+    post:
+      tags:
+      - Wills
+      security:
+      - bearerAuth: []
+      summary: 유언장 작성
+      description: 제목, 내용, 수신자를 받아 유언장을 작성하고 DB에 저장
+      parameters:
+      - $ref: "#/components/parameters/userIdParam"
+      requestBody:
+        $ref: "#/components/requestBodies/willReq"
+      responses:
+        200:
+          description: 유언장 등록 성공
+          $ref: "#/components/schemas/Will"
   /api/auth/{userId}/wills/{willId}:
     get:
       tags:
