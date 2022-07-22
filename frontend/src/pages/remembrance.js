@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createContext, useRef } from "react";
+import React, { useState, useEffect, useCallback, createContext, useRef } from "react";
 import Router, { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
@@ -24,28 +24,50 @@ import Flower from '../assets/lily.svg';
 
 
 const CommentList = ({ comments, modal }) => {
+    
+    const handleOk = () => {
+        
+    }
+    
+    const handleCancel = () => {
+        console.log('확인')
+        setIsModalVisible(false);
+    }
+    
     return (
         <IconGroup>
             <IconComments>
                 {comments.map((comment, i) => {
+                    // const [isModalVisible, setIsModalVisible] = useState(null);
+                    const [inputVisible, setInputVisible] = useState(false);
+                    const [inputValue, setInputValue] = useState('');
+                    
                     return (
                         <FlowerIconDiv
                             key={`${i}+${comment.password}`}
                             onClick={() => {
-                                // console.log('테스트', modal)
                                 const modalData = {
                                     title: comment.title,
                                     content: (
                                         <>
-                                            {/* <ReachableContext.Consumer>{(name) => `Reachable: ${name}!`}</ReachableContext.Consumer>
-                                            <br />
-                                            <UnreachableContext.Consumer>{(name) => `Unreachable: ${name}!`}</UnreachableContext.Consumer> */}
                                             <p>{`작성자: ${comment.writer}`}</p>
                                             <p>{`내용: ${comment.content}`}</p>
+                                            {inputVisible ?
+                                                <>
+                                                    <Input 
+                                                        placeholder="제거 하려면 비밀번호를 입력하세요."
+                                                        value={inputValue}  
+                                                        onChange={(e) => setInputValue(e.target.value)}      
+                                                    />
+                                                    <Button onClick={() => deleteComment(comment, inputValue)}>입력</Button>
+                                                </> :
+                                                <Button onClick={() => setInputVisible(true)}>댓글 제거하기</Button>
+                                            }
                                         </>
-                                    )
+                                    ),
                                 }
-                                console.log(modalData);       
+                                // console.log(inputVisible);
+                                // console.log(modalData, comment);       
                                 modal.info(modalData);
                             }}
                         >
@@ -57,6 +79,19 @@ const CommentList = ({ comments, modal }) => {
     )
 }
 
+const deleteComment = async (commentData, password) => {
+    const {commentId, remembranceId} = commentData;
+    console.log(commentData, password);
+    try {
+        const res = 
+                await axios.delete(`/api/remembrances/${remembranceId}/comments/${commentId}`, {
+                    data: { password: commentData.password }
+                });
+        console.log(res);
+    } catch(err) {
+        console.log(err.response.data.reason);
+    }
+}
 
 const handlerFormClear = (formRef) => {
     formRef.current.setFieldsValue({
@@ -139,13 +174,15 @@ const remembrance = () => {
         try {
 
             comments.forEach(async (comment) => {
-                const res = await axios.get(`/api/remembrances/${remembranceId}/comments/${comment._id  }`);
+                const res = await axios.get(`/api/remembrances/${remembranceId}/comments/${comment._id}`);
                 console.log(res);
                 const data = {
                     writer: comment.writer,
                     title: comment.title,
                     content: comment.content,
-                    password: comment.password
+                    password: comment.password,
+                    commentId: comment._id,
+                    remembranceId
                 }
                 setComments((prev) => [...prev, data]);
             })
@@ -261,13 +298,6 @@ const remembrance = () => {
                     <Portrait>
                         <Frame>
                             <FrameImages>
-                                {/* <Image
-                                    src="https://images.unsplash.com/photo-1516967124798-10656f7dca28?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8d2FybSUyMGhlYXJ0fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=600&q=60"
-                                    alt="테스트 사진"
-                                    width={150}
-                                    height={150}
-                                    priority
-                                /> */}
                                 <TbRectangleVertical className={'frame_svg'} />
                                 <img src={userData.photo} />
                             </FrameImages>
@@ -286,6 +316,11 @@ const remembrance = () => {
                         </Decorator>
                     </Portrait>
                     {comments.length > 0 &&
+                        // <CommentList comments={comments} />
+                        // <Modal title="Basic Modal" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+                        //     <p>{`작성자: ${comment.writer}`}</p>
+                        //     <p>{`내용: ${comment.content}`}</p>
+                        // </Modal>
                         <ReachableContext.Provider value="Light">
                             <CommentList comments={comments} modal={modal} />
                             {contextHolder}

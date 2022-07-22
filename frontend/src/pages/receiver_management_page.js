@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RECEIVERACTIONS } from "../reducers/receivers";
 
 import 'antd/dist/antd.css';
-import { Divider, List, Modal } from 'antd';
+import { Divider, List, Modal, Input } from 'antd';
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 
@@ -34,7 +34,7 @@ const receiver_page = () => {
         name: '',
         email: '',
         relation: '',
-        receiverId: ''
+        receiverId: '',
     })
     const inputEl = useRef(null);
 
@@ -65,7 +65,7 @@ const receiver_page = () => {
     }
 
     const handleInputValues = (e) => {
-        console.log(e.target.name);        
+        console.log(e.target.name, e.target.value);        
         setInputValues((prev) => {
             return {
                 ...prev,
@@ -109,7 +109,7 @@ const receiver_page = () => {
         const submitData = new FormData(e.target);
         const fullName = submitData.get('name');
         const emailAddress = submitData.get('email');
-        const relation = submitData.get('input_relation');
+        const relation = submitData.get('relation');
         // console.log(data.get('name'), data.get('input_relation'));
         axios.post(`/api/auth/${userId}/receiver`, {
             fullName,
@@ -169,6 +169,14 @@ const receiver_page = () => {
     }
 
     const handleRegisterInfo = () => {
+       // 비우기
+       setInputValues({
+            name: '',
+            email: '',
+            relation: '',
+            receiverId: '',
+       });
+
         setRegistFormVisible(true);
         setModalSubmitMode('registerInfo');
     }
@@ -195,9 +203,11 @@ const receiver_page = () => {
 
     return (
         <AppLayout>
-            <Button type='button'
-                onClick={handleRegisterInfo}
-            >리스트 등록하기</Button>
+            <ButtonWrapper>
+                <Button type='button'
+                    onClick={handleRegisterInfo}
+                >리스트 등록하기</Button>
+            </ButtonWrapper>
             {registFormVisible &&
                 <Modal
                     title="registerForm"
@@ -216,7 +226,7 @@ const receiver_page = () => {
                     <form id='registerForm' onSubmit={onSubmitRegistForm}>
                         <div>
                             <label htmlFor='name'>이름:
-                                <input
+                                <Input
                                     name='name'
                                     onChange={handleInputValues}
                                     value={InputValues.name}
@@ -225,13 +235,12 @@ const receiver_page = () => {
                         </div>
                         <div>
                             <label htmlFor='email'>이메일:
-                                <input
+                                <Input
                                     name='email'
                                     onChange={handleInputValues}
                                     value={InputValues.email}
                                 />
                             </label>
-                            <Button type='button'>이메일 중복 확인</Button>
                         </div>
                         <div>
                             <label htmlFor='relation'>관계:
@@ -243,8 +252,8 @@ const receiver_page = () => {
                                     <option value="지인">지인</option>
                                     <option value="typing">직접입력</option>
                                 </select>
-                                <input 
-                                    name='input_relation'
+                                <Input 
+                                    name='relation'
                                     ref={inputEl}
                                     onChange={handleInputValues}
                                     value={InputValues.relation}
@@ -343,5 +352,15 @@ const ButtonGroup = styled.div`
     right: 10px;
     & button:first-of-type {
         margin-right: 10px;
+    }
+`
+
+const ButtonWrapper = styled.div`
+    position: relative;
+    height: 70px;
+    & > button {
+        position: absolute;
+        right: 85px;
+        bottom: 0;
     }
 `

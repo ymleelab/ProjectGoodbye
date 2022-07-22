@@ -7,6 +7,7 @@ const nextConfig = {
 			'basicincomekorea.org',
 			'media.istockphoto.com',
 			'd3vx2tv8yhh0mv.cloudfront.net',
+			'www.pexels.com'
 		],
 	},
 	async rewrites() {
