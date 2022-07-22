@@ -34,7 +34,10 @@ const SignIn = () => {
 				if (res.data.token) {
 					sessionStorage.setItem('token', res.data.token);
 					sessionStorage.setItem('userId', res.data.userId);
-					sessionStorage.setItem('remembranceId', res.data.remembranceId);
+					sessionStorage.setItem(
+						'remembranceId',
+						res.data.remembranceId,
+					);
 					// const { token, userId } = res.data;
 					// console.log(res, res.data, fullName);
 					Router.replace(redirectUrl);
