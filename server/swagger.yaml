@@ -878,6 +878,22 @@ paths:
         200:
           description: 하나의 유언장 데이터
           $ref: "#/components/responses/willRes"
+    patch:
+      tags:
+      - Wills
+      security:
+      - bearerAuth: []
+      summary: 유언장 수정
+      description: 로그인한 유저의 특정 유언장 수정
+      parameters:
+      - $ref: "#/components/parameters/userIdParam"
+      - $ref: "#/components/parameters/willIdParam"
+      requestBody:
+        $ref: "#/components/requestBodies/willReq"
+      responses:
+        200:
+          description: 유언장 수정 성공
+          $ref: "#/components/responses/willRes"
     delete:
       tags:
       - Wills

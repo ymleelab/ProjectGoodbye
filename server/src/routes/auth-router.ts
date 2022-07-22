@@ -516,37 +516,6 @@ authRouter.delete(
     },
 );
 
-/**
- * @swagger
- * /api/auth/{userId}/wills/{willId}:
- *   patch:
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *           required: true
- *       - in: path
- *         name: willId
- *         schema:
- *           type: string
- *           required: true
- *     security:
- *       - bearerAuth: []
- *     tags: [AuthWill]
- *     summary: 특정 유저의 특정 유언장을 수정할 때 사용하는 API
- *     description: 유저가 유언장을 patch 요청시 req.body의 title, content, receivers 정보를 사용, 유언장 정보를 수정
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/WillPost'
- *     responses:
- *       200:
- *         description: Updated Will as JSON
- *
- */
 authRouter.patch(
     '/:userId/wills/:willId',
     async (req: Request, res: Response, next: NextFunction) => {
