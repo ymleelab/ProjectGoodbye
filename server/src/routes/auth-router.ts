@@ -52,37 +52,6 @@ authRouter.get(
     },
 );
 
-/**
- * @swagger
- * /api/auth/{userId}:
- *   patch:
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *         required: true
- *     security:
- *       - bearerAuth: []
- *     tags: [AuthUser]
- *     summary: 유저의 회원 정보 수정 시 사용하는 API
- *     description: 유저가 회원가입 post요청 시, currentPassword로 password 확인 후 관련된 정보 들을 req.body로 받아 유저 정보 수정하는 API
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             $ref: '#/components/schemas/UserUpdate'
- *     responses:
- *       200:
- *         description: Updated User as JSON
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/User'
- *
- */
-
 authRouter.patch(
     '/:userId',
     async (req: Request, res: Response, next: NextFunction) => {
@@ -124,6 +93,10 @@ authRouter.patch(
                 userInfoRequired,
                 toUpdate,
             );
+
+            // 비밀번호를 제외한 데이터를 추모에도 반영
+            delete toUpdate.password;
+            await remembranceService.setRemembrance(userId, toUpdate);
 
             // 업데이트 이후의 유저 데이터를 프론트에 보내 줌
             res.status(200).json(updatedUserInfo);

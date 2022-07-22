@@ -110,23 +110,6 @@ components:
         dateOfDeath:
           type: string
           example: "2022-07-20"
-    UserUpdate:
-      type: object
-      required:
-      - currentPassword
-      properties:
-        fullName:
-          type: string
-          example: "Steve Baek"
-        dateOfBirth:
-          type: string
-          example: "970623"
-        password:
-          type: string
-          example: "12345"
-        currentPassword:
-          type: string
-          example: "12345"
     TrustedUserInfo:
       type: object
       required:
@@ -661,7 +644,38 @@ paths:
       responses:
         200:
           description: '로그인 유저 인증 성공'
-          $ref: "#/components/schemas/User"
+          $ref: "#/components/responses/userRes"
+    patch:
+      tags:
+      - Auth
+      security:
+      - bearerAuth: []
+      summary: 유저 정보 수정
+      description: 수정될 유저 데이터와 현재 비밀번호를 입력 받아 유저 정보 수정, 추모 데이터에 반영
+      parameters:
+      - $ref: "#/components/parameters/userIdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - currentPassword
+              properties:
+                fullName:
+                  $ref: "#/components/schemas/User/properties/fullName"
+                dateOfBirth:
+                  $ref: "#/components/schemas/User/properties/dateOfBirth"
+                password:
+                  description: "유저의 새 비밀번호"
+                  $ref: "#/components/schemas/User/properties/password"
+                currentPassword:
+                  $ref: "#/components/schemas/User/properties/password"
+      responses:
+        200:
+          description: 유저 정보 수정 성공
+          $ref: "#/components/responses/userRes"
   /api/remembrances:
     get:
       tags:
