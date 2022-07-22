@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { useSelector, useDispatch } from "react-redux";
-import { RECEIVERACTIONS } from "../reducers/receivers";
+import { useSelector, useDispatch } from 'react-redux';
+import { RECEIVERACTIONS } from '../reducers/receivers';
+import Router, { useRouter } from 'next/router';
 
 import 'antd/dist/antd.css';
 import { Divider, List, Modal, Input } from 'antd';
@@ -12,22 +13,20 @@ import AppLayout from '../components/AppLayout';
 import { Button } from '../util/common_styles';
 
 const receiver_page = () => {
-    const dispatch = useDispatch();
+	const dispatch = useDispatch();
+	const router = useRouter();
+	const { logInState } = useSelector((state) => state.user);
 
-    /*
+	/*
         리스트 등록하기와 각 리스트 별 정보수정 버튼을 눌렀을 때
         submit에 따른 API 통신을 분기해주기 위함
     */
-    const [modalSubmitMode, setModalSubmitMode] = useState(null);
+	const [modalSubmitMode, setModalSubmitMode] = useState(null);
 
-    const {
-        familyList,
-        friendList,
-        relativeList,
-        acquaintanceList
-    } = useSelector(state => state.receivers);
-    const [registFormVisible, setRegistFormVisible] = useState(false);
-    // const [relationValue, setRelationValue] = useState('');
+	const { familyList, friendList, relativeList, acquaintanceList } =
+		useSelector((state) => state.receivers);
+	const [registFormVisible, setRegistFormVisible] = useState(false);
+	// const [relationValue, setRelationValue] = useState('');
 
     // 구지 할 필요 없을 듯?!
     const [InputValues, setInputValues] = useState({
@@ -38,69 +37,101 @@ const receiver_page = () => {
     })
     const inputEl = useRef(null);
 
+	useEffect(() => {
+		if (!logInState) {
+			alert('서비스를 이용하려면 로그인을 먼저 해주세요!');
+			Router.replace('/sign_in');
+		}
+		getReceiverList();
+	}, []);
 
-    useEffect(() => {
-        getReceiverList();
-    }, [])
+	const handleCancel = () => {
+		setRegistFormVisible(false);
+	};
 
-    const handleCancel = () => {
-        setRegistFormVisible(false);
-    }
+	const handleSelect = (e) => {
+		const selection = e.target.value;
+		setInputValues((prev) => {
+			if (selection === 'typing') {
+				inputEl.current.focus();
+				return {
+					...prev,
+					relation: '',
+				};
+			}
+			return {
+				...prev,
+				relation: selection,
+			};
+		});
+	};
 
-    const handleSelect = (e) => {
-        const selection = e.target.value;
-        setInputValues((prev) => {
-            if (selection === 'typing') {
-                inputEl.current.focus();
-                return {
-                    ...prev,
-                    relation: '',
-                };
-            }
-            return {
-                ...prev,
-                relation: selection
-            };
-        })
-    }
+	const handleInputValues = (e) => {
+		console.log(e.target.name);
+		setInputValues((prev) => {
+			return {
+				...prev,
+				[e.target.name]: e.target.value,
+			};
+		});
+	};
 
-    const handleInputValues = (e) => {
-        console.log(e.target.name, e.target.value);        
-        setInputValues((prev) => {
-            return {
-                ...prev,
-                [e.target.name]: e.target.value
-            };
-        })
-    }
+	// 리스트 불러오기
+	const getReceiverList = () => {
+		const token = sessionStorage.getItem('token');
+		const userId = sessionStorage.getItem('userId');
+		axios
+			.get(`/api/auth/${userId}/receivers`, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			})
+			.then((res) => {
+				dispatch(RECEIVERACTIONS.getReceivers({ lists: res.data }));
+			})
+			.catch((err) => console.log(err));
+	};
 
-    // const onChangeInput = (e) => {
-    //     setRelationValue(e.target.value);
-    // }
-
-
-    // 리스트 불러오기
-    const getReceiverList = () => {
-        const token = sessionStorage.getItem('token');
-        const userId = sessionStorage.getItem('userId');
-        axios.get(`/api/auth/${userId}/receivers`, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        }).then(res => {
-            dispatch(RECEIVERACTIONS.getReceivers({ lists: res.data }));
-        }).catch(err => console.log(err));
-    }
+	const onSubmitRegistForm = (e) => {
+		e.preventDefault();
+		if (modalSubmitMode === 'registerInfo') {
+			registerReciver(e);
+		} else {
+			changeReciver();
+		}
+	};
 
 
-    const onSubmitRegistForm = (e) => {
-        e.preventDefault();
-        if (modalSubmitMode === 'registerInfo') {
-            registerReciver(e);
-        } else {
-            changeReciver();
-        }
-    }
+	// 리스트 수정하기
+	const changeReciver = (e) => {
+		const token = sessionStorage.getItem('token');
+		const userId = sessionStorage.getItem('userId');
+		const { name, email, relation, receiverId } = InputValues;
+		axios
+			.patch(
+				`/api/auth/${userId}/receivers/${receiverId}`,
+				{
+					fullName: name,
+					emailAddress: email,
+					userId,
+					relation: relation,
+					role: 'user',
+				},
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				},
+			)
+			.then((res) => {
+				console.log(res);
+				alert('변경되었습니다!');
+				getReceiverList();
+				setRegistFormVisible(false);
+			})
+			.catch((err) => console.log(err));
+	};
+
 
     // 리스트 등록하기
     const registerReciver = (e) => {
@@ -124,30 +155,6 @@ const receiver_page = () => {
         }).then(res => {
             console.log(res);
             alert('등록되었습니다!');
-            getReceiverList();
-            setRegistFormVisible(false);
-        }).catch(err => console.log(err));
-    }
-
-
-    // 리스트 수정하기
-    const changeReciver = (e) => {
-        const token = sessionStorage.getItem('token');
-        const userId = sessionStorage.getItem('userId');
-        const {name, email, relation, receiverId} = InputValues;
-        axios.patch(`/api/auth/${userId}/receivers/${receiverId}`, {
-            fullName: name,
-            emailAddress: email,
-            userId,
-            relation: relation,
-            role: 'user'
-        }, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        }).then(res => {
-            console.log(res);
-            alert('변경되었습니다!');
             getReceiverList();
             setRegistFormVisible(false);
         }).catch(err => console.log(err));
@@ -334,17 +341,17 @@ const receiver_page = () => {
 export default receiver_page;
 
 const listStyle = css`
-    width: 80%;
-    margin: auto;
-`
+	width: 80%;
+	margin: auto;
+`;
 
 const listItemStyle = css`
-    position: relative;
-    justify-content: start;
-    span: first-of-type {
-        margin-right: 10rem;
-    }
-`
+	position: relative;
+	justify-content: start;
+	span: first-of-type {
+		margin-right: 10rem;
+	}
+`;
 
 const ButtonGroup = styled.div`
     display: inline-block;
