@@ -14,6 +14,8 @@ tags:
     description: '유저 관련 API'
   - name: Auth
     description: '인증된 유저 관련 API'
+  - name: Wills
+    description: '유언장 관련 API'
   - name: Remembrances
     description: '추모 관련 API'
   - name: Comments
@@ -452,6 +454,18 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Will"
+    willsRes:
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/Will"
+    remembranceRes:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/RemembranceWithCommentId"
     remembrancesRes:
       content:
         application/json:
@@ -459,11 +473,6 @@ components:
             type: array
             items:
               $ref: "#/components/schemas/RemembranceWithCommentId"
-    remembranceRes:
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/RemembranceWithCommentId"
     remembranceWithCommentsRes:
       content:
         application/json:
@@ -830,6 +839,22 @@ paths:
         200:
           description: 사망 처리 성공
           $ref: "#/components/responses/resultRes"
+
+  /api/auth/{userId}/wills:
+    get:
+      tags:
+      - Wills
+      security:
+      - bearerAuth: []
+      summary: 유언장 전체 조회
+      description: 로그인한 유저가 작성한 모든 유언장 전달
+      parameters:
+      - $ref: "#/components/parameters/userIdParam"
+      responses:
+        200:
+          description: 여러개의 유언장 정보
+          $ref: "#/components/responses/willsRes"
+
   /api/remembrances:
     get:
       tags:

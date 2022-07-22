@@ -438,27 +438,6 @@ authRouter.delete(
 
 // authrouter- will post, get, patch, delete
 
-/**
- * @swagger
- * /api/auth/{userId}/wills:
- *   get:
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *         required: true
- *     security:
- *       - bearerAuth: []
- *     tags: [AuthWill]
- *     summary: 유저의 유언장 리스트를 불러오는 API
- *     description: 유저의 uri의 유저 아이디를 통하여 해당 유저의 유언장 리스트를 불러오는 API
- *     responses:
- *       200:
- *         description: Will list as JSON
- *
- */
-
 authRouter.get(
     '/:userId/wills',
     async (req: Request, res: Response, next: NextFunction) => {
