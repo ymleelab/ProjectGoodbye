@@ -452,32 +452,6 @@ authRouter.get(
     },
 );
 
-/**
- * @swagger
- * /api/auth/{userId}/wills/{willId}:
- *   get:
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *         required: true
- *       - in: path
- *         name: willId
- *         schema:
- *           type: string
- *         required: true
- *     security:
- *       - bearerAuth: []
- *     tags: [AuthWill]
- *     summary: 유저의 유언장 아이디로 해당 유언장을 불러오는 API
- *     description: 유저의 uri의 유저 아이디와 유언장 아이디를 통하여 해당 유언장을 불러오는 API
- *     responses:
- *       200:
- *         description: Will as JSON
- *
- */
-
 authRouter.get(
     '/:userId/wills/:willId',
     async (req: Request, res: Response, next: NextFunction) => {
