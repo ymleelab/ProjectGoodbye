@@ -49,8 +49,6 @@ const MyWillDetail = () => {
 				},
 			})
 			.then((res) => {
-				// dispatch(RECEIVERACTIONS.getReceivers({ lists: res.data }));
-				//console.log(res.data);
 				setReceiverData([...res.data]);
 			})
 			.catch((err) => console.log(err));
@@ -58,7 +56,6 @@ const MyWillDetail = () => {
 
 	useEffect(() => {
 		if (!router.isReady) return;
-		//console.log(logInState);
 		if (logInState === null) return;
 		if (!logInState) {
 			alert('서비스를 이용하려면 로그인을 먼저 해주세요!');
@@ -79,7 +76,6 @@ const MyWillDetail = () => {
 			let receivers_forShow = '';
 
 			willList[0][id].receivers.map((item) => {
-				//console.log(item.receiverId);
 				const receiverId = item.receiverId;
 
 				axios
@@ -89,9 +85,6 @@ const MyWillDetail = () => {
 						},
 					})
 					.then((res) => {
-						// dispatch(RECEIVERACTIONS.getReceivers({ lists: res.data }));
-						//console.log(res.data);
-						//setReceiverData([...res.data]);
 						receivers_forShow += `${res.data.fullName}(${res.data.relation}) <${res.data.emailAddress}>, `;
 					})
 					.catch((err) => console.log(err))
@@ -118,7 +111,6 @@ const MyWillDetail = () => {
 	const RegisterForm = useCallback(() => {
 		const { userId, headerAuth } = getData();
 		const url = `/api/auth/${userId}/will`;
-		console.log({ receivers: receiverList });
 		const data = { title, content, receivers: receiverList };
 
 		axios
@@ -148,7 +140,6 @@ const MyWillDetail = () => {
 
 			receiverData.map((item, i) => {
 				if (checkedIndex.indexOf(i) > -1) {
-					console.log('here');
 					receivers_forShow += `${receiverData[i].fullName}(${receiverData[i].relation}) <${receiverData[i].emailAddress}>, `;
 					receivers_forSend.push({
 						email: receiverData[i].emailAddress,
@@ -156,7 +147,6 @@ const MyWillDetail = () => {
 					});
 				}
 			});
-			//console.log(receivers_forSend);
 			setReceivers(receivers_forShow.slice(0, -2));
 			setReceiverList(receivers_forSend);
 			checkedIndex = [];
@@ -216,7 +206,6 @@ const MyWillDetail = () => {
 										itemKey="receiver_list"
 									>
 										{(item, i) => {
-											//console.log(item);
 											const receiverInfo = {
 												fullName: item.fullName,
 												relation: item.relation,

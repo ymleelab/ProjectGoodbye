@@ -19,7 +19,6 @@ const Home = () => {
   const getRecentRBData = async () => {
     try {
       const res = await axios.get(`/api/remembrances/recent?count=6`);
-      console.log(res);
       setCurrentRB([...res.data])
     } catch (error) {
       console.log(error);
