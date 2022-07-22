@@ -564,31 +564,7 @@ authRouter.get(
         }
     },
 );
-/**
- * @swagger
- * /api/auth/{userId}/receivers/{receiverId}:
- *   get:
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *         required: true
- *       - in: path
- *         name: receiverId
- *         schema:
- *           type: string
- *         required: true
- *     security:
- *       - bearerAuth: []
- *     tags: [AuthReceiver]
- *     summary: 유저의 수신자 아이디로 해당 수신자 정보를 불러오는 API
- *     description: 유저의 uri의 유저 아이디와 수신자 아이디를 통하여 해당 수신자 정보를 불러오는 API
- *     responses:
- *       200:
- *         description: Receiver as JSON
- *
- */
+
 authRouter.get(
     '/:userId/receivers/:receiverId',
     async (req: Request, res: Response, next: NextFunction) => {

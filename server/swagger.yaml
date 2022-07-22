@@ -389,6 +389,12 @@ components:
       required: true
       schema:
         $ref: "#/components/schemas/Will/properties/_id"
+    receiverIdParam:
+      name: receiverId
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/Receiver/properties/_id"
     remembranceIdParam:
       name: remembranceId
       in: path
@@ -480,6 +486,11 @@ components:
             type: array
             items:
               $ref: "#/components/schemas/Will"
+    receiverRes:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Receiver"
     receiversRes:
       content:
         application/json:
@@ -955,7 +966,22 @@ paths:
         200:
           description: 여러개의 수신자 데이터
           $ref: "#/components/responses/receiversRes"
-          
+  /api/auth/{userId}/receivers/{receiverId}:
+    get:
+      tags:
+      - Receivers
+      security:
+      - bearerAuth: []
+      summary: 특정 수신자 조회
+      description: receiverId로 특정 수신자의 정보 전달
+      parameters:
+      - $ref: "#/components/parameters/userIdParam"
+      - $ref: "#/components/parameters/receiverIdParam"
+      responses:
+        200:
+          description: 하나의 수신자 데이터
+          $ref: "#/components/responses/receiverRes"
+
   /api/remembrances:
     get:
       tags:
