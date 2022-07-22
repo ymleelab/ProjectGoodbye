@@ -160,31 +160,6 @@ authRouter.delete('/:userId/image/:imageUrl', async (req, res, next) => {
 // confirmed란 사실과 trustedUser의 아이디를 추가.
 
 ///  이메일을 받은 사람이 유언장 발송 권한을 confirm하기전에 query로 받아온 정보로 managedUsers에 추가하는 api
-/**
- * @swagger
- * /api/auth/{userId}/confirmation:
- *   patch:
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *         required: true
- *       - in: query
- *         name: token
- *         schema:
- *           type: string
- *           required: true
- *     security:
- *       - bearerAuth: []
- *     tags: [AuthTrustAndManage]
- *     summary: 유저에게서 이메일을 받아서 trusted user가 된 사람이 로그인 혹은 회원 가입 후, url query에서 받은 토큰정보로 managedUsers와 trustedUser 정보를 업데이트 하는 API
- *     description: 예를 들어서 유저 A가 B가 아들이어서 trusted user로 아들 이메일을 등록, 관련 이메일을 받은 아들 B가 메일의 링크를 따라서 회원가입 후 로그인을 하면 신뢰받는 유저로 등록. A의 trusted user정보에 B 정보가 들어가고, B managedUsers에 A 정보가 추가됨.
- *     responses:
- *       200:
- *         description: mainUserInfo (A), trustedUserInfo (B) as JSON
- *
- */
 // homepage/accept?token 부분에 사용하면 될 것 같음.
 authRouter.patch(
     '/:userId/confirmation',

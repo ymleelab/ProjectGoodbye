@@ -633,6 +633,7 @@ paths:
         200:
           description: 수신자 확인 성공
           $ref: "#/components/responses/willRes"
+
   /api/auth/{userId}:
     get:
       tags:
@@ -729,6 +730,36 @@ paths:
         201:
           description: 사진 삭제 성공
           $ref: "#/components/responses/resultRes"
+  /api/auth/{userId}/confirmation:
+    patch:
+      tags:
+      - Auth
+      security:
+      - bearerAuth: []
+      summary: 로그인 유저가 자신을 신뢰하는 유저로 등록하는 것을 수락
+      description: 유저 로그인 시 신뢰하는 유저 등록을 수락하는 것으로 간주. 로그인한 유저의 managedUser에 요청 유저 정보 저장, 요청 유저의 trusedUser에 로그인한 유저 정보 저장
+      parameters:
+      - $ref: "#/components/parameters/userIdParam"
+      - in: query
+        name: token
+        schema:
+          type: string
+          description: 요청한 유저와 요청 받은 유저의 정보가 담긴 토큰
+        required: true
+      responses:
+        200:
+          description: 신뢰하는 유저 등록 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mainUserInfo:
+                    $ref: "#/components/responses/userRes"
+                    description: '요청한 유저의 정보'
+                  toUpdateTrustedUser:
+                    $ref: "#/components/responses/userRes"
+                    description: '요청 받은(현재 로그인된) 유저의 정보'
   /api/remembrances:
     get:
       tags:
