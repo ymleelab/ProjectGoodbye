@@ -399,7 +399,7 @@ authRouter.delete(
         try {
             const { userId } = req.params;
             checkUserValidity(req, userId);
-            const { currentPassword } = req.body;
+            const currentPassword = req.get('password');
             if (!currentPassword) {
                 throw new Error(
                     '정보를 변경하려면, 현재의 비밀번호가 필요합니다.',
