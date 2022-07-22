@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -17,7 +18,12 @@ import { passportConfiguration, JWTConfiguration } from './services';
 import { loginRequired, errorHandler, notFoundHandler } from './middlewares';
 // import { swaggerSpecs } from '../swagger';
 
+const PORT = process.env.SERVER_PORT || 5000;
+
 const app = express();
+app.listen(PORT, () => {
+    console.log(`정상적으로 서버를 시작하였습니다.  http://localhost:${PORT}`);
+});
 
 // cors error
 app.use(cors());
