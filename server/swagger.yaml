@@ -1,7 +1,7 @@
 openapi: '3.0.0'
 
 info:
-  title: 'Project Good-Bye'
+  title: 'Project GoodBye'
   version: '1.0.0'
   description: '온라인 유언장 서비스 API Docs'
 
@@ -10,6 +10,8 @@ servers:
 - url: http://kdt-sw2-seoul-team11.elicecoding.com:5000
 
 tags:
+  - name: Users
+    description: '유저 관련 API'
   - name: Remembrances
     description: '추모 관련 API'
   - name: Comments
@@ -18,7 +20,155 @@ tags:
     description: '부고 관련 API'
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+        fullName:
+          type: string
+        email:
+          type: string
+        dateOfBirth:
+          type: string
+        password:
+          type: string
+        wills:
+          type: array
+        receivers:
+          type: array
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    InputEmail:
+      type: object
+      required:
+      - email
+      properties:
+        email:
+          type: string
+          example: "email@email.com"
+    UserDelete:
+      type: object
+      required:
+      - currentPassword
+      properties:
+        currentPassword:
+          type: string
+          example: "12345"
+    ConfirmDeath:
+      type: object
+      required:
+      - dateOfDeath
+      properties:
+        dateOfDeath:
+          type: string
+          example: "2022-07-20"
+    UserUpdate:
+      type: object
+      required:
+      - currentPassword
+      properties:
+        fullName:
+          type: string
+          example: "Steve Baek"
+        dateOfBirth:
+          type: string
+          example: "970623"
+        password:
+          type: string
+          example: "12345"
+        currentPassword:
+          type: string
+          example: "12345"
+    Email:
+      type: object
+      required:
+        - receivers
+        - subject
+        - html
+      properties:
+        receivers:
+          type: array
+          items:
+            type: string
+          example: ["email@email.com","example@email.com"]
+        subject:
+          type: string
+          example: "Hello"
+        html:
+          type: string
+          example: "<h1>Hello world</h1>"
+    TrustedUserInfo:
+      type: object
+      required:
+      - email
+      - currentPassword
+      properties:
+        email:
+          type: string
+          example: "example@email.com"
+        currentPassword:
+          type: string
+          example: '12345678'
+    UserLogin:
+      type: object
+      required:
+      - email
+      - password
+      properties:
+        email:
+          type: string
+          example: "email@email.com"
+        password:
+          type: string
+          example: "12345"
+    WillPost:
+      type: object
+      required:
+      - title
+      - content
+      - receivers
+      properties:
+        title:
+          type: string
+          example: "어머니에게"
+        content:
+          type: string
+          example: "사랑하는 어머니에게..."
+        receivers:
+          type: array
+          items:
+            type: object
+            properties:
+              receiverId:
+                type: string
+              email:
+                type: string
+          example: [{receiverId, email}]
+    ReceiverPost:
+      type: object
+      required:
+      - fullName
+      - emailAddress
+      - relation
+      properties:
+        fullName:
+          type: string
+          example: "홍길동"
+        emailAddress:
+          type: string
+          example: "hong@email.com"
+        relation:
+          type: string
+          example: "brother"
     Remembrance:
       type: object
       required:
@@ -200,7 +350,7 @@ components:
     ObituaryUpdate:
       type: object
       required:
-        - password
+      - password
       properties:
         deceased:
           type: string
@@ -276,6 +426,34 @@ components:
       schema:
         $ref: "#/components/schemas/Obituary/properties/_id"
   requestBodies:
+    userRegister:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - fullName
+              - email
+              - password
+              - repeatPassword
+              - dateOfBirth
+            properties:
+              fullName:
+                type: string
+                example: "Steve Baek"
+              email:
+                type: string
+                example: "email@email.com"
+              dateOfBirth:
+                type: string
+                example: "1997-06-23"
+              password:
+                type: string
+                example: "abcde123"
+              repeatPassword:
+                type: string
+                example: "abcde123"
     commentReq:
       required: true
       content:
@@ -303,6 +481,13 @@ components:
               result:
                 type: string
                 example: "success"
+    userRes:
+      content:
+        application/json:
+          schema:
+            type: object
+            items:
+              $ref: "#/components/schemas/User"
     remembrancesRes:
       content:
         application/json:
@@ -340,6 +525,18 @@ components:
             $ref: "#/components/schemas/Obituary"
 
 paths:
+  /api/users/register:
+    post:
+      tags:
+      - Users
+      summary: 유저 회원가입
+      description: 이름, 이메일, 생일, 비밀번호를 입력받아 유저 회원가입, 추모 데이터 생성
+      requestBody:
+        $ref: '#/components/requestBodies/userRegister'
+      responses:
+        201:
+          description: 회원 가입 성공한 유저 데이터
+          $ref: "#/components/responses/userRes"
   /api/remembrances:
     get:
       tags:
