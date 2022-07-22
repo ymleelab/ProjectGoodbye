@@ -63,15 +63,37 @@ components:
             description: "수신자의 objectId"
             example: "62d0e380a665e5eb53d0a80f"
           description: "유저가 작성한 유언장의 수신자 리스트"
-
-    InputEmail:
+    Will:
       type: object
-      required:
-      - email
       properties:
-        email:
+        _id:
           type: string
-          example: "email@email.com"
+          description: '유언장 objectId'
+          example: "62cfdc9235dc3ae2670e05bd"
+        title:
+          type: string
+          description: '유언장 제목'
+          example: '사랑하는 어머니께'
+        content:
+          type: string
+          description: '유언장 내용'
+          example: '보고싶을거에요..'
+        userId:
+          type: string
+          description: '유언장을 작성한 유저의 objectId'
+          example: "62ce0b33ae074e2a043f1d09"
+        recevers:
+          type: array
+          items:
+            type: object
+            properties:
+              receiverId:
+                type: string
+                description: '수신자 objectId'
+              email:
+                type: string
+                description: '수신자 이메일'
+    
     UserDelete:
       type: object
       required:
@@ -394,6 +416,12 @@ components:
           description: '상주 이름'
           example: '홍철수'
   parameters:
+    willIdParam:
+      name: willId
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/Will/properties/_id"
     remembranceIdParam:
       name: remembranceId
       in: path
@@ -444,9 +472,12 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            items:
-              $ref: "#/components/schemas/User"
+            $ref: "#/components/schemas/User"
+    willRes:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Will"
     remembrancesRes:
       content:
         application/json:
@@ -586,6 +617,31 @@ paths:
         200:
           description: 이메일 전송 성공
           $ref: "#/components/responses/resultRes"
+  /api/users/:willId:
+    post:
+      tags:
+      - Users
+      summary: 유언장 상세 - 수신자 Ver
+      description: willId와 수신자의 이메일을 전달 받아 해당 유언장의 수신자로 등록된 이메일이 맞는지 확인 후 유언장 데이터 반환
+      parameters:
+      - $ref: "#/components/parameters/willIdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - email
+              properties:
+                email:
+                  type: string
+                  description: "유언장 수신자의 이메일"
+                  example: "email@email.com"
+      responses:
+        200:
+          description: 수신자 확인 성공
+          $ref: "#/components/responses/willRes"
   /api/remembrances:
     get:
       tags:
