@@ -77,6 +77,33 @@ npm run start
 <p align="center"><a href="https://nextjs.org/"><img src="https://upload.wikimedia.org/wikipedia/commons/8/8e/Nextjs-logo.svg" height="70"/></a>　　　　　　<a href="https://react-redux.js.org/"><img src="https://upload.wikimedia.org/wikipedia/commons/4/49/Redux.png" height="80"/></a></p>
 <p align="center"><a href="https://nodejs.org"><img src="https://upload.wikimedia.org/wikipedia/commons/d/d9/Node.js_logo.svg" height="70"/></a>　　　　　　<a href="https://expressjs.com"><img src="https://upload.wikimedia.org/wikipedia/commons/6/64/Expressjs.png" height="50"/></a>　　　　　　<a href="https://www.typescriptlang.org"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Typescript_logo_2020.svg" height="60"/></a></p>
 <p align="center"><a href="https://www.mongodb.com"><img src="https://upload.wikimedia.org/wikipedia/commons/9/93/MongoDB_Logo.svg" height="60"/></a></p>
+<br>
+<details><summary><strong>Frontend</strong></summary>
+<ul>
+    <li>[NextJs 프로젝트](https://nextjs.org/)</li>
+    <li>[상태관리 - reduxjs/toolkit](https://redux-toolkit.js.org/)</li>
+    <li>[axios 요청](https://github.com/axios/axios)</li>
+    <li>[AntDesign 스타일링](https://ant.design/)</li>
+    <li>[Emotion 스타일링](https://emotion.sh/docs/introduction)</li>
+    <li>[NProgress](https://www.npmjs.com/package/nprogress)</li>
+</ul>
+</details>
+<details><summary><strong>Backend</strong></summary>
+<ul>
+    <li>[ExpressJS framework](https://expressjs.com/)</li>
+    <li>[TypeScript](https://www.typescriptlang.org/)</li>
+    <li>[MongoDB Atlas](https://www.mongodb.com/ko-kr)</li>
+    <li>[JOI validator](https://joi.dev/api/)</li>
+    <li>[Passport 유저 인증](https://www.passportjs.org/)</li>
+    <li>[Bcrypt 암호화](https://www.npmjs.com/package/bcrypt)</li>
+    <li>[JsonWebToken](https://www.npmjs.com/package/jsonwebtoken)</li>
+    <li>[Swagger open API](https://swagger.io/)</li>
+    <li>[Multer](https://www.npmjs.com/package/multer)</li>
+    <li>[AWS s3 및 cloudfront](https://aws.amazon.com/ko/s3/)</li>
+    <li>[smtp - nodemailer](https://nodemailer.com/about/)</li>
+    <li>[cors](https://www.npmjs.com/package/cors)</li>
+</ul>
+</details>
 
 <br>
 <br>
