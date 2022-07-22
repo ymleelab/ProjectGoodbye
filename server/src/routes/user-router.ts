@@ -97,30 +97,8 @@ usersRouter.post(
         }
     },
 );
-// 결국에는 한 유저의 유언장 목록을 전체 전송해야 할텐데, 이부분을 back에서 다 찾아서 전송하는 api가 맞을까, front가 client에서 여러번 요청을 하는게 나을까
 
-/**
- * @swagger
- * /api/users/sendEmail:
- *   post:
- *     tags: [Users]
- *     summary: 기본적인 receivers, subject, html 정보를 받아서 이메일은 전송 시키는 API
- *     description: receivers로 보낼 이메일 주소가 담긴 배열, subject로 이메일 제목, html로 html형식의 string을 받아서 이메일을 전송 시키는 api
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Email'
- *     responses:
- *       200:
- *         description: 성공적으로 이메일이 보내지면 result- success를 JSON 형태로 반환
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *
- */
+// 결국에는 한 유저의 유언장 목록을 전체 전송해야 할텐데, 이부분을 back에서 다 찾아서 전송하는 api가 맞을까, front가 client에서 여러번 요청을 하는게 나을까
 usersRouter.post(
     '/sendEmail',
     async (req: Request, res: Response, next: NextFunction) => {

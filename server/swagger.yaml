@@ -105,24 +105,6 @@ components:
         currentPassword:
           type: string
           example: "12345"
-    Email:
-      type: object
-      required:
-        - receivers
-        - subject
-        - html
-      properties:
-        receivers:
-          type: array
-          items:
-            type: string
-          example: ["email@email.com","example@email.com"]
-        subject:
-          type: string
-          example: "Hello"
-        html:
-          type: string
-          example: "<h1>Hello world</h1>"
     TrustedUserInfo:
       type: object
       required:
@@ -449,7 +431,7 @@ components:
               password:
                 $ref: "#/components/schemas/Comment/properties/password"
   responses:
-    deleteRes:
+    resultRes:
       content:
         application/json:
           schema:
@@ -569,6 +551,41 @@ paths:
                   userId:
                     type: string
                     description: "로그인 성공한 유저의 userId"
+  /api/users/sendEmail:
+    post:
+      tags:
+      - Users
+      summary: 이메일 전송
+      description: 수신자, 제목, html 형식의 내용을 받아 이메일로 전송
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - receivers
+                - subject
+                - html
+              properties:
+                receivers:
+                  type: array
+                  items:
+                    type: string
+                  description: "이메일 수신자 리스트"
+                  example: ["email@email.com","example@email.com"]
+                subject:
+                  type: string
+                  description: "이메일 제목"
+                  example: "Hello"
+                html:
+                  type: string
+                  description: "html 형식으로 작성된 이메일 본문"
+                  example: "<h1>Hello world</h1>"
+      responses:
+        200:
+          description: 이메일 전송 성공
+          $ref: "#/components/responses/resultRes"
   /api/remembrances:
     get:
       tags:
@@ -671,7 +688,7 @@ paths:
       responses:
         201:
           description: "추모글 데이터 삭제"
-          $ref: "#/components/responses/deleteRes"
+          $ref: "#/components/responses/resultRes"
   /api/obituaries:
     post:
       tags:
@@ -736,4 +753,4 @@ paths:
       responses:
         201:
           description: "부고 데이터 삭제"
-          $ref: "#/components/responses/deleteRes"
+          $ref: "#/components/responses/resultRes"
