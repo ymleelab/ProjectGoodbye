@@ -104,14 +104,6 @@ components:
         currentPassword:
           type: string
           example: "12345"
-    ConfirmDeath:
-      type: object
-      required:
-      - dateOfDeath
-      properties:
-        dateOfDeath:
-          type: string
-          example: "2022-07-20"
     WillPost:
       type: object
       required:
@@ -771,10 +763,10 @@ paths:
       - $ref: "#/components/parameters/userIdParam"
       - in: query
         name: token
+        required: true
         schema:
           type: string
-          description: 요청한 유저와 요청 받은 유저의 정보가 담긴 토큰
-        required: true
+        description: 요청한 유저와 요청 받은 유저의 정보가 담긴 토큰
       responses:
         200:
           description: 신뢰하는 유저 등록 성공
@@ -789,6 +781,37 @@ paths:
                   toUpdateTrustedUser:
                     $ref: "#/components/responses/userRes"
                     description: '요청 받은(현재 로그인된) 유저의 정보'
+  /api/auth/{userId}/managedUsers/{managedUserId}:
+    patch:
+      tags:
+      - Auth
+      security:
+      - bearerAuth: []
+      summary: 유저의 사망 정보 등록 및 유언장 발송
+      description: 로그인한 유저(A)를 신뢰하는 유저로 등록한 유저(B)가 사망 시 사망일자를 입력하고 B의 유언장을 전송
+      parameters:
+      - $ref: "#/components/parameters/userIdParam"
+      - in: path
+        name: managedUserId
+        required: true
+        schema:
+          type: string
+        description: '사망 처리할 유저의 objectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - dateOfDeath
+              properties:
+                dateOfDeath:
+                  $ref: "#/components/schemas/Remembrance/properties/dateOfDeath"
+      responses:
+        200:
+          description: 사망 처리 성공
+          $ref: "#/components/responses/resultRes"
   /api/remembrances:
     get:
       tags:

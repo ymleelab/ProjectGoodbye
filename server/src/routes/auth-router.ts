@@ -322,37 +322,7 @@ authRouter.patch(
         }
     },
 );
-/**
- * @swagger
- * /api/auth/{userId}/managedUsers/{managedUserId}:
- *   patch:
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *         required: true
- *       - in: path
- *         name: managedUserId
- *         schema:
- *           type: string
- *         required: true
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             $ref: '#/components/schemas/ConfirmDeath'
- *     tags: [AuthEmail]
- *     summary: TrustedUser가 managedUser가 죽었을 경우, 사망일자와 함께 유언장 url과 추모 url이 첨부된 이메일을 보내는 API
- *     description: 예를 들어서 유저 B가 A가 사망하여서 유언장 전송하기를 누름, 그러면 modal에 사망일자를 입력하게 되고, 사망일자를 입력하면 A가 등록한 모든 유언장에서 이메일 정보를 써서 url(추모, 유언장) 링크가 들은 email을 발송함.
- *     responses:
- *       200:
- *         description: 성공 시 result-success
- *
- */
+
 authRouter.post(
     '/:userId/managedUsers/:managedUserId',
     async (req: Request, res: Response, next: NextFunction) => {
