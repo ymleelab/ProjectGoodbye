@@ -11,7 +11,7 @@
 
 <br>
 
-[서비스 바로가기](http://kdt-sw2-seoul-team11.elicecoding.com) | [기획 바로가기](기획) | [API 문서 바로가기](https://kdt-gitlab.elice.io/sw_track/class_02_seoul/web_project_2/team11/project-goodbye/-/blob/dev/server/swagger.yaml)
+[서비스 바로가기](http://kdt-sw2-seoul-team11.elicecoding.com) | [기획 바로가기](https://kdt-gitlab.elice.io/sw_track/class_02_seoul/web_project_2/team11/project-goodbye/-/wikis/기획) | [API 문서 바로가기](https://kdt-gitlab.elice.io/sw_track/class_02_seoul/web_project_2/team11/project-goodbye/-/blob/dev/server/swagger.yaml)
 
 <br>
 <br>
@@ -39,9 +39,9 @@
 <br>
 
 _조금 더 자세한 내용은 Wiki Page를 이용해주세요._
-> [:envelope: 유언장 관련 기능](유언장)<br>   
-[:reminder_ribbon: 추모 관련 기능](추모)<br>   
-[:busts_in_silhouette: 회원 관련 기능](회원)
+> [:envelope: 유언장 관련 기능](https://kdt-gitlab.elice.io/sw_track/class_02_seoul/web_project_2/team11/project-goodbye/-/wikis/유언장)<br>   
+[:reminder_ribbon: 추모 관련 기능](https://kdt-gitlab.elice.io/sw_track/class_02_seoul/web_project_2/team11/project-goodbye/-/wikis/추모)<br>   
+[:busts_in_silhouette: 회원 관련 기능](https://kdt-gitlab.elice.io/sw_track/class_02_seoul/web_project_2/team11/project-goodbye/-/wikis/회원)
 
 <br>
 <br>
