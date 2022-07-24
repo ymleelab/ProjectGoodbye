@@ -58,7 +58,7 @@ npm run start
 ```
 <br>
 
-**Backend** - Typescript   
+**Backend** - NodeJs   
 ```bash
 # 개발
 npm run dev
