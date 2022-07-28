@@ -1,6 +1,3 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { Card } from 'antd';
@@ -9,25 +6,9 @@ import 'antd/dist/antd.css';
 import Image from 'next/image';
 import willAd from '../assets/will_ad.jpg';
 import AppLayout from '../components/AppLayout';
+import RemembranceList from '../components/remembranceList'
 
 const Home = () => {
-	const [currentRB, setCurrentRB] = useState([]);
-
-
-  const getRecentRBData = async () => {
-    try {
-      const res = await axios.get(`/api/remembrances/recent?count=6`);
-      setCurrentRB([...res.data])
-    } catch (error) {
-      console.log(error);
-    }
-    
-  } 
-  
-  useEffect(() => {
-      getRecentRBData();
-  }, [])
-
 	return (
 		<AppLayout>
 			<div css={adBoxStyle}>
@@ -74,36 +55,7 @@ const Home = () => {
         </ObituaryDiv>
         <ObituaryImg /> 
       </ObituaryBox> */}
-			<BoxStyle>
-				<div css={currentProgress}>
-					<h1>현재 진행중인 추모식</h1>
-					<p>진행중인 추모</p>
-					<div css={CardGroup}>
-						{currentRB.map((death, i) => {
-							return (
-								death.dateOfDeath && (
-									<div
-										key={`${death._id} + ${i}`}
-										css={progessCard}
-									>
-										<a
-											href={`http://kdt-sw2-seoul-team11.elicecoding.com:5001/remembrance?remembranceId=${death._id}`}
-										>
-											<Card
-												title={death.fullName}
-												bordered={true}
-											>
-												<p>{`${death.dateOfBirth} \n~`}</p>
-												<p>{`${death.dateOfDeath}`}</p>
-											</Card>
-										</a>
-									</div>
-								)
-							);
-						})}
-					</div>
-				</div>
-			</BoxStyle>
+			<RemembranceList />
 		</AppLayout>
 	);
 };
@@ -156,6 +108,8 @@ const RbImg = styled.div`
 
 const RmBox = styled.div`
 	display: flex;
+	height: 90vh;
+	margin: 0 5em;
 	flex-direction: column;
 	align-items: center;
 `;
@@ -196,7 +150,7 @@ const ObituaryImg = styled.div`
 const adBoxStyle = css`
 	display: flex;
 	width: 100%;
-	height: 30rem;
+	height: 100vh;
 	margin: 10rem 0;
 	padding: 2rem;
 	align-item: center;
@@ -207,7 +161,8 @@ const adBoxStyle = css`
 `;
 const BoxStyle = styled.div`
 	width: 100%;
-	margin: 10rem 0;
+	//height: 100vh;
+	margin-bottom: 10rem;
 	padding: 2rem;
 `;
 
