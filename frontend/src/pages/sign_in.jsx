@@ -2,7 +2,7 @@ import React, { useCallback, useState, useEffect } from 'react';
 import { Form } from 'antd';
 import { css } from '@emotion/react';
 import useInput from '../hooks/useInput';
-import AppLayout from '../components/AppLayout';
+import { AppLayout } from '../components';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { USERACTIONS } from '../reducers/user';

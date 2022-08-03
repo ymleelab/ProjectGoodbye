@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useCallback, createContext, useRef } from "react";
-import Router, { useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import axios from 'axios';
 
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import { Comment, Form, Modal, Input } from "antd";
+import { Form, Modal, Input } from "antd";
 import 'antd/dist/antd.css';
 
 import { BsFlower1 } from 'react-icons/bs';
-import { TbRectangleVertical } from 'react-icons/tb';
-import AppLayout from "../components/AppLayout";
+import { AppLayout } from "../components";
 import { Button } from "../util/common_styles";
 import Flower from '../assets/lily.svg';
 
@@ -193,7 +192,6 @@ const remembrance = () => {
         }
     }
     
-    // remembranceId예시 62d7b9e42f66fc6992fe82e1
     
     
     const getRemembranceData = async (remembranceId) => {
@@ -285,7 +283,6 @@ const remembrance = () => {
                     <Portrait>
                         <Frame>
                             <FrameImages>
-                                {/* <TbRectangleVertical className={'frame_svg'} /> */}
                                 <img src={userData.photo} />
                             </FrameImages>
                         </Frame>
@@ -328,12 +325,6 @@ const remembrance = () => {
     )
 }
 
-{/* <FcFrame />
-<MdOutlineCropPortrait />
-<MdPortrait />
-<BsFlower1 />
-<GiFlowerPot />
-<GiGraveFlowers /> */}
 
 export default remembrance;
 

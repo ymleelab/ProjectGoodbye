@@ -6,9 +6,9 @@ import {
     FaInstagram,
     FaTwitter,
 } from 'react-icons/fa';
-import { Button, Modal } from 'antd';
+import { Modal } from 'antd';
 import styled from '@emotion/styled';
-import RemembranceList from '../components/remembranceList'
+import {RemembranceList} from './remembranceList';
 
 const Footer = () => {
     const [modal2Visible, setModal2Visible] = useState(false);

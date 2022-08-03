@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import AppLayout from '../components/AppLayout';
+import { AppLayout } from '../components';
 import { Button } from 'antd';
 import 'antd/dist/antd.css';
 import { css } from '@emotion/react';

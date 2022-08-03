@@ -150,7 +150,7 @@ const ReceiverList = ({ will }) => {
     )
 }
 
-export default ReceiverList;
+export {ReceiverList};
 
 const ListWrapper = styled.div`
     display: flex;

@@ -9,7 +9,7 @@ import styled from '@emotion/styled';
 import 'antd/dist/antd.css';
 const { confirm } = Modal;
 
-import AppLayout from '../components/AppLayout';
+import { AppLayout } from '../components';
 import useInput from '../hooks/useInput';
 import Image from 'next/image';
 import axios from 'axios';

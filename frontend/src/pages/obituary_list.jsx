@@ -1,4 +1,4 @@
-import AppLayout from '../components/AppLayout';
+import { AppLayout } from '../components';
 import Image from 'next/image';
 import Link from 'next/link';
 import { css } from '@emotion/react';

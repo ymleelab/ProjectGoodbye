@@ -1,12 +1,11 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import { Card } from 'antd';
 import 'antd/dist/antd.css';
 
-import Image from 'next/image';
 import willAd from '../assets/will_ad.jpg';
-import AppLayout from '../components/AppLayout';
-import RemembranceList from '../components/remembranceList'
+import { AppLayout,
+	     RemembranceList
+ } from '../components';
 
 const Home = () => {
 	return (
@@ -18,17 +17,9 @@ const Home = () => {
 						<br />
 						유언장
 					</h1>
-					{/* <h1>유언장</h1> */}
 					<p>소중한 추억을 전하세요</p>
 				</WillDiv>
 				<WillImg alt="유언장 소개 이미지" />
-				{/* <div css={imageStyle}>
-          <Image
-            src={willAd}
-            alt="유언장 이미지"
-            layout='fill'
-          />
-        </div> */}
 			</div>
 			<RmBox>
 				<RbDiv>
@@ -39,22 +30,8 @@ const Home = () => {
 					</h1>
 					<p>함께 슬픔을 나누세요</p>
 				</RbDiv>
-				{/* <div css={imageStyle}>
-          <Image
-            src="https://images.unsplash.com/photo-1595062584313-47018e0ee5cb?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8ZnVuZXJhbHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=600&q=60"
-            alt="추모 이미지"
-            layout='fill'
-          />
-        </div> */}
 				<RbImg alt="추모 소개 이미지" />
 			</RmBox>
-			{/* <ObituaryBox>
-        <ObituaryDiv>
-          <h1>온라인<br/>부고<br/>서비스</h1>
-          <p>쉽게 부고를 작성하고 알리세요</p>
-        </ObituaryDiv>
-        <ObituaryImg /> 
-      </ObituaryBox> */}
 			<RemembranceList />
 		</AppLayout>
 	);

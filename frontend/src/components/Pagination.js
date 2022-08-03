@@ -55,7 +55,7 @@ const Pagination = ({ currPage, pageCount, onClickPage }) => {
     )
 }
 
-export default Pagination;
+export {Pagination};
 
 
 const Container = styled.div`
@@ -80,8 +80,3 @@ const Button = styled.button`
         color: #F9FAFC;
     `}
 `
-
-// const ArrowButton = styled.button`
-//     color: #3E606F;
-//     background-color: #D1DBBD;
-// `

@@ -4,7 +4,7 @@ import { OBITUARYACTIONS } from '../reducers/obituary'
 import Link from 'next/link';
 import axios from 'axios';
 
-import AppLayout from '../components/AppLayout';
+import { AppLayout } from '../components';
 import { Button as CommonButton } from './../util/common_styles';
 import useInput from '../hooks/useInput';
 

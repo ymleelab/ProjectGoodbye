@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import AppLayout from '../components/AppLayout';
+import { AppLayout } from '../components';
 import { Button } from 'antd';
 import 'antd/dist/antd.css';
 import { css } from '@emotion/react';
@@ -66,7 +66,7 @@ const mainWrapper = css`
 	margin: 10em auto; //추가
 `;
 
-const sectionWrapper = css`
-	// width: 25em; //longer than signin
+				const sectionWrapper = css`
+					// width: 25em; //longer than signin
 	// margin: auto;
 `;

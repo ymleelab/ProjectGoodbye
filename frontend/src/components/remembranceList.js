@@ -58,7 +58,7 @@ const RemembranceList = () => {
     )
 }
 
-export default RemembranceList;
+export {RemembranceList};
 
 const BoxStyle = styled.div`
 	width: 100%;

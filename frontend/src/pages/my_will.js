@@ -8,22 +8,22 @@ import React, {
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 
+import Image from 'next/image';
+import Link from 'next/link';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { Card } from 'antd';
 import 'antd/dist/antd.css';
 
-import Image from 'next/image';
-import Link from 'next/link';
-import AppLayout from '../components/AppLayout';
-import Pagination from '../components/Pagination';
-import ReceiverList from '../components/ReceiverList';
 
+import {
+	AppLayout,
+	Pagination,
+	ReceiverList
+} from '../components';
 import { Button } from '../util/common_styles';
-import userLoginCheck from '../util/userLoginCheck';
 import { WillACTIONS } from '../reducers/will';
 import { RECEIVERACTIONS } from '../reducers/receivers';
-import getUserIdToken from '../util/getUserIdToken';
 
 /* 
 	로그인 한 상태에서만 유언장 페이지에 접근가능
@@ -32,8 +32,8 @@ import getUserIdToken from '../util/getUserIdToken';
 
 const MyWill = () => {
 	const dispatch = useDispatch();
-	const [willList, allReceiverList] = useSelector((state) => {
-		return [state.will.willList, state.receivers.allReceiverList];
+	const willList = useSelector((state) => {
+		return state.will.willList;
 	});
 	const { logInState } = useSelector((state) => state.user);
 	const [currentPage, setCurrentPage] = useState(1);

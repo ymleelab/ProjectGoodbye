@@ -4,7 +4,7 @@ import Router, { useRouter } from 'next/router';
 import VirtualList from 'rc-virtual-list';
 import axios from 'axios';
 
-import AppLayout from '../components/AppLayout';
+import { AppLayout } from '../components';
 import useInput from '../hooks/useInput';
 import userLoginCheck from '../util/userLoginCheck';
 

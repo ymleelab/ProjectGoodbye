@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import Router, { useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import axios from 'axios';  
 
 import styled from "@emotion/styled";
 
 import useInput from "../hooks/useInput";
-import AppLayout from '../components/AppLayout';
+import { AppLayout } from '../components';
 import { Button } from '../util/common_styles';
 
 const will_check_page = () => {

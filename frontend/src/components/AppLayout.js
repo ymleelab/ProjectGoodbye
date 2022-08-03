@@ -22,7 +22,7 @@ const AppLayout = ({ children }) => {
 	);
 };
 
-export default AppLayout;
+export { AppLayout };
 
 const Wrapper = styled.div`
 	z-index: 2;

@@ -9,12 +9,11 @@ import { Divider, List, Modal, Input } from 'antd';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
-import AppLayout from '../components/AppLayout';
+import { AppLayout } from '../components';
 import { Button } from '../util/common_styles';
 
 const receiver_page = () => {
 	const dispatch = useDispatch();
-	const router = useRouter();
 	const { logInState } = useSelector((state) => state.user);
 
 	/*
@@ -26,7 +25,6 @@ const receiver_page = () => {
 	const { familyList, friendList, relativeList, acquaintanceList } =
 		useSelector((state) => state.receivers);
 	const [registFormVisible, setRegistFormVisible] = useState(false);
-	// const [relationValue, setRelationValue] = useState('');
 
 	
 	const [InputValues, setInputValues] = useState({
