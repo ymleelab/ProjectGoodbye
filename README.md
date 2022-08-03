@@ -1,4 +1,4 @@
-# :pen_ballpoint: Project GoodBye
+🖊 Project GoodBye
 ## 01 서비스 소개
 
 > 소중한 사람들에게 전하는 마지막 인사, **GoodBye**
@@ -76,7 +76,11 @@ npm run start
 <p align="center"><a href="https://nextjs.org/"><img src="https://upload.wikimedia.org/wikipedia/commons/8/8e/Nextjs-logo.svg" height="70"/></a>　　　　　　<a href="https://react-redux.js.org/"><img src="https://upload.wikimedia.org/wikipedia/commons/4/49/Redux.png" height="80"/></a></p>
 <p align="center"><a href="https://nodejs.org"><img src="https://upload.wikimedia.org/wikipedia/commons/d/d9/Node.js_logo.svg" height="70"/></a>　　　　　　<a href="https://expressjs.com"><img src="https://upload.wikimedia.org/wikipedia/commons/6/64/Expressjs.png" height="50"/></a>　　　　　　<a href="https://www.typescriptlang.org"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Typescript_logo_2020.svg" height="60"/></a></p>
 <p align="center"><a href="https://www.mongodb.com"><img src="https://upload.wikimedia.org/wikipedia/commons/9/93/MongoDB_Logo.svg" height="60"/></a></p>
-<img src="https://kdt-gitlab.elice.io/sw_track/class_02_seoul/web_project_2/team11/project-goodbye/-/wikis/uploads/67cea2a78ba61f0df459658e99e2dc12/image.png" width="500" />
+
+![db](https://user-images.githubusercontent.com/97888284/182645840-153b4242-fc54-4ba8-8a41-5e3dfb42e7a6.png)
+
+
+
 <br>
 <details><summary><strong>Frontend</strong></summary>
 <ul>
@@ -112,7 +116,7 @@ npm run start
 
 | 이름 | 포지션 | 담당 |
 |:-----:|:-------:|-----|
-| 백성호<br><a href="https://github.com"><img src="/uploads/47560f0a69d63c70afc02fbb0fac3a0b/free-icon-github-logo-25231.png" width="20" height="20"/></a> | _팀장_<br>BE | 유저 및 유언장 관련 API 구현, 이메일 전송 기능 구현 |
-| 권강훈<br><a href="https://github.com"><img src="/uploads/47560f0a69d63c70afc02fbb0fac3a0b/free-icon-github-logo-25231.png" width="20" height="20"/></a> | FE | 메인·추모·유언장 목록·수신자 목록 페이지 구현, 페이지네이션 컴포넌트 구현 |
-| 이영민<br><a href="https://github.com"><img src="/uploads/47560f0a69d63c70afc02fbb0fac3a0b/free-icon-github-logo-25231.png" width="20" height="20"/></a> | FE | 회원가입 및 로그인·마이페이지·유언장 상세 페이지 구현, 권한 부여 로직 처리 |
-| 전가영<br><a href="https://github.com/dsyhwk1016"><img src="/uploads/47560f0a69d63c70afc02fbb0fac3a0b/free-icon-github-logo-25231.png" width="20" height="20"/></a> | BE | 추모 및 추모글 관련 API 구현, 이미지 업로드 기능 구현, 서비스 배포 |
+| 백성호<br> | _팀장_<br>BE | 유저 및 유언장 관련 API 구현, 이메일 전송 기능 구현 |
+| 권강훈<br> | FE | 메인·추모·유언장 목록·수신자 목록 페이지 구현, 페이지네이션 컴포넌트 구현 |
+| 이영민<br> | FE | 회원가입 및 로그인·마이페이지·유언장 상세 페이지 구현, 권한 부여 로직 처리 |
+| 전가영<br> | BE | 추모 및 추모글 관련 API 구현, 이미지 업로드 기능 구현, 서비스 배포 |
