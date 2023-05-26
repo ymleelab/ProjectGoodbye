@@ -1,8 +1,8 @@
 import React from 'react';
-import Router from "next/router";
+import Router from 'next/router';
 import Head from 'next/head';
-import NProgress from "nprogress";
-import "nprogress/nprogress.css";
+import NProgress from 'nprogress';
+import 'nprogress/nprogress.css';
 import wrapper from '../store/configureStore';
 
 function MyApp({ Component }) {
@@ -14,14 +14,33 @@ function MyApp({ Component }) {
 			NProgress.done();
 		};
 
-		Router.events.on("routeChangeStart", start);
-		Router.events.on("routeChangeComplete", end);
-		Router.events.on("routeChangeError", end);
+		((o) => {
+			if (document.getElementById(o.scriptId)) return;
+			const d = document,
+				t = 'script',
+				$script = d.createElement(t),
+				$element = d.getElementsByTagName(t)[0];
+			$script.id = o.scriptId;
+			$script.src =
+				'https://hey-there.io/hey-there-resource/button/' +
+				o.appId +
+				'.js';
+			$script.async = true;
+			$script.defer = true;
+			$element.parentNode.insertBefore($script, $element);
+		})({
+			scriptId: 'hey-there-loader',
+			appId: 'bb4b190e-9bdd-450c-b971-5e68d8baf955',
+		});
+
+		Router.events.on('routeChangeStart', start);
+		Router.events.on('routeChangeComplete', end);
+		Router.events.on('routeChangeError', end);
 
 		return () => {
-			Router.events.off("routeChangeStart", start);
-			Router.events.off("routeChangeComplete", end);
-			Router.events.off("routeChangeError", end);
+			Router.events.off('routeChangeStart', start);
+			Router.events.off('routeChangeComplete', end);
+			Router.events.off('routeChangeError', end);
 		};
 	}, []);
 	return (
@@ -37,7 +56,5 @@ function MyApp({ Component }) {
 		</>
 	);
 }
-
-
 
 export default wrapper.withRedux(MyApp);
